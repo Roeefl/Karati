@@ -1,0 +1,119 @@
+@import url(https://fonts.googleapis.com/css?family=Varela+Round);
+
+.nav-list {
+  list-style: none; 
+  text-align: center;
+}
+
+.nav-list a {
+  text-decoration:none;
+  transition:color 0.3s ease-out;
+  color:inherit;
+}
+
+.nav-list li {
+  position:relative;
+  display:inline-block;
+  margin:5px;
+  letter-spacing:-1px;
+}
+
+.db_list:after, 
+.db_list:before,
+.db_list a:after, 
+.db_list a:before {
+  background-color:#CEDD3E;
+}
+
+.db_list:hover {
+  color:#CEDD3E
+}
+
+.gr_by_author:after, 
+.gr_by_author:before,
+.gr_by_author a:after, 
+.gr_by_author a:before {
+  background-color:#F27132;
+}
+
+.gr_by_author:hover {
+  color:#F27132;
+}
+
+.swipe:after, 
+.swipe:before,
+.swipe a:after, 
+.swipe a:before {
+  background-color:#85C3E9;
+}
+
+.swipe:hover{
+  color:#85C3E9;
+}
+
+.about:after, 
+.about:before,
+.about a:after, 
+.about a:before{
+  background-color:#FDBE2A;
+}
+
+.about:hover{
+  color:#FDBE2A;
+}
+
+.nav-list li:after, 
+.nav-list li:before, 
+.nav-list  a:before, 
+.nav-list  a:after{
+  position:absolute;
+  content:'';
+  border-radius:4px;
+}
+
+.nav-list li:after,
+.nav-list li:before{
+  bottom:-4px;
+  height:4px;
+}
+
+.nav-list li:not(.selected):before{
+  left:0;
+  right:-2px;
+}
+
+.nav-list li.selected:after{
+  left:0;
+  right:39px; 
+}
+
+.nav-list li.selected:before{
+  right:-2px;
+  width:13px;
+}
+
+
+.nav-list .selected a:before{
+  height:22px;
+  width:4px;
+  bottom:-22px;
+  right:7px;
+}
+
+.nav-list .selected a:after{
+  height:4px;
+  width:40px;
+  bottom:-13px;
+  right:5px;
+  transform:rotate(30deg);
+}
+
+.wrapper {
+  width:500px;
+  margin:0 auto;
+}
+
+.nav-title {
+  text-align: center;
+  padding-bottom: .5em;
+}

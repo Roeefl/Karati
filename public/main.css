@@ -1,0 +1,104 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto');
+
+/* color Scheme:
+  Pineapple: #44355B
+  Dark Purple: #31263E
+  Raisin Black: #221E22
+  Buff: #F4CF8B
+  Flame: #EE5622
+ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font: 16px/1 'Roboto', sans-serif;
+  background-color: #221E22;
+  -webkit-font-smoothing: antialiased;
+  margin: 0;
+  height: 100%;
+}
+
+header {
+  height: 100px;
+  color: #EE5622;
+}
+
+nav {
+  height: 100px;
+  color: #EE5622;
+}
+
+main {
+  color: #EE5622;
+}
+
+.pineapple {
+  color: #44355B
+}
+.dark-purple {
+  color: #31263E;
+}
+.raisin-black {
+  color: #221E22;
+}
+.buff {
+  color: #F4CF8B;
+}
+.flame {
+color: #EE5622;
+}
+
+  
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+  font-size: 100%;
+  vertical-align: baseline;
+  border: 0;
+  outline: 0;
+  color:black;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+#main-content-container {
+  min-height: 300px;
+}
+
+#goodreads-query {
+  margin-bottom: 40px;
+}
+
+.hidden {
+  display: none;
+}
+
+#grid-books {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-around;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#swipe-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.round-frame {
+  border: 1px solid #44355B;
+  -webkit-border-radius: 20px;
+  -moz-border-radius: 20px;
+  border-radius: 20px;
+}

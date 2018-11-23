@@ -1,0 +1,42 @@
+.grid-book {
+    width: 200px;
+    min-height: 200px;
+    margin-top: 30px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+.grid-book .book-frame {
+  flex: 6;
+  display: flex;
+  flex-direction: column;
+}
+
+.grid-book .book-img {
+  width: fit-content;
+  flex: 5;
+}
+
+.grid-book .book-desc {
+  flex: 1;
+  font-size: 8px;
+  padding: 6px;
+}
+
+.grid-book .book-options {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+}
+
+.grid-book .book-options .book-func {
+  flex: 1;
+}
+
+.grid-book .book-options .book-func button {
+  background-color: inherit;
+}
+
+  
