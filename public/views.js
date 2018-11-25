@@ -1,76 +1,176 @@
 let views = {
 
-    default: 'list_db',
+    default: 'myshelf',
 
-    loading: function() {
-        return `
-            <div id="loader-container">
-                <div class="book">
-                    <div class="book__pages">
-                        <div class="book__page book__page--left"></div>
-                        <div class="book__page book__page--right"></div>
-                
-                        <div class="book__page book__page--right book__page--animated"></div>
-                        <div class="book__page book__page--right book__page--animated"></div>
-                        <div class="book__page book__page--right book__page--animated"></div>
-                        <div class="book__page book__page--right book__page--animated"></div>
-                        <div class="book__page book__page--right book__page--animated"></div>
-                        <div class="book__page book__page--right book__page--animated"></div>
-                        <div class="book__page book__page--right book__page--animated"></div>
-                        <div class="book__page book__page--right book__page--animated"></div>
-                        <div class="book__page book__page--right book__page--animated"></div>
-                        <div class="book__page book__page--right book__page--animated"></div>
+    loading: {
+        render: function(callback) {
+            callback(`
+                <div id="loader-container">
+                    <div class="book">
+                        <div class="book__pages">
+                            <div class="book__page book__page--left"></div>
+                            <div class="book__page book__page--right"></div>
+                    
+                            <div class="book__page book__page--right book__page--animated"></div>
+                            <div class="book__page book__page--right book__page--animated"></div>
+                            <div class="book__page book__page--right book__page--animated"></div>
+                            <div class="book__page book__page--right book__page--animated"></div>
+                            <div class="book__page book__page--right book__page--animated"></div>
+                            <div class="book__page book__page--right book__page--animated"></div>
+                            <div class="book__page book__page--right book__page--animated"></div>
+                            <div class="book__page book__page--right book__page--animated"></div>
+                            <div class="book__page book__page--right book__page--animated"></div>
+                            <div class="book__page book__page--right book__page--animated"></div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        `;
+            `);
+        }
     },
 
-    list_db: function(callback) {
-        request('books', data => {
-            let pData = JSON.parse(data);
-
-            if (pData.error) {
-                if (pData.error == 30) {
-                    //  'NOT_LOGGED_IN'  : '30'
-                    callback(`
-                        <div id="not-logged-in">
-                            Error: not logged into system.
-                        </div>
-                    `);
-                }
-            } else {
-                callback(`
-                    <table id="all-books" class="table is-bordered is-hoverable">
-                        <thead>
-                            <tr>
-                            <th><abbr title="Position">_ID</abbr></th>
-                            <th><abbr title="Author">Author</abbr></th>
-                            <th><abbr title="Title">Title</abbr></th>
-                        </thead>
-                        <tbody id='all-books-content'>
-                            ${pData.map(book =>
-                                `<tr>
-                                    <td>${book._id}</td>
-                                    <td>${book.author}</td>
-                                    <td>${book.title}</td>
-                                </tr>
-                                `
-                            ).join('')
-                            }
-                        </tbody>
-                    </table>
-                `);
-            }
-        });
-    },
-
-    about: function(callback) {
-        callback(`
+    about: {
+        render: function(callback) {
+            callback(`
             <div>
                 Nothing
             </div>
         `);
+        }
+    },
+
+    myshelf: {
+        new: function() {
+            return {
+                children: [],
+
+                render: function(callback) {
+                    request('my-shelf', data => {
+                        let pData = JSON.parse(data);
+        
+                        if (pData.error) {
+                            if (pData.error == 30) {
+                                //  'NOT_LOGGED_IN'  : '30'
+                                callback(`
+                                    <div id="not-logged-in">
+                                        Error: not logged into system.
+                                    </div>
+                                `);
+                            } else if (pData.error == 32) {
+                                callback(`
+                                    <div id="shelf-is-empty">
+                                        Your shelf is empty.
+                                    </div>
+                                `);
+                            }
+                        } else {
+                            for (let bookData of pData) {
+                                this.children.push(
+                                    views.book.new(bookData, false)
+                                );
+                            }
+
+                            callback(`
+                                <ul class='grid-books'>
+                                    ${this.children.map(child => child.render()).join('')}
+                                </ul>
+                            `);
+                        }
+                    });
+                }
+            }
+        }
+    },
+
+    book: {
+        new: function(bookData, isFromGR) {
+            return {
+                id: `book_${Math.random()}`,
+                bookInfo: bookData,
+                isFromGoodreads: isFromGR,
+                state: {
+                    smileClass: 'flame'
+                },
+                toggleSmile: function(e, done) {
+                    if (this.state.smileClass == 'flame') {
+                        setState(this.id, {smileClass: 'pineapple'}, success => {
+                            console.log(this.state);
+                        });
+                    } else {
+                        setState(this.id, {smileClass: 'flame'}, success => {
+                            console.log(this.state);
+                        });
+                    }
+
+                    done();
+                },
+
+                doNothing: function(e, done) {
+                    done();
+                },
+
+                userAddOwnedBook: function(event, done) {
+                    event.preventDefault();
+        
+                    var data = {
+                        goodreadsID: this.bookInfo.id._
+                    };
+        
+                    $.post('/user-add-owned-book', data, response => {
+                        let pResponse = JSON.parse(response);
+
+                        if (pResponse.error) {
+                            console.log('data error');
+                        }
+
+                        if (pResponse.saved) {
+                            alert('Book saved to User');
+                        } else {
+                            alert('Book already attached to User');
+                        }
+
+                        done();
+                    });
+                },
+
+                render: function() {
+                    let author = '';
+                    let imageURL = '';
+                    let bookID = '';
+                    let title = this.bookInfo.title;
+                    let action = 'doNothing';
+        
+                    if (this.isFromGoodreads) {
+                        author = this.bookInfo.author.name;
+                        imageURL = this.bookInfo.image_url;
+                        bookID = this.bookInfo.id._;
+                        action = 'userAddOwnedBook';
+                    } else {
+                        author = this.bookInfo.author;
+                        imageURL = this.bookInfo.imageURL;
+                        bookID = this.bookInfo._id;
+                    }
+        
+                    return `
+                        <li class="grid-book">
+                            <img class="book-img" src="${imageURL}">
+                            <span class="book-desc">${title} by ${author}</span>
+                            <span class="book-options">
+                                <span class="book-func">
+                                    <button onclick="onAction('${this.id}', '${action}', event)">
+                                        <i class="fas fa-plus-circle"></i>
+                                    </button>
+                                </span>
+                                <span class="book-func">
+                                    <button onclick="onAction('${this.id}', 'toggleSmile', event)">
+                                        <i class="fas fa-grin-hearts ${this.state.smileClass}"></i>
+                                    </button>
+                                </span>
+                            </span>
+                        </li>
+                    `;
+                }
+            }
+        }
     },
 
     swipe: {
@@ -87,10 +187,10 @@ let views = {
                 if (views.swipe.availableSwipes.error) {
                     if (views.swipe.availableSwipes.error == 31) {
                         views.swipe.noMoreSwipes = true;
-                        reRender('swipe');
+                        reRender(this);
                     }
                 } else {
-                    reRender('swipe');
+                    reRender(this);
                 }
             });
         },
@@ -152,7 +252,7 @@ let views = {
 
             $.post('/user-swipe-book', data, result => {
                 views.swipe.availableSwipes.shift(); // remove swiped from available swipes
-                reRender('swipe');
+                reRender();
             });
         },
         swipeYes: function(event) {
@@ -166,79 +266,58 @@ let views = {
     },
 
     query: {
+        new: function() {
+            return {
+                id: `query_${Math.random()}`,
+                children: [],
 
-        pResults: [],
-
-        render: function(callback) {
-            callback(`
-                <div>
-                    <div id="goodreads-query">
-                        <form action="/goodreads-search-books" method="GET" onsubmit="onAction('query', 'search', event)">
-                            <input type="text" placeholder="Tolkien" name="query">
-                            <button type="submit" class="btn-prime fillup">Search using GoodReads API</button>
-                        </form>
-                    </div>
-                    <ul id="grid-books">
-                        ${views.query.pResults.map(result =>
-                            `<li class="grid-book">
-                                <img class="book-img" src="${result.best_book.image_url}">
-                                <span class="book-desc">${result.best_book.title} by ${result.best_book.author.name}</span>
-                                <span class="book-options">
-                                    <span class="book-func">
-                                        <form action="/user-add-owned-book" method="POST" onsubmit="onAction('query', 'userAddOwnedBook', event)">
-                                            <input type="text" style="display: none;" name="goodreadsid" value="${result.best_book.id._}">
-                                            <button type="submit"><i class="fas fa-plus-circle"></i></button>
-                                        </form>
-                                    </span>
-                                    <span class="book-func">
-                                        <i class="fas fa-grin-hearts"></i>
-                                    </span>
-                                </span>
-                            </li>
-                            `
-                            ).join('')
+                render: function(callback) {
+                    callback(`
+                        <div>
+                            <div id="goodreads-query">
+                                <form action="/goodreads-search-books" method="GET" onsubmit="onAction('${this.id}', 'search', event)">
+                                    <input type="text" placeholder="Tolkien" name="query">
+                                    <button type="submit" class="btn-prime fillup">Search using GoodReads API</button>
+                                </form>
+                            </div>
+                            <ul class="grid-books">
+                                ${this.children.map(child => child.render()).join('')}
+                            </ul>
+            
+                        </div>
+                    `)
+                },
+        
+                search: function(event, done) {
+                    event.preventDefault();
+        
+                    var data = {
+                        query: event.target.query.value
+                    };
+        
+                    // $.post('/goodreads-search-books', data, results => {
+                    $.post(event.target.action, data, results => {
+                        let parseResults =  JSON.parse(results);
+                        if (parseResults.error) {
+                            console.log('data error');
                         }
-                    </ul>
-    
-                </div>
-            `)
-        },
 
-        search: function(event) {
-            event.preventDefault();
+                        if (!Array.isArray(parseResults)) {
+                            this.children.push(views.book.new(parseResults.best_book));
+                        } else {
+                            for (let bookData of parseResults) {
+                                // console.log(bookData);
+                                this.children.push(
+                                    views.book.new(bookData.best_book, true)
+                                );
+                            }
+                        }
 
-            var data = {
-                query: event.target.query.value
-            };
 
-            // $.post('/goodreads-search-books', data, results => {
-            $.post(event.target.action, data, results => {
-                views.query.pResults =  JSON.parse(results);
-                if (views.query.pResults.error) {
-                    console.log('data error');
+                        done();
+                    });
                 }
-                render('query');
-            });
-        },
-
-        userAddOwnedBook: function(event) {
-            event.preventDefault();
-
-            var data = {
-                goodreadsID: event.target.goodreadsid.value
-            };
-
-            $.post('/user-add-owned-book', data, response => {
-                let pResponse = JSON.parse(response);
-                if (pResponse.error) {
-                    console.log('data error');
-                }
-                if (pResponse.saved) {
-                    alert('Book saved to User');
-                } else {
-                    alert('Book already attached to User');
-                }
-            });
+            }
         }
     }
 }

@@ -1,8 +1,10 @@
 window.addEventListener('hashchange', e => {
-    onRouteChange(getViewName(e.newURL));
+    currentRoute = getViewName(e.newURL);
+    onRouteChange(currentRoute);
 });
 window.addEventListener('load', e => {
-    onRouteChange(getViewName(e.target.location.hash));
+    currentRoute = getViewName(e.target.location.hash)
+    onRouteChange(currentRoute);
 });
 
 // When the user clicks anywhere outside of the modal, close it

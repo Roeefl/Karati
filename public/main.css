@@ -96,7 +96,7 @@ textarea {
   display: none;
 }
 
-#grid-books {
+.grid-books {
   display: flex;
   flex-flow: row wrap;
   justify-content: space-around;

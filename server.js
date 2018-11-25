@@ -387,11 +387,11 @@ app.get('/user-get-swipes-batch', (req, res) => {
         where('_id').ne(currentUserID).
         limit(10).
         select('name ownedBooks').
-        exec(function(err, results) {
-          for (let u = 0; u < results.length; u++) {
-            for (let b = 0; b < results[u].ownedBooks.length; b++) {
+        exec(function(err, possibilities) {
+          for (let possibility of possibilities) {
+            for (let ownedBook of possibility.ownedBooks) {
 
-              let currBookID = results[u].ownedBooks[b].bookID;
+              let currBookID = ownedBook.bookID;
               let bookInfo = allBooks.find(book => book._id == currBookID);
               // console.log(allBooks);
               // console.log(currBookID);
@@ -418,8 +418,8 @@ app.get('/user-get-swipes-batch', (req, res) => {
               if (!isBookSwipedByCurrentUser && !isBookOwnedByCurrentUser) {
                 console.log('adding ' + currBookID + ' to swipes');
                 let addSwipe = {
-                  ownerID: results[u]._id,
-                  ownedBy: results[u].name,
+                  ownerID: possibility._id,
+                  ownedBy: possibility.name,
                   bookID: currBookID,
                   author: bookInfo.author,
                   title: bookInfo.title,
@@ -429,7 +429,7 @@ app.get('/user-get-swipes-batch', (req, res) => {
                 console.log(swipes.length);
                 swipes.push(addSwipe);
               }
-              // console.log('pushed userID ' + results[u]._id+ ' with bookID ' + results[u].ownedBooks[b].bookID);
+              // console.log('pushed userID ' + possibility._id+ ' with bookID ' + ownedBook.bookID);
             }
           }
 
@@ -467,9 +467,9 @@ function checkForMatch(currentUser, ownerID) {
   getUser(ownerID, owner => {
     let hasSwipedYesOnAnyBookByTheOtherUser = false;
     if (owner.swipes) {
-      for (let s = 0; s < owner.swipes.length; s++) {
-        if (owner.swipes[s].like) {
-          let findMatch = currentUser.ownedBooks.find( ownedBook => ownedBook.bookID ==  owner.swipes[s].bookID );ג
+      for (let swipe of owner.swipes) {
+        if (swipe.like) {
+          let findMatch = currentUser.ownedBooks.find( ownedBook => ownedBook.bookID == swipe.bookID );ג
           if ( findMatch ) {
             console.log('MATCH!');
             console.log(findMatch); 
@@ -503,6 +503,41 @@ app.post('/user-swipe-book', (req, res) => {
       }
       
       res.end(JSON.stringify(newSwipe));
+    });
+  });
+});
+
+app.get('/my-shelf', (req, res) => {
+  if (!ensureLogin(req, res)) return;
+
+  let currentUserID = req.session.passport.user;
+
+  let myShelf = [];
+
+  Book.find({}, (err, allBooks) => {
+    if (err) return handleError(err);
+
+    getUser(currentUserID, currentUser => {
+      for (let ownedBook of currentUser.ownedBooks) { 
+        let ownedBookID = ownedBook.bookID;
+        let bookInfo = allBooks.find(book => book._id == ownedBookID);
+
+        let addToShelf = {
+          bookID: ownedBookID,
+          author: bookInfo.author,
+          title: bookInfo.title,
+          goodreadsID: bookInfo.goodreadsID,
+          imageURL: bookInfo.imageURL
+        }
+
+        myShelf.push(addToShelf);
+      }
+
+      if (myShelf.length > 0) {
+        res.end( JSON.stringify(myShelf) );
+      } else {
+        res.end( JSON.stringify({'error': errors.SHELF_IS_EMPTY}) );
+      }
     });
   });
 });
