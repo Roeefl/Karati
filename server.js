@@ -469,11 +469,11 @@ function checkForMatch(currentUser, ownerID) {
     if (owner.swipes) {
       for (let s = 0; s < owner.swipes.length; s++) {
         if (owner.swipes[s].like) {
-          let findMatch = currentUser.ownedBooks.find( ownedBook => ownedBook.bookID ==  owner.swipes[s].bookID );
+          let findMatch = currentUser.ownedBooks.find( ownedBook => ownedBook.bookID ==  owner.swipes[s].bookID );ג
           if ( findMatch ) {
             console.log('MATCH!');
             console.log(findMatch); 
-          }
+          }ג
         }
       }
     }

@@ -16,7 +16,6 @@
 
 body {
   font: 16px/1 'Roboto', sans-serif;
-  background-color: #221E22;
   -webkit-font-smoothing: antialiased;
   margin: 0;
   height: 100%;
@@ -29,17 +28,11 @@ a {
 
 header {
   height: 100px;
-  color: #EE5622;
   padding-top: 20px;
 }
 
 nav {
   height: 100px;
-  color: #EE5622;
-}
-
-main {
-  color: #EE5622;
 }
 
 .pineapple {
