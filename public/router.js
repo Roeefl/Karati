@@ -35,3 +35,7 @@ function render(viewName) {
 function onRouteChange(viewName) {
     render(viewName);
 };
+
+function reRender(viewName) {
+    render(viewName);
+};

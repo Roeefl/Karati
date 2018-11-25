@@ -29,27 +29,39 @@ let views = {
     list_db: function(callback) {
         request('books', data => {
             let pData = JSON.parse(data);
-            callback(`
-                <table id="all-books" class="table is-bordered is-hoverable">
-                    <thead>
-                        <tr>
-                        <th><abbr title="Position">_ID</abbr></th>
-                        <th><abbr title="Author">Author</abbr></th>
-                        <th><abbr title="Title">Title</abbr></th>
-                    </thead>
-                    <tbody id='all-books-content'>
-                        ${pData.map(book =>
-                            `<tr>
-                                <td>${book._id}</td>
-                                <td>${book.author}</td>
-                                <td>${book.title}</td>
-                            </tr>
-                            `
-                        ).join('')
-                        }
-                    </tbody>
-                </table>
-            `);
+
+            if (pData.error) {
+                if (pData.error == 30) {
+                    //  'NOT_LOGGED_IN'  : '30'
+                    callback(`
+                        <div id="not-logged-in">
+                            Error: not logged into system.
+                        </div>
+                    `);
+                }
+            } else {
+                callback(`
+                    <table id="all-books" class="table is-bordered is-hoverable">
+                        <thead>
+                            <tr>
+                            <th><abbr title="Position">_ID</abbr></th>
+                            <th><abbr title="Author">Author</abbr></th>
+                            <th><abbr title="Title">Title</abbr></th>
+                        </thead>
+                        <tbody id='all-books-content'>
+                            ${pData.map(book =>
+                                `<tr>
+                                    <td>${book._id}</td>
+                                    <td>${book.author}</td>
+                                    <td>${book.title}</td>
+                                </tr>
+                                `
+                            ).join('')
+                            }
+                        </tbody>
+                    </table>
+                `);
+            }
         });
     },
 
@@ -61,60 +73,86 @@ let views = {
         `);
     },
 
-    swipe: {    
-        render: function(callback) {
-            request('user-next-book', data => {
-                let pData = JSON.parse(data);
+    swipe: {
 
-                if (pData.error && pData.error === 99) {
-                    callback(`
-                        <div id="swipe-container">
-                            No more books around your location!
-                        </div>
-                    `);
+        availableSwipes: [],
+        noMoreSwipes: false,
+
+        getBatch: function(callback) {
+            request('/user-get-swipes-batch', data => {
+                views.swipe.availableSwipes = JSON.parse(data);
+
+                // console.log(views.swipe.availableSwipes);
+
+                if (views.swipe.availableSwipes.error) {
+                    if (views.swipe.availableSwipes.error == 31) {
+                        views.swipe.noMoreSwipes = true;
+                        reRender('swipe');
+                    }
                 } else {
-
-                    let sTitle = pData.title.substring(0, 70);
-
-                    callback(`
-                        <div id="swipe-container">
-                            <div class="grid-book">
-                                <span class="book-frame round-frame">
-                                    <img class="book-img" src="${pData.imageURL}">
-                                    <span class="book-desc buff">${sTitle}</span>
-                                    <span class="book-desc buff">by ${pData.author}</span>
-                                    <span class="book-desc buff">Offered for exchange by <span class="flame">${pData.ownedBy}</span>
-                                </span>
-                                <span class="book-options">
-                                    <span class="book-func round-frame">
-                                        <form action="/user-swipe-book" method="POST" onsubmit="onAction('swipe', 'swipeYes', event)">
-                                            <input type="text" style="display: none;" name="bookid" value="${pData.bookID}">
-                                            <button type="submit"><i class="fas fa-heart flame"></i></button>
-                                        </form>
-                                    </span>
-                                    <span class="book-func round-frame">
-                                        <form action="/user-swipe-book" method="POST" onsubmit="onAction('swipe', 'swipeNo', event)">
-                                            <input type="text" style="display: none;" name="bookid" value="${pData.bookID}">
-                                            <button type="submit"><i class="fas fa-thumbs-down buff"></i></button>
-                                        </form>
-                                    </span>
-                                </span>
-                            </div>
-                        </div>
-                    `);
+                    reRender('swipe');
                 }
-
             });
         },
 
+        render: function(callback) {
+            if (views.swipe.noMoreSwipes) {
+                callback(`
+                    <div id="swipe-container">
+                        No more books around your location!
+                    </div>
+                `);
+            } else if (views.swipe.availableSwipes.length === 0) {
+                views.swipe.getBatch(callback);
+            } else {
+
+                // currently contains available swipes - go through them
+                let currentSwipe = views.swipe.availableSwipes[0];
+                let sTitle = currentSwipe.title.substring(0, 70);
+
+                // console.log(currentSwipe);
+                
+                callback(`
+                    <div id="swipe-container">
+                        <div class="grid-book">
+                            <span class="book-frame round-frame">
+                                <img class="book-img" src="${currentSwipe.imageURL}">
+                                <span class="book-desc buff">${sTitle}</span>
+                                <span class="book-desc buff">by ${currentSwipe.author}</span>
+                                <span class="book-desc buff">Offered for exchange by <span class="flame">${currentSwipe.ownedBy}</span>
+                            </span>
+                            <span class="book-options">
+                                <span class="book-func round-frame">
+                                    <form action="/user-swipe-book" method="POST" onsubmit="onAction('swipe', 'swipeYes', event)">
+                                        <input type="text" style="display: none;" name="bookid" value="${currentSwipe.bookID}">
+                                        <button type="submit"><i class="fas fa-heart flame"></i></button>
+                                    </form>
+                                </span>
+                                <span class="book-func round-frame">
+                                    <form action="/user-swipe-book" method="POST" onsubmit="onAction('swipe', 'swipeNo', event)">
+                                        <input type="text" style="display: none;" name="bookid" value="${currentSwipe.bookID}">
+                                        <button type="submit"><i class="fas fa-thumbs-down buff"></i></button>
+                                    </form>
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                `);
+            }
+        },
+
         nextBook: function(swipeYes) {
+            let currentSwipe = views.swipe.availableSwipes[0];
+
             var data = {
                 bookID: event.target.bookid.value,
-                like: swipeYes
+                like: swipeYes,
+                ownerID: currentSwipe.ownerID
             };
 
             $.post('/user-swipe-book', data, result => {
-                onRouteChange('swipe');
+                views.swipe.availableSwipes.shift(); // remove swiped from available swipes
+                reRender('swipe');
             });
         },
         swipeYes: function(event) {
@@ -130,8 +168,6 @@ let views = {
     query: {
 
         pResults: [],
-
-        // renderAll: function(callback) { }
 
         render: function(callback) {
             callback(`
@@ -178,8 +214,10 @@ let views = {
             // $.post('/goodreads-search-books', data, results => {
             $.post(event.target.action, data, results => {
                 views.query.pResults =  JSON.parse(results);
-                console.log(views.query.pResults);
-                onRouteChange('query');
+                if (views.query.pResults.error) {
+                    console.log('data error');
+                }
+                render('query');
             });
         },
 
@@ -192,10 +230,13 @@ let views = {
 
             $.post('/user-add-owned-book', data, response => {
                 let pResponse = JSON.parse(response);
+                if (pResponse.error) {
+                    console.log('data error');
+                }
                 if (pResponse.saved) {
                     alert('Book saved to User');
                 } else {
-                    alert ('Book already attached to User');
+                    alert('Book already attached to User');
                 }
             });
         }

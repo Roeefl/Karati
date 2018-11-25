@@ -22,9 +22,15 @@ body {
   height: 100%;
 }
 
+a {
+  text-decoration: none;
+  color: #EE5622;
+}
+
 header {
   height: 100px;
   color: #EE5622;
+  padding-top: 20px;
 }
 
 nav {
@@ -49,7 +55,23 @@ main {
   color: #F4CF8B;
 }
 .flame {
-color: #EE5622;
+  color: #EE5622;
+}
+
+.bg-pineapple {
+  background-color: #44355B
+}
+.bg-dark-purple {
+  background-color: #31263E;
+}
+.bg-raisin-black {
+  background-color: #221E22;
+}
+.bg-buff {
+  background-color: #F4CF8B;
+}
+.bg-flame {
+  background-color: #EE5622;
 }
 
   
