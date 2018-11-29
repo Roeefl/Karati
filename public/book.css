@@ -1,12 +1,17 @@
 .grid-book {
-    width: 200px;
-    min-height: 200px;
-    margin-top: 30px;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
+  width: 200px;
+  height: 200px;
+  margin-top: 30px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.morning-fade {
+  background: #fff;
+  background: linear-gradient(163deg,#270530 10%,#196d82 36%,#fff 70%);
+}
 
 .grid-book .book-frame {
   flex: 6;

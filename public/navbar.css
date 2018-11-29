@@ -51,14 +51,14 @@
   color:#85C3E9;
 }
 
-.about:after, 
-.about:before,
-.about a:after, 
-.about a:before{
+.my_matches:after, 
+.my_matches:before,
+.my_matches a:after, 
+.my_matches a:before{
   background-color:#FDBE2A;
 }
 
-.about:hover{
+.my_matches:hover{
   color:#FDBE2A;
 }
 

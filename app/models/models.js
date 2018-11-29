@@ -70,9 +70,24 @@ let bookSchema = new Schema( {
     imageURL: {
         type: String,
         required: false
+    },
+    description: {
+        type: String,
+        required: false
+    },
+    numOfPages: {
+        type: Number,
+        required: false
     }
 });
 
+/*
+    *** Status codes ***
+    3 - Pending
+    4 - Approved by firstUser
+    5 - Approved by secondUser
+    6 - Approved by both users
+*/
 let matchSchema = new Schema ( {
     firstUser: {
         userID: {
@@ -96,7 +111,11 @@ let matchSchema = new Schema ( {
     },
     dateMatched: {
         type: Date,
-        requireD: true
+        required: true
+    },
+    status: {
+        type: Number,
+        required: true
     }
 });
 
