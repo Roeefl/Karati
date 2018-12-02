@@ -1,0 +1,39 @@
+header, footer {
+    height: 14vh;
+    /* padding-top: 10px; */
+    box-shadow: rgba(35, 4, 35, 0.1) 0px 4px 23px;
+    background: linear-gradient(rgb(49, 38, 62) 0%, rgb(68, 53, 91) 100%);
+    font-size: 2rem;
+}
+
+.header-container, .footer-container {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0px auto;
+    padding: 0px 10x;
+}
+
+.header-inner-container, .footer-inner-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 10px 0px;
+}
+
+.header-nav {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.header-nav .nav-section {
+    margin-left: 10px;
+}
+
+.header-login {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.back-home {
+    width: 40px;
+}

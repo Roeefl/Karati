@@ -8,6 +8,10 @@
   Flame: #EE5622
  */
 
+ html {
+  font-size: 62.5%;
+ }
+
 * {
   margin: 0;
   padding: 0;
@@ -15,24 +19,16 @@
 }
 
 body {
-  font: 16px/1 'Roboto', sans-serif;
+  font-family: 'Roboto', sans-serif;
   -webkit-font-smoothing: antialiased;
   margin: 0;
   height: 100%;
+  /* direction: rtl; */
 }
 
 a {
-  text-decoration: none;
-  color: #EE5622;
-}
-
-header {
-  height: 100px;
-  padding-top: 20px;
-}
-
-nav {
-  height: 100px;
+  text-decoration: none !important;
+  color: #EE5622 !important;
 }
 
 .pineapple {
@@ -73,7 +69,8 @@ input,
 select,
 textarea {
   font-family: inherit;
-  font-size: 100%;
+  font-size: 2rem;
+  /* font-size: 1.6rem; */
   vertical-align: baseline;
   border: 0;
   outline: 0;
@@ -125,4 +122,23 @@ textarea {
   list-style: none;
   padding: 0;
   margin: 0;
+}
+
+#main-container {
+  width: 70%;
+  max-width: 1000px;
+  margin: 0px auto;
+  padding: 0px 10x;
+  min-height: 60vh;
+  /* max-height: 2000px; */
+}
+
+.main-intro {
+  height: 25vh;
+  width: 100%;
+  box-shadow: rgba(35, 4, 35, 0.1) 0px 3.7px 23.53px;
+}
+
+.main-recent-books {
+
 }

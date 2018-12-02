@@ -179,7 +179,12 @@ app.get('/', (req, res) => {
 // goodreads.getBooksByAuthor('656983');
 
 app.post('/goodreads-search-books', (req, res) => {
-  if (!ensureLogin(req, res)) return;
+  if (!ensureLogin(req, res)) {
+    res.end( JSON.stringify(
+      {'error': errors.NOT_LOGGED_IN}
+    ));
+    return;
+  }
 
   const FILTER_ALL = 'all';
   let query = req.body.query;
@@ -349,7 +354,13 @@ function addBookIfMissing(goodreadsID, callback) {
  * If book does not exist in books collection, adds the book to it first, then to ownedBooks.
  */
 app.post('/user-add-owned-book', (req, res) => {
-  if (!ensureLogin(req, res)) return;
+  if (!ensureLogin(req, res)) {
+    res.end( JSON.stringify(
+      {'error': errors.NOT_LOGGED_IN}
+    ));
+    return;
+  }
+
   let currentUserID = req.session.passport.user;
   
   addBookIfMissing(req.body.goodreadsID, bookID => {
@@ -383,7 +394,12 @@ function getUser(userID, callback) {
  * 2 - If he already swept on it prior, he shouldn't see it either anymore.
  */
 app.get('/user-get-swipes-batch', (req, res) => {
-  if (!ensureLogin(req, res)) return;
+  if (!ensureLogin(req, res)) {
+    res.end( JSON.stringify(
+      {'error': errors.NOT_LOGGED_IN}
+    ));
+    return;
+  }
 
   let currentUserID = req.session.passport.user;
   let swipes = []; // init empty array for books available for swiping
@@ -506,7 +522,12 @@ function checkForMatch(currentUser, swipedBookID, ownerID) {
 }
 
 app.post('/user-swipe-book', (req, res) => {
-  if (!ensureLogin(req, res)) return;
+  if (!ensureLogin(req, res)) {
+    res.end( JSON.stringify(
+      {'error': errors.NOT_LOGGED_IN}
+    ));
+    return;
+  }
 
   let currentUserID = req.session.passport.user;
 
@@ -533,7 +554,13 @@ app.post('/user-swipe-book', (req, res) => {
 });
 
 app.get('/my-shelf', (req, res) => {
-  if (!ensureLogin(req, res)) return;
+  if (!ensureLogin(req, res)) {
+    res.end( JSON.stringify(
+      {'error': errors.NOT_LOGGED_IN}
+    ));
+    return;
+  }
+
 
   let currentUserID = req.session.passport.user;
 
@@ -568,7 +595,13 @@ app.get('/my-shelf', (req, res) => {
 });
 
 app.get('/user-get-matches', (req, res) => {
-  if (!ensureLogin(req, res)) return;
+  if (!ensureLogin(req, res)) {
+    res.end( JSON.stringify(
+      {'error': errors.NOT_LOGGED_IN}
+    ));
+    return;
+  }
+
 
   let currentUserID = req.session.passport.user;
   let currentUserObjectID = new ObjectId(req.session.passport.user);

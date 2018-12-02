@@ -1,6 +1,26 @@
 let views = {
 
-    default: 'myshelf',
+    default: 'main',
+
+    main: {
+        render: function(callback) {
+            callback `
+                <div>
+                    <div class="main-intro">
+                    קראתי
+                    קראת? החלפת
+                    יאללה, אני רוצה לנסות
+                    </div>
+                    <div class="main-recent-books">
+                    </div>
+                    <div class="main-features">
+                    </div>
+                    <div class="main-how-to-use">
+                    </div>
+                </div>
+            `
+        }
+    },
 
     loading: {
         render: function(callback) {
@@ -77,6 +97,13 @@ let views = {
                                 if (pData.error == 33) {
                                     this.noMatches = true;
                                     reRender(this);
+                                } else if (pData.error == 30) {
+                                    //  'NOT_LOGGED_IN'  : '30'
+                                    callback(`
+                                        <div id="not-logged-in">
+                                            Error: not logged into system.
+                                        </div>
+                                    `);
                                 }
                             } else {
                                 for (let match of pData) {
@@ -241,16 +268,21 @@ let views = {
         
                 getBatch: function(e, done) {
                     request('/user-get-swipes-batch', data => {
-                        this.availableSwipes = JSON.parse(data);
+                        let pData = JSON.parse(data);
         
                         // console.log(views.swipe.availableSwipes);
         
-                        if (this.availableSwipes.error) {
-                            if (this.availableSwipes.error == 31) {
+                        if (pData.error) {
+                            if (pData.error == 30) {
+                                //  'NOT_LOGGED_IN'  : '30'
+                                done();
+
+                            } else if (pData.error == 31) {
                                 this.noMoreSwipes = true;
                                 reRender(this);
                             }
                         } else {
+                            this.availableSwipes = pData;
                             reRender(this);
                         }
                     });
@@ -360,23 +392,24 @@ let views = {
         
                     // $.post('/goodreads-search-books', data, results => {
                     $.post(event.target.action, data, results => {
-                        let parseResults =  JSON.parse(results);
+                        let pData =  JSON.parse(results);
 
-                        if (parseResults.error) {
-                            console.log('data error');
-                        }
-
-                        if (!Array.isArray(parseResults)) {
-                            this.children.push(views.book.new(parseResults.best_book));
+                        if (pData.error) {
+                            if (pData.error == 30) {
+                                //  'NOT_LOGGED_IN'  : '30'
+                            }
                         } else {
-                            for (let bookData of parseResults) {
-                                // console.log(bookData);
-                                this.children.push(
-                                    views.book.new(bookData.best_book, true)
-                                );
+                            if (!Array.isArray(parseResults)) {
+                                this.children.push(views.book.new(parseResults.best_book));
+                            } else {
+                                for (let bookData of parseResults) {
+                                    // console.log(bookData);
+                                    this.children.push(
+                                        views.book.new(bookData.best_book, true)
+                                    );
+                                }
                             }
                         }
-
 
                         done();
                     });
