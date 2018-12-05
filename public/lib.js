@@ -19,3 +19,14 @@ function request(url, success) {
 //     });
 //     xhr.send(data);
 // }
+
+let colorCombos = [
+    {
+        bg: '#130321',
+        font: '#ebf8df'
+    },
+    {
+        bg: '#b0a9ac',
+        font: '#505251'
+    }
+];

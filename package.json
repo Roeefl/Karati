@@ -3,12 +3,18 @@
   "version": "0.0.1",
   "description": "",
   "main": "server.js",
+  "engines": {
+    "node": "10.11.0",
+    "npm": "6.4.1"
+  },
   "scripts": {
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "start": "node server.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@sendgrid/mail": "^6.3.1",
     "body-parser": "^1.18.3",
     "bulma": "^0.7.2",
     "connect-ensure-login": "^0.1.1",
@@ -22,15 +28,17 @@
     "mongodb": "^3.1.9",
     "mongoose": "^5.3.13",
     "morgan": "^1.9.1",
+    "nodemailer": "^4.7.0",
     "passport": "^0.4.0",
     "passport-facebook": "^2.1.1",
     "passport-google-oauth": "^1.0.0",
     "passport-google-oauth2": "^0.1.6",
     "passport-local": "^1.0.0",
-    "request": "^2.88.0",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
-    "react-scripts": "2.1.1"
+    "react-scripts": "2.1.1",
+    "request": "^2.88.0",
+    "sse": "0.0.8"
   },
   "devDependencies": {
     "nodemon": "^1.18.6",

@@ -36,6 +36,10 @@ let userSchema = new Schema( {
         type: String,
         required: true
     },
+    email: {
+        type: String,
+        required: true
+    },
     created: {
         type: Date,
         required: false
@@ -81,6 +85,21 @@ let bookSchema = new Schema( {
     }
 });
 
+let chatMsg = new Schema ( {
+    sender: {
+        type: String,
+        required: true
+    },
+    message: {
+        type: String,
+        required: true
+    },
+    whenSent: {
+        type: Date,
+        required: true
+    }
+});
+
 /*
     *** Status codes ***
     3 - Pending
@@ -92,7 +111,7 @@ let matchSchema = new Schema ( {
     firstUser: {
         userID: {
             type: String,
-            requireD: true
+            required: true
         },
         bookID: {
             type: String,
@@ -116,6 +135,10 @@ let matchSchema = new Schema ( {
     status: {
         type: Number,
         required: true
+    },
+    chat: {
+        type: [chatMsg],
+        required: false
     }
 });
 

@@ -1,10 +1,12 @@
-let views = {
+    let views = {
 
     default: 'main',
 
+    currentBook: null,
+
     main: {
         render: function(callback) {
-            callback `
+            callback (`
                 <div>
                     <div class="main-intro">
                     קראתי
@@ -18,7 +20,7 @@ let views = {
                     <div class="main-how-to-use">
                     </div>
                 </div>
-            `
+            `);
         }
     },
 
@@ -48,25 +50,127 @@ let views = {
         }
     },
 
+    showbook: { 
+        render: function(callback) {
+            callback (`
+                <div class="view-container">
+                    <div class="view-upper">
+                        <div id="view-upper-container" class="view-inner-container">
+                            <div class="view-upper-title">
+                                Book Information
+                            </div>
+                            <div class="view-upper-sep">
+                            </div>
+                            <div class="view-upper-subtitle">
+                                Here you can see all the relevant info for the book you chose
+                            </div>
+                        </div>
+                    </div>
+                    <div class="view-control">
+                        <div id="view-control-container" class="view-inner-container">
+                            
+                        </div>
+                    </div>
+                    <div class="view-data">
+                        <div id="view-data-container" class="view-inner-container">
+
+                            <div class="grid-book">
+                                <div class="book-container">
+                                    <div class="info">
+                                        <div class="info-upper">
+                                            <div class="title">${views.currentBook.title}</div>
+                                            <div class="author">${views.currentBook.author}</div>
+                                        </div>
+                                        <div class="info-lower">
+                                            <div class="owned-by"></div>
+                                        </div>
+                                    </div>
+                                    <div class="image">
+                                        <img src="${views.currentBook.imageURL}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `); 
+        }
+    },
+
     match: {
         new: function(matchData) {
             return {
                 id: `match_${Math.random()}`,
                 data: matchData,
+                myBook: matchData.myBook,
+                otherBook: matchData.otherBook,
 
                 state: {
                     // smileClass: 'flame'
                 },
 
                 render: function() {
-                    return `
-                    <li class="match">
-                        <img class="match-image" src="${this.data.imageURL}">
-                        <span class="match-book-title">${this.data.title} by ${this.data.author}</span>
-                        <span class="match-book-desc">${this.data.description}</span>
-                        <span class="match-date-desc">${this.data.matchedOn}</span>
-                        <span class="match-owner">${this.data.ownerName}</span>
-                        <span class="match-status">${this.data.status}</span>
+                    return `        
+                    <li class="grid-match">
+                        <a href="#openmatch">
+                            <div class="match-container" onclick="onAction('${this.id}', 'setCurrentMatch', event)">
+
+                                <div class="match-book other-book">
+                                    <div class="match-book-container">
+                                        <div class="owner">
+                                            <div class="owner-inner">
+                                                <div>This book is offered for exchange by:</div>
+                                                <div>${this.otherBook.owner}</div>
+                                            </div>
+                                        </div>
+                                        <div class="details">
+                                            <div class="image">
+                                                <img src="${this.otherBook.imageURL}"/>
+                                            </div>
+                                            <div class="info">
+                                                <div class="upper">
+                                                    <div class="title">${this.otherBook.title}</div>
+                                                    <div class="author">${this.otherBook.author}</div>
+                                                </div>
+                                                <div class="lower">
+                                                    <div class="desc">${this.otherBook.desc}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="swap">
+                                    <button class="swap-books">
+                                        <i class="fas fa-retweet"></i>
+                                        <span>Swap!</span>
+                                    </button>
+                                </div>
+
+                                <div class="match-book my-book">
+                                    <div class="match-book-container">
+                                        <div class="owner">
+                                            <div class="owner-inner">Your Book:</div>
+                                        </div>
+                                        <div class="details">
+                                            <div class="image">
+                                                <img src="${this.myBook.imageURL}"/>
+                                            </div>
+                                            <div class="info">
+                                                <div class="upper">
+                                                    <div class="title">${this.myBook.title}</div>
+                                                    <div class="author">${this.myBook.author}</div>
+                                                </div>
+                                                <div class="lower">
+                                                    <div class="desc">${this.myBook.desc}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </a>
                     </li>
                     `;
                 }
@@ -111,9 +215,32 @@ let views = {
                                 }
                                 
                                 callback(`
-                                    <ul class='grid-matches'>
-                                        ${this.matches.map(match => match.render()).join('')}
-                                    </ul>
+                                    <div class="view-container">
+                                        <div class="view-upper">
+                                            <div id="view-upper-container" class="view-inner-container">
+                                                <div class="view-upper-title">
+                                                    My Matches
+                                                </div>
+                                                <div class="view-upper-sep">
+                                                </div>
+                                                <div class="view-upper-subtitle">
+                                                    All matches between your owned books and books of other users
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="view-control">
+                                            <div id="view-control-container" class="view-inner-container">
+                                                Control
+                                            </div>
+                                        </div>
+                                        <div class="view-data">
+                                            <div id="view-data-container" class="view-inner-container">
+                                                <ul class='grid-matches'>
+                                                    ${this.matches.map(match => match.render()).join('')}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
                                 `);
                             }
                         });
@@ -169,9 +296,17 @@ let views = {
     book: {
         new: function(bookData, isFromGR) {
             return {
-                id: `book_${Math.random()}`,
+                id: bookData.id._,
                 bookInfo: bookData,
                 isFromGoodreads: isFromGR,
+
+                bookID: '',
+                author: '',
+                title: bookData.title,
+                imageURL: '',
+                action:  'doNothing',
+
+
                 state: {
                     smileClass: 'flame'
                 },
@@ -199,6 +334,8 @@ let views = {
                     var data = {
                         goodreadsID: this.bookInfo.id._
                     };
+
+                    console.log(data.goodreadsID);
         
                     $.post('/user-add-owned-book', data, response => {
                         let pResponse = JSON.parse(response);
@@ -217,40 +354,50 @@ let views = {
                     });
                 },
 
-                render: function() {
-                    let author = '';
-                    let imageURL = '';
-                    let bookID = '';
-                    let title = this.bookInfo.title;
-                    let action = 'doNothing';
-        
+                setCurrentBook: function(event, done) {
+                    views.currentBook = this;
+                },
+
+                render: function() {        
                     if (this.isFromGoodreads) {
-                        author = this.bookInfo.author.name;
-                        imageURL = this.bookInfo.image_url;
-                        bookID = this.bookInfo.id._;
-                        action = 'userAddOwnedBook';
+                        this.author = this.bookInfo.author.name;
+                        this.imageURL = this.bookInfo.image_url;
+                        this.bookID = this.bookInfo.id._;
+                        this.action = 'userAddOwnedBook';
                     } else {
-                        author = this.bookInfo.author;
-                        imageURL = this.bookInfo.imageURL;
-                        bookID = this.bookInfo._id;
+                        this.author = this.bookInfo.author;
+                        this.imageURL = this.bookInfo.imageURL;
+                        this.bookID = this.bookInfo._id;
                     }
+
+                    // <a href="#showbook">
+                    // </a>
+
+                    // <div class="owned-by"></div>
         
                     return `
                         <li class="grid-book">
-                            <img class="book-img" src="${imageURL}">
-                            <span class="book-desc">${title} by ${author}</span>
-                            <span class="book-options">
-                                <span class="book-func">
-                                    <button onclick="onAction('${this.id}', '${action}', event)">
-                                        <i class="fas fa-plus-circle"></i>
-                                    </button>
-                                </span>
-                                <span class="book-func">
-                                    <button onclick="onAction('${this.id}', 'toggleSmile', event)">
-                                        <i class="fas fa-grin-hearts ${this.state.smileClass}"></i>
-                                    </button>
-                                </span>
-                            </span>
+                                <div class="book-container" onclick="onAction('${this.id}', 'setCurrentBook', event)">
+                                    <div class="info">
+                                        <div class="info-upper">
+                                            <div class="title">${this.title}</div>
+                                            <div class="author">${this.author}</div>
+                                        </div>
+                                        <div class="info-lower">
+                                            
+                                            <div class="add-book">
+                                                <button onclick="onAction('${this.id}', 'userAddOwnedBook', event)">
+                                                    <i class="fas fa-plus-circle"></i> I own this book!
+                                                </button>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="image">
+                                        <img src="${this.imageURL}">
+                                    </div>
+                                </div>
+
                         </li>
                     `;
                 }
@@ -265,6 +412,7 @@ let views = {
 
                 availableSwipes: [],
                 noMoreSwipes: false,
+                notLoggedIn: false,
         
                 getBatch: function(e, done) {
                     request('/user-get-swipes-batch', data => {
@@ -275,7 +423,8 @@ let views = {
                         if (pData.error) {
                             if (pData.error == 30) {
                                 //  'NOT_LOGGED_IN'  : '30'
-                                done();
+                                this.notLoggedIn = true;
+                                reRender(this);
 
                             } else if (pData.error == 31) {
                                 this.noMoreSwipes = true;
@@ -289,7 +438,13 @@ let views = {
                 },
         
                 render: function(callback) {
-                    if (this.noMoreSwipes) {
+                    if (this.notLoggedIn) {
+                        callback(`
+                        <div id="not-logged-in">
+                            Error: not logged into system.
+                        </div>
+                    `);
+                    } else if (this.noMoreSwipes) {
                         callback(`
                             <div id="swipe-container">
                                 No more books around your location!
@@ -365,22 +520,48 @@ let views = {
             return {
                 id: `query_${Math.random()}`,
                 children: [],
+                failedQuery: false,
 
                 render: function(callback) {
-                    callback(`
-                        <div>
-                            <div id="goodreads-query">
-                                <form action="/goodreads-search-books" method="GET" onsubmit="onAction('${this.id}', 'search', event)">
-                                    <input type="text" placeholder="Tolkien" name="query">
-                                    <button type="submit" class="btn-prime fillup">Search using GoodReads API</button>
-                                </form>
-                            </div>
-                            <ul class="grid-books">
-                                ${this.children.map(child => child.render()).join('')}
-                            </ul>
-            
+                    if (this.failedQuery) {
+                        callback(`
+                        <div id="not-logged-in">
+                            Error: not logged into system.
                         </div>
-                    `)
+                        `);
+                    } else {
+                        callback(`
+                        <div class="view-container">
+                            <div class="view-upper">
+                                <div id="view-upper-container" class="view-inner-container">
+                                    <div class="view-upper-title">
+                                        Search the book database
+                                    </div>
+                                    <div class="view-upper-sep">
+                                    </div>
+                                    <div class="view-upper-subtitle">
+                                        Enter a part of the title, the author name, etc...
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="view-control">
+                                <div id="view-control-container" class="view-inner-container">
+                                    <form class="search-books" action="/goodreads-search-books" method="GET" onsubmit="onAction('${this.id}', 'search', event)">
+                                        <input type="text" placeholder="Tolkien" name="query">
+                                        <button type="submit" class="btn-prime">Search using GoodReads API</button>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="view-data">
+                                <div id="view-data-container" class="view-inner-container">
+                                    <ul class="grid-books">
+                                        ${this.children.map(child => child.render()).join('')}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        `);
+                    }
                 },
         
                 search: function(event, done) {
@@ -397,12 +578,13 @@ let views = {
                         if (pData.error) {
                             if (pData.error == 30) {
                                 //  'NOT_LOGGED_IN'  : '30'
+                                this.failedQuery = true;
                             }
                         } else {
-                            if (!Array.isArray(parseResults)) {
-                                this.children.push(views.book.new(parseResults.best_book));
+                            if (!Array.isArray(pData)) {
+                                this.children.push(views.book.new(pData.best_book));
                             } else {
-                                for (let bookData of parseResults) {
+                                for (let bookData of pData) {
                                     // console.log(bookData);
                                     this.children.push(
                                         views.book.new(bookData.best_book, true)

@@ -13,6 +13,11 @@ const errors = require('./config/errors');
 
 require('dotenv').config();
 
+// using SendGrid's v3 Node.js Library
+// https://github.com/sendgrid/sendgrid-nodejs
+const sendGridMail = require('@sendgrid/mail');
+sendGridMail.setApiKey(process.env.SENDGRID_API_KEY);
+
 /* Models */
 const Models = require('./app/models/models');
 let User = Models.User;
@@ -39,6 +44,7 @@ passport.use(new GoogleStrategy (
           {
             oauthID: profile.id,
             name: profile.displayName,
+            email: profile.emails[0].value,
             created: Date.now()
           }
         );
@@ -127,7 +133,33 @@ app.use(require('express-session')({ secret: 'keyboard cat', resave: true, saveU
 
 // Initialize Passport and restore authentication state, if any, from the session
 app.use(passport.initialize());
-app.use(passport.session());
+app.use(passport.session());  
+
+// function ensureAuthenticated(req, res, next) {
+//   console.log('ensureAuthenticated is used');
+
+//   // if (req && req.session || !req.session.passport || !req.session.passport.user) {
+//   if (!req.isAuthenticated()) {  
+//     res.end( JSON.stringify( {
+//         'error': errors.NOT_LOGGED_IN
+//       } )
+//     );
+//     return;
+//   }
+//   return next();
+// };
+
+
+function ensureAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) { return next(); }
+
+    res.end( JSON.stringify( {
+        'error': errors.NOT_LOGGED_IN
+      } )
+    );
+};
+
+const PORT = process.env.PORT || 9000;
 
 // MongoDB Connect
 mongoose.connect(process.env.ATLAS_CONNECTION, {useNewUrlParser: true} );
@@ -136,12 +168,11 @@ db.on('error', function () {
   console.log('connection error on mongoose')
 });
 db.once('open', function() {
-    app.listen(9000, () => {
-      console.log('Listening on port 9000');
+    app.listen(PORT, () => {
+      console.log('Listening on port ' + PORT);
     });
     console.log('Mongoose connected to MongoDB Atlas');
 });
-
 
 // function getBook(id, callback) {
 //   collection.find({_id: mongo.ObjectID(id)}).toArray((err, result) => {
@@ -167,25 +198,9 @@ app.get('/', (req, res) => {
 //   })
 // });
 
-// app.get('/books', (req, res) => {
-//   if (!ensureLogin(req, res)) return;
-
-//   Book.find({}, (err, books) => {
-//     if (err) return handleError(err);
-//       res.end(JSON.stringify(books));
-//   });
-// });
-
 // goodreads.getBooksByAuthor('656983');
 
 app.post('/goodreads-search-books', (req, res) => {
-  if (!ensureLogin(req, res)) {
-    res.end( JSON.stringify(
-      {'error': errors.NOT_LOGGED_IN}
-    ));
-    return;
-  }
-
   const FILTER_ALL = 'all';
   let query = req.body.query;
 
@@ -197,11 +212,19 @@ app.post('/goodreads-search-books', (req, res) => {
     })
 });
 
+app.get('/book/:id', (req, res) => {
+  console.log(req.params.id);
+  Book.findOne({
+    
+  });
+});
+
 app.get('/login/google',
   passport.authenticate('google', { successRedirect: '/', scope:
-    [ 'profile' ]
+    [ 'profile', 'email' ]
   })
 );
+
 app.get('/login/google/callback', 
   passport.authenticate('google', { failureRedirect: '/' }),
     function(req, res) {
@@ -210,8 +233,10 @@ app.get('/login/google/callback',
 );
 
 app.get('/login/facebook',
-  passport.authenticate('facebook'),
-  function(req, res){});
+  passport.authenticate('facebook', { successRedirect: '/', scope:
+    [ 'profile' ]
+  })
+);
 app.get('/login/facebook/callback',
   passport.authenticate('facebook', { failureRedirect: '/' }),
   function(req, res) {
@@ -229,21 +254,12 @@ app.get('/profile', ensureAuthenticated, function(req, res) {
   });
 });
 
-function ensureAuthenticated(req, res, next) {
-  if (req.isAuthenticated()) { return next(); }
-  res.redirect('/');
-};
-
-function ensureLogin(req, res) {
-  if (!req || !req.session || !req.session.passport || !req.session.passport.user) {
-    res.end( JSON.stringify( {
-        'error': errors.NOT_LOGGED_IN
-      } )
-    );
-    return false;
-  }
-  return true;
-};
+// if (!ensureLogin(req, res)) {
+//   res.end( JSON.stringify(
+//     {'error': errors.NOT_LOGGED_IN}
+//   ));
+//   return;
+// }
 
 // app.get('/books/:bookId', (req, res) => {
 //   console.log(req.query);
@@ -319,6 +335,7 @@ function addBookIfMissing(goodreadsID, callback) {
       callback(found.id);
     }
     else { // book not yet in Mongo collection books - so add it
+      // console.log('Adding book to DB! ' + goodreadsID);
       goodreads.showBook(goodreadsID)
       .then( (result) => {
 
@@ -353,14 +370,7 @@ function addBookIfMissing(goodreadsID, callback) {
  * Adds a book selected by user to mark as 'owned' to ownedBooks collection.
  * If book does not exist in books collection, adds the book to it first, then to ownedBooks.
  */
-app.post('/user-add-owned-book', (req, res) => {
-  if (!ensureLogin(req, res)) {
-    res.end( JSON.stringify(
-      {'error': errors.NOT_LOGGED_IN}
-    ));
-    return;
-  }
-
+app.post('/user-add-owned-book', ensureAuthenticated, (req, res) => {
   let currentUserID = req.session.passport.user;
   
   addBookIfMissing(req.body.goodreadsID, bookID => {
@@ -393,26 +403,21 @@ function getUser(userID, callback) {
  * 1 - If the userID in the OwnedBook record matches the userID of the current user - it's his own book and he shouldn't see it while swiping
  * 2 - If he already swept on it prior, he shouldn't see it either anymore.
  */
-app.get('/user-get-swipes-batch', (req, res) => {
-  if (!ensureLogin(req, res)) {
-    res.end( JSON.stringify(
-      {'error': errors.NOT_LOGGED_IN}
-    ));
-    return;
-  }
+app.get('/user-get-swipes-batch', ensureAuthenticated, (req, res) => {
+  const MAX_BATCH_SIZE = 30;
 
   let currentUserID = req.session.passport.user;
   let swipes = []; // init empty array for books available for swiping
 
-  Book.find({}, function (err, allBooks) { 
+  Book.find({}, function (err, allBooks) {
     getUser(currentUserID, currentUser => {
       User.
         find({}).
         where('_id').ne(currentUserID).
-        limit(30).
+        limit(MAX_BATCH_SIZE).
         select('name ownedBooks').
-        exec(function(err, possibilities) {
-          for (let possibility of possibilities) {
+        exec(function(err, usersWithPossibleBooksForSwiping) {
+          for (let possibility of usersWithPossibleBooksForSwiping) {
             for (let ownedBook of possibility.ownedBooks) {
 
               let currBookID = ownedBook.bookID;
@@ -466,6 +471,7 @@ app.get('/user-get-swipes-batch', (req, res) => {
     });
   });
 
+  // TODO flatten-aggregation-group make this workz
   // User.aggregate([
   //   { $match: { _id: { $ne: userObjectID } } },
   //   { $group: { _id: null, books: { $mergeObjects: '$ownedBooks' } } },
@@ -476,59 +482,67 @@ app.get('/user-get-swipes-batch', (req, res) => {
   // });
 });
 
+function alertUsersWithMail(user1, user2) {
+  let msg = {
+    to: user1.email,
+    from: 'getkarati@gmail.com',
+    subject: 'You have a new match in Karati!',
+    text: 'Match',
+    html: '<div>You have a new match in Karati!</div>'
+  };
+  sendGridMail.send(msg);
+
+  msg.to = user2.email;
+  sendGridMail.send(msg);
+}
+
+const STATUS_PENDING = 3;
+
 /**
  * Check for ANY book match between two users
  * @param {*} currentUser 
  * @param {*} ownerID 
  */
-function checkForMatch(currentUser, swipedBookID, ownerID) {
-  // console.log('Checking for match between:');
-  // console.log(firstUserID);
-  // console.log(secondUserID);
-  
+function checkForMatch(currentUser, owner, swipedBookID, callback) {
   // so currently I already KNOW that currentUser has JUST swiped yes on some book that ownerID possesses.
   // now need to loop over the swipes array of ownerID and check if he has done a YES swipe on ANY book that currentUser has on his ownedBooks array
-  getUser(ownerID, owner => {
-    if (owner.swipes) {
-      for (let swipe of owner.swipes) {
-        if (swipe.like) {
-          let findMatch = currentUser.ownedBooks.find( ownedBook => ownedBook.bookID == swipe.bookID );
-          if ( findMatch ) {
+  if (owner.swipes) {
+    for (let swipe of owner.swipes) {
+      if (swipe.like) {
+        let findMatch = currentUser.ownedBooks.find( ownedBook => ownedBook.bookID == swipe.bookID );
+        
+        if ( findMatch ) {
 
-            let saveMatch = new Match({
-              firstUser: {
-                userID: currentUser._id,
-                bookID: swipedBookID
-              },
-              secondUser: {
-                userID: ownerID,
-                bookID: swipe.bookID
-              },
-              dateMatched: Date.now(),
-              status: 3
-            });
+          let saveMatch = new Match({
+            firstUser: {
+              userID: currentUser._id,
+              bookID: swipedBookID
+            },
+            secondUser: {
+              userID: owner._id,
+              bookID: swipe.bookID
+            },
+            dateMatched: Date.now(),
+            status: STATUS_PENDING
+          });
 
-            saveMatch.save(function (err, saved) {
-              if (err) return handleError(err);
-            
-              console.log('Match Saved:');
-              console.log(saved);
-            });
-          }
+          saveMatch.save(function (err, saved) {
+            if (err) return handleError(err);
+          
+            console.log('Match Saved:');
+            console.log(saved);
+
+            callback();
+            return;
+            // TODO: Mail alert both users with deep link to match when a new match
+          });
         }
       }
     }
-  });
+  }
 }
 
-app.post('/user-swipe-book', (req, res) => {
-  if (!ensureLogin(req, res)) {
-    res.end( JSON.stringify(
-      {'error': errors.NOT_LOGGED_IN}
-    ));
-    return;
-  }
-
+app.post('/user-swipe-book', ensureAuthenticated, (req, res) => {
   let currentUserID = req.session.passport.user;
 
   getUser(currentUserID, currentUser => {
@@ -544,24 +558,20 @@ app.post('/user-swipe-book', (req, res) => {
       console.log('/user-swipe-book saved swipe ' + req.body.bookID + ' to user ' + currentUserID);
 
       if (newSwipe.like) {
-        // if swipe was a YES
-        checkForMatch(currentUser, req.body.bookID, req.body.ownerID);
+        // if swipe was a YES - alert both users with a mail
+        getUser(req.body.ownerID, owner => {
+          checkForMatch(currentUser, owner, req.body.bookID, () => {
+            alertUsersWithMail(currentUser, owner);
+          });
+        });
       }
-      
+
       res.end(JSON.stringify(newSwipe));
     });
   });
 });
 
-app.get('/my-shelf', (req, res) => {
-  if (!ensureLogin(req, res)) {
-    res.end( JSON.stringify(
-      {'error': errors.NOT_LOGGED_IN}
-    ));
-    return;
-  }
-
-
+app.get('/my-shelf', ensureAuthenticated, (req, res) => {
   let currentUserID = req.session.passport.user;
 
   let myShelf = [];
@@ -594,15 +604,9 @@ app.get('/my-shelf', (req, res) => {
   });
 });
 
-app.get('/user-get-matches', (req, res) => {
-  if (!ensureLogin(req, res)) {
-    res.end( JSON.stringify(
-      {'error': errors.NOT_LOGGED_IN}
-    ));
-    return;
-  }
+const MAX_DESC_LEN = 200;
 
-
+app.get('/user-get-matches', ensureAuthenticated, (req, res) => {
   let currentUserID = req.session.passport.user;
   let currentUserObjectID = new ObjectId(req.session.passport.user);
   let returnMatches = [];
@@ -621,23 +625,40 @@ app.get('/user-get-matches', (req, res) => {
 
         for (let match of userMatches) {
           let owner = match.firstUser;
+          let myself = match.secondUser;
+
           if (match.firstUser.userID == currentUserID) {
             owner = match.secondUser;
+            myself = match.firstUser;
           }
 
-          let bookInfo = allBooks.find(book => book._id == owner.bookID);
+          let myInfo = allUsers.find(user => user._id == currentUserID);
           let ownerInfo = allUsers.find(user => user._id == owner.userID);
 
+          let myBookInfo = allBooks.find(book => book._id == myself.bookID);
+          let otherBookInfo = allBooks.find(book => book._id == owner.bookID);
+
           let addToMatches = {
-            ownerName: ownerInfo.name,
-            bookID: owner.bookID,
-            author: bookInfo.author,
-            title: bookInfo.title,
-            goodreadsID: bookInfo.goodreadsID,
-            imageURL: bookInfo.imageURL,
+            myBook: {
+              owner: myInfo.name,
+              bookID: myself.bookID,
+              author: myBookInfo.author,
+              title: myBookInfo.title,
+              goodreadsID: myBookInfo.goodreadsID,
+              imageURL: myBookInfo.imageURL,
+              desc: (myBookInfo.description ? myBookInfo.description.substr(0, MAX_DESC_LEN) : 0)
+            },
+            otherBook: {
+              owner: ownerInfo.name,
+              bookID: owner.bookID,
+              author: otherBookInfo.author,
+              title: otherBookInfo.title,
+              goodreadsID: otherBookInfo.goodreadsID,
+              imageURL: otherBookInfo.imageURL,
+              desc: (otherBookInfo.description ? otherBookInfo.description.substr(0, MAX_DESC_LEN) : 0)
+            },
             matchedOn: match.dateMatched,
-            status: match.status,
-            description: (bookInfo.description ? bookInfo.description : 0)
+            status: match.status
           };
 
           returnMatches.push(addToMatches);

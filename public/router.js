@@ -40,6 +40,7 @@ function setState(viewId, newState, callback) {
 }
 
 function onAction(id, actionName, e) {
+    // console.log(id);
     let view = findById(root, id);
     view[actionName](e, () => {
         reRenderRoot();
