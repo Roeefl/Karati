@@ -30,3 +30,8 @@ let colorCombos = [
         font: '#505251'
     }
 ];
+
+let ERRORS = {};
+request('/error-codes', data => {
+    ERRORS = JSON.parse(data);
+});

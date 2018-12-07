@@ -7,9 +7,10 @@ const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
 const GoodReadsAPI = require('goodreads-api-node');
 const passport = require('passport');
-const FacebookStrategy = require('passport-facebook').Strategy;
 const GoogleStrategy = require('passport-google-oauth2').Strategy;
+const FacebookStrategy = require('passport-facebook').Strategy;
 const errors = require('./config/errors');
+const matchStatus = require('./config/matchStatus');
 
 require('dotenv').config();
 
@@ -32,32 +33,25 @@ passport.use(new GoogleStrategy (
     callbackURL: process.env.GOOGLE_CALLBACK_URL,
     passReqToCallback: true
   },
-  function(request, accessToken, refreshToken, profile, done) {
-    User.findOne( { oauthID: profile.id }, function(err, user) {
-      if(err) {
-        console.log(err); // handle errors!
+  async function(request, accessToken, refreshToken, profile, done) {
+    const existingUser = await User.findOne( { oauthID: profile.id } );
+
+    if (existingUser) {
+      return done(null, existingUser);
+    }
+
+    newUser = new User(
+      {
+        oauthID: profile.id,
+        name: profile.displayName,
+        email: profile.emails[0].value,
+        created: Date.now()
       }
-      if (!err && user !== null) {
-        done(null, user);
-      } else { // user not found in users collection
-        user = new User(
-          {
-            oauthID: profile.id,
-            name: profile.displayName,
-            email: profile.emails[0].value,
-            created: Date.now()
-          }
-        );
-        user.save(function(err) {
-          if(err) {
-            console.log(err); // handle errors!
-          } else {
-            console.log('saving user to mongoose');
-            done(null, user);
-          }
-        });
-      }
-    });
+    );
+
+    const savedUser = await newUser.save();
+    console.log('saving user to mongoose');
+    done(null, savedUser);
   }
 ));
 
@@ -190,6 +184,10 @@ app.get('/', (req, res) => {
   res.render('index', { user: req.user });
 });
 
+app.get('/error-codes', (req, res) => {
+  res.end( JSON.stringify(errors) );
+});
+
 // app.post('/add-book', (req, res) => {
 //   db.collection(COL_BOOKS).insertOne(req.body, (err, result) => {
 //     if (err) return console.log(err);
@@ -200,16 +198,21 @@ app.get('/', (req, res) => {
 
 // goodreads.getBooksByAuthor('656983');
 
-app.post('/goodreads-search-books', (req, res) => {
+app.post('/goodreads-search-books', async function searchGoodreads(req, res) {
   const FILTER_ALL = 'all';
   let query = req.body.query;
 
-  goodreads.searchBooks( {q: query, field: FILTER_ALL} )
-    .then( (result) => {
-      res.end(JSON.stringify(result.search.results.work));
-    }).catch( (error) => {
-      console.log('Error from goodreads searchBooks API: ' + error);
-    })
+  const goodreadsJson = await goodreads.searchBooks( {q: query, field: FILTER_ALL} );
+  const searchResults = goodreadsJson.search.results.work;
+
+  res.end( JSON.stringify(searchResults) );
+
+  // goodreads.searchBooks( {q: query, field: FILTER_ALL} )
+  //   .then( (result) => {
+  //     res.end(JSON.stringify(result.search.results.work));
+  //   }).catch( (error) => {
+  //     console.log('Error from goodreads searchBooks API: ' + error);
+  //   })
 });
 
 app.get('/book/:id', (req, res) => {
@@ -220,13 +223,19 @@ app.get('/book/:id', (req, res) => {
 });
 
 app.get('/login/google',
-  passport.authenticate('google', { successRedirect: '/', scope:
-    [ 'profile', 'email' ]
-  })
+  passport.authenticate('google',
+    {
+      successRedirect: '/',
+      scope: [ 'profile', 'email' ]
+    }
+  )
 );
 
 app.get('/login/google/callback', 
-  passport.authenticate('google', { failureRedirect: '/' }),
+  passport.authenticate('google',
+    {
+      failureRedirect: '/' }
+    ),
     function(req, res) {
       res.redirect('/');
     }
@@ -327,7 +336,7 @@ function addOwnedBookByUser(userID, bookID, callback) {
 function addBookIfMissing(goodreadsID, callback) {
   Book.findOne( {
     goodreadsID: goodreadsID
-  }, function (err, found) {
+  }, async function (err, found) {
     if (err) return handleError(err);
 
     if (found) { // book already in books collection - just grab the objectID from it and callback
@@ -336,29 +345,27 @@ function addBookIfMissing(goodreadsID, callback) {
     }
     else { // book not yet in Mongo collection books - so add it
       // console.log('Adding book to DB! ' + goodreadsID);
-      goodreads.showBook(goodreadsID)
-      .then( (result) => {
 
-        // console.log(result);
+      const result = await goodreads.showBook(goodreadsID)
 
-        let saveBook = new Book(
-          { goodreadsID: goodreadsID,
-            author: parseAuthorName(result.book),
-            title: result.book.title,
-            created: Date.now(),
-            imageURL: result.book.image_url,
-            description: result.book.description,
-            numOfPages: result.book.num_pages
-          }
-        );
+      let saveBook = new Book(
+        { goodreadsID: goodreadsID,
+          author: parseAuthorName(result.book),
+          title: result.book.title,
+          created: Date.now(),
+          imageURL: result.book.image_url,
+          description: result.book.description,
+          numOfPages: result.book.num_pages
+        }
+      );
 
-        saveBook.save(function (err, saved) {
-          if (err) return handleError(err);
-        
-          console.log('bookID saved:');
-          console.log(saved);
-          callback(saved.id);
-        });
+      saveBook.save(function (err, saved) {
+        if (err) return handleError(err);
+      
+        console.log('bookID saved:');
+        console.log(saved);
+        callback(saved.id);
+
       }).catch( (error) => {
         console.log('Error from goodreads searchBooks API: ' + error);
       })
@@ -490,13 +497,12 @@ function alertUsersWithMail(user1, user2) {
     text: 'Match',
     html: '<div>You have a new match in Karati!</div>'
   };
-  sendGridMail.send(msg);
+  // Freeze in Dev Mode to save SendGrid quota
+  // sendGridMail.send(msg);
 
   msg.to = user2.email;
-  sendGridMail.send(msg);
+  // sendGridMail.send(msg);
 }
-
-const STATUS_PENDING = 3;
 
 /**
  * Check for ANY book match between two users
@@ -523,7 +529,7 @@ function checkForMatch(currentUser, owner, swipedBookID, callback) {
               bookID: swipe.bookID
             },
             dateMatched: Date.now(),
-            status: STATUS_PENDING
+            status: matchStatus.PENDING
           });
 
           saveMatch.save(function (err, saved) {

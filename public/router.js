@@ -57,7 +57,7 @@ function render(viewName) {
         } else {
             root = view;
         }
-        console.log(root);
+        // console.log(root);
     // }
 
     root.render(html => {

@@ -198,11 +198,10 @@
                             let pData = JSON.parse(data);
             
                             if (pData.error) {
-                                if (pData.error == 33) {
+                                if (pData.error == ERRORS.NO_MATCHES) {
                                     this.noMatches = true;
                                     reRender(this);
-                                } else if (pData.error == 30) {
-                                    //  'NOT_LOGGED_IN'  : '30'
+                                } else if (pData.error == ERRORS.NOT_LOGGED_IN) {
                                     callback(`
                                         <div id="not-logged-in">
                                             Error: not logged into system.
@@ -260,14 +259,13 @@
                         let pData = JSON.parse(data);
         
                         if (pData.error) {
-                            if (pData.error == 30) {
-                                //  'NOT_LOGGED_IN'  : '30'
+                            if (pData.error == ERRORS.NOT_LOGGED_IN) {
                                 callback(`
                                     <div id="not-logged-in">
                                         Error: not logged into system.
                                     </div>
                                 `);
-                            } else if (pData.error == 32) {
+                            } else if (pData.error == ERRORS.SHELF_IS_EMPTY) {
                                 callback(`
                                     <div id="shelf-is-empty">
                                         Your shelf is empty.
@@ -421,12 +419,11 @@
                         // console.log(views.swipe.availableSwipes);
         
                         if (pData.error) {
-                            if (pData.error == 30) {
-                                //  'NOT_LOGGED_IN'  : '30'
+                            if (pData.error == ERRORS.NOT_LOGGED_IN) {
                                 this.notLoggedIn = true;
                                 reRender(this);
 
-                            } else if (pData.error == 31) {
+                            } else if (pData.error == ERRORS.END_OF_RESULTS) {
                                 this.noMoreSwipes = true;
                                 reRender(this);
                             }
@@ -576,8 +573,7 @@
                         let pData =  JSON.parse(results);
 
                         if (pData.error) {
-                            if (pData.error == 30) {
-                                //  'NOT_LOGGED_IN'  : '30'
+                            if (pData.error == ERRORS.NOT_LOGGED_IN) {
                                 this.failedQuery = true;
                             }
                         } else {
