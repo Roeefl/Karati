@@ -1,4 +1,4 @@
-    let views = {
+let views = {
 
     default: 'main',
 
@@ -18,6 +18,32 @@
                     <div class="main-features">
                     </div>
                     <div class="main-how-to-use">
+                    </div>
+                </div>
+            `);
+        }
+    },
+
+    loading: {
+        render: function(callback) {
+            callback(`
+                <div id="loader-container">
+                    <div class="book">
+                        <div class="book__pages">
+                            <div class="book__page book__page--left"></div>
+                            <div class="book__page book__page--right"></div>
+                    
+                            <div class="book__page book__page--right book__page--animated"></div>
+                            <div class="book__page book__page--right book__page--animated"></div>
+                            <div class="book__page book__page--right book__page--animated"></div>
+                            <div class="book__page book__page--right book__page--animated"></div>
+                            <div class="book__page book__page--right book__page--animated"></div>
+                            <div class="book__page book__page--right book__page--animated"></div>
+                            <div class="book__page book__page--right book__page--animated"></div>
+                            <div class="book__page book__page--right book__page--animated"></div>
+                            <div class="book__page book__page--right book__page--animated"></div>
+                            <div class="book__page book__page--right book__page--animated"></div>
+                        </div>
                     </div>
                 </div>
             `);
@@ -47,7 +73,6 @@
                     </div>
                     <div class="view-data">
                         <div id="view-data-container" class="view-inner-container">
-
                             <div class="grid-book">
                                 <div class="book-container">
                                     <div class="info">
@@ -88,7 +113,6 @@
                     <li class="grid-match">
                         <a href="#openmatch">
                             <div class="match-container" onclick="onAction('${this.id}', 'setCurrentMatch', event)">
-
                                 <div class="match-book other-book">
                                     <div class="match-book-container">
                                         <div class="owner">
@@ -113,14 +137,12 @@
                                         </div>
                                     </div>
                                 </div>
-
                                 <div class="swap">
                                     <button class="swap-books">
                                         <i class="fas fa-retweet"></i>
                                         <span>Swap!</span>
                                     </button>
                                 </div>
-
                                 <div class="match-book my-book">
                                     <div class="match-book-container">
                                         <div class="owner">
@@ -142,7 +164,6 @@
                                         </div>
                                     </div>
                                 </div>
-
                             </div>
                         </a>
                     </li>
@@ -172,10 +193,11 @@
                             let pData = JSON.parse(data);
             
                             if (pData.error) {
-                                if (pData.error == ERRORS.NO_MATCHES) {
+                                if (pData.error == 33) {
                                     this.noMatches = true;
                                     reRender(this);
-                                } else if (pData.error == ERRORS.NOT_LOGGED_IN) {
+                                } else if (pData.error == 30) {
+                                    //  'NOT_LOGGED_IN'  : '30'
                                     callback(`
                                         <div id="not-logged-in">
                                             Error: not logged into system.
@@ -233,13 +255,14 @@
                         let pData = JSON.parse(data);
         
                         if (pData.error) {
-                            if (pData.error == ERRORS.NOT_LOGGED_IN) {
+                            if (pData.error == 30) {
+                                //  'NOT_LOGGED_IN'  : '30'
                                 callback(`
                                     <div id="not-logged-in">
                                         Error: not logged into system.
                                     </div>
                                 `);
-                            } else if (pData.error == ERRORS.SHELF_IS_EMPTY) {
+                            } else if (pData.error == 32) {
                                 callback(`
                                     <div id="shelf-is-empty">
                                         Your shelf is empty.
@@ -362,14 +385,12 @@
                                                     <i class="fas fa-plus-circle"></i> I own this book!
                                                 </button>
                                             </div>
-
                                         </div>
                                     </div>
                                     <div class="image">
                                         <img src="${this.imageURL}">
                                     </div>
                                 </div>
-
                         </li>
                     `;
                 }
@@ -393,11 +414,12 @@
                         // console.log(views.swipe.availableSwipes);
         
                         if (pData.error) {
-                            if (pData.error == ERRORS.NOT_LOGGED_IN) {
+                            if (pData.error == 30) {
+                                //  'NOT_LOGGED_IN'  : '30'
                                 this.notLoggedIn = true;
                                 reRender(this);
 
-                            } else if (pData.error == ERRORS.END_OF_RESULTS) {
+                            } else if (pData.error == 31) {
                                 this.noMoreSwipes = true;
                                 reRender(this);
                             }
@@ -517,7 +539,7 @@
                             </div>
                             <div class="view-control">
                                 <div id="view-control-container" class="view-inner-container">
-                                    <form class="search-books" action="/bookSearch" method="GET" onsubmit="onAction('${this.id}', 'search', event)">
+                                    <form class="search-books" action="/api/books/search" method="GET" onsubmit="onAction('${this.id}', 'search', event)">
                                         <input type="text" placeholder="Tolkien" name="query">
                                         <button type="submit" class="btn-prime">Search using GoodReads API</button>
                                     </form>
@@ -533,6 +555,39 @@
                         </div>
                         `);
                     }
+                },
+        
+                search: function(event, done) {
+                    event.preventDefault();
+        
+                    var data = {
+                        query: event.target.query.value
+                    };
+        
+                    // $.post('/goodreads-search-books', data, results => {
+                    $.post(event.target.action, data, results => {
+                        let pData =  JSON.parse(results);
+
+                        if (pData.error) {
+                            if (pData.error == 30) {
+                                //  'NOT_LOGGED_IN'  : '30'
+                                this.failedQuery = true;
+                            }
+                        } else {
+                            if (!Array.isArray(pData)) {
+                                this.children.push(views.book.new(pData.best_book));
+                            } else {
+                                for (let bookData of pData) {
+                                    // console.log(bookData);
+                                    this.children.push(
+                                        views.book.new(bookData.best_book, true)
+                                    );
+                                }
+                            }
+                        }
+
+                        done();
+                    });
                 }
             }
         }
