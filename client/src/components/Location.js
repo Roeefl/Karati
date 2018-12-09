@@ -1,12 +1,12 @@
 import React from 'react';
-import Temp from './Temp';
+import Spinner from './Spinner';
 
 class Location extends React.Component {
     state = {
         lat: null,
         long: null,
         errorMsg: ''
-    };
+    }
 
     componentDidMount() {
         window.navigator.geolocation.getCurrentPosition(
@@ -28,7 +28,7 @@ class Location extends React.Component {
         );
     }
 
-    render() {
+    renderContent () {
         if (this.state.errorMsg && !this.state.lat) {
             return (
                 <div>
@@ -39,15 +39,20 @@ class Location extends React.Component {
 
         if (this.state.lat && !this.state.errorMsg) {
             return (
-                <Temp lat={this.state.lat}/>
+                <div>Lat: {this.state.lat}</div>
             );
         }
 
         return (
-            <div>
-                Loading...
-            </div>
+            <Spinner message="Loading Karati App..." />
+        );
+    }
 
+    render() {
+        return (
+            <div className="border-red">
+                {this.renderContent()}
+            </div>
         );
     }
 }

@@ -14,7 +14,6 @@
     <link rel="stylesheet" href="buttons.css">
     <link rel="stylesheet" href="login-modal.css">
 
-    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.css"> -->
     <link   rel="stylesheet"
             href="https://use.fontawesome.com/releases/v5.5.0/css/all.css"
             integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU"
@@ -99,8 +98,14 @@
         
                     <% } else { %>
                         <button class="login-button">
-                            <a href="/profile">
+                            <a href="/api/myProfile">
                                 <i class="fas fa-user-plus"></i>My Profile
+                            </a>
+                        </button>
+
+                        <button class="login-button">
+                            <a href="/api/logout">
+                                <i class="fas fa-sign-out"></i>Log Out
                             </a>
                         </button>
                     <% } %>
@@ -116,16 +121,6 @@
             </main>
         </div>
     </div>
-
-    <footer>
-        <div class="footer-container flame">
-            <div class="footer-inner-container">
-                <div class="footer-fb">
-                    Contact: roeefl@gmail.com
-                </div>
-            </div>
-        </div>
-    </footer>
 
     <script
         src="https://code.jquery.com/jquery-3.3.1.min.js"

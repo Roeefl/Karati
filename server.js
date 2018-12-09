@@ -1,148 +1,76 @@
-/* Requires */
 const express = require('express');
 const bodyParser= require('body-parser');
-// const mongo = require('mongodb');
-// const MongoClient = require('mongodb').MongoClient;
+
+const cookieParser = require('cookie-parser');
+const expressSession = require('express-session');
+
 const mongoose = require('mongoose');
+require('./models/User');
+require('./models/Book');
+require('./models/Match');
+
+/* Models */
+const User = mongoose.model('users');
+const Book = mongoose.model('books');
+const Match = mongoose.model('matches');
+
 const ObjectId = mongoose.Types.ObjectId;
+
 const GoodReadsAPI = require('goodreads-api-node');
-const passport = require('passport');
-const GoogleStrategy = require('passport-google-oauth2').Strategy;
-const FacebookStrategy = require('passport-facebook').Strategy;
-const errors = require('./config/errors');
+
 const matchStatus = require('./config/matchStatus');
 
 require('dotenv').config();
 
-// using SendGrid's v3 Node.js Library
-// https://github.com/sendgrid/sendgrid-nodejs
+const errors = require('./config/errors');
+
 const sendGridMail = require('@sendgrid/mail');
 sendGridMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-/* Models */
-const Models = require('./app/models/models');
-let User = Models.User;
-let Book = Models.Book;
-let Match = Models.Match;
-
-// Passport-Google
-passport.use(new GoogleStrategy (
-  {
-    clientID: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: process.env.GOOGLE_CALLBACK_URL,
-    passReqToCallback: true
-  },
-  async function(request, accessToken, refreshToken, profile, done) {
-    const existingUser = await User.findOne( { oauthID: profile.id } );
-
-    if (existingUser) {
-      return done(null, existingUser);
-    }
-
-    newUser = new User(
-      {
-        oauthID: profile.id,
-        name: profile.displayName,
-        email: profile.emails[0].value,
-        created: Date.now()
-      }
-    );
-
-    const savedUser = await newUser.save();
-    console.log('saving user to mongoose');
-    done(null, savedUser);
-  }
-));
-
-// Passport-Google
-passport.use(new FacebookStrategy (
-  {
-    clientID: process.env.FACEBOOK_CLIENT_ID,
-    clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
-    callbackURL: process.env.FACEBOOK_CALLBACK_URL,
-  },
-  function(request, accessToken, refreshToken, profile, done) {
-    User.findOne( { oauthID: profile.id }, function(err, user) {
-      if(err) {
-        console.log(err); // handle errors!
-      }
-      if (!err && user !== null) {
-        done(null, user);
-      } else { // user not found in users collection
-        user = new User(
-          {
-            oauthID: profile.id,
-            name: profile.displayName,
-            created: Date.now()
-          }
-        );
-        user.save(function(err) {
-          if(err) {
-            console.log(err); // handle errors!
-          } else {
-            console.log('saving user to mongoose');
-            done(null, user);
-          }
-        });
-      }
-    });
-  }
-));
-
-// Configure Passport authenticated session persistence.
-// serialize and deserialize
-passport.serializeUser(function(user, done) {
-  console.log('serializeUser: ' + user._id);
-  done(null, user._id);
-});
-passport.deserializeUser(function(id, done) {
-  User.findById(id, function(err, user) {
-      if(!err) done(null, user);
-      else done(err, null);
-    });
-});
-
-let AUTH_GOODREADS = {
+const AUTH_GOODREADS = {
   'key'      : 'tww0u4mt3LF2cEYOwo88A',
   'secret'   :  'z5BfwtkdN7vCx2CGj6gqxJkrTz9Zv373xgCjdHnRY'
 };
+
 const goodreads = GoodReadsAPI(AUTH_GOODREADS);
 
-// MongoDB
-const COL_BOOKS = 'books';
 
-// ExpressJS
 const app = express();
+
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
 app.use(express.static('public'));
 app.set('view engine', 'ejs');
+// app.use(express.static('client'));
 
 // Use application-level middleware for common functionality, including
 // logging, parsing, and session handling.
 app.use(require('morgan')('combined'));
-app.use(require('cookie-parser')());
-app.use(require('body-parser').urlencoded({ extended: true }));
-app.use(require('express-session')({ secret: 'keyboard cat', resave: true, saveUninitialized: true }));
+app.use(require('body-parser').urlencoded(
+  {
+    extended: true
+  }
+));
 
-// Initialize Passport and restore authentication state, if any, from the session
-app.use(passport.initialize());
-app.use(passport.session());  
+app.use(
+  expressSession(
+    {
+      secret: 'keyboard cat',
+      resave: true,
+      saveUninitialized: true,
+      cookie: {
+        maxAge: 30 * 24 * 60 * 60 * 1000
+      }
+    }
+  )  
+);
 
-// function ensureAuthenticated(req, res, next) {
-//   console.log('ensureAuthenticated is used');
+app.use(
+  cookieParser()
+);
 
-//   // if (req && req.session || !req.session.passport || !req.session.passport.user) {
-//   if (!req.isAuthenticated()) {  
-//     res.end( JSON.stringify( {
-//         'error': errors.NOT_LOGGED_IN
-//       } )
-//     );
-//     return;
-//   }
-//   return next();
-// };
-
+const passportService = require('./services/passport');
+passportService(app);
 
 function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) { return next(); }
@@ -155,7 +83,6 @@ function ensureAuthenticated(req, res, next) {
 
 const PORT = process.env.PORT || 9000;
 
-// MongoDB Connect
 mongoose.connect(process.env.ATLAS_CONNECTION, {useNewUrlParser: true} );
 let db = mongoose.connection;
 db.on('error', function () {
@@ -168,99 +95,51 @@ db.once('open', function() {
     console.log('Mongoose connected to MongoDB Atlas');
 });
 
-// function getBook(id, callback) {
-//   collection.find({_id: mongo.ObjectID(id)}).toArray((err, result) => {
-//     callback(result[0]);
-//   });
-// }
+require('./routes/authRoutes')(app);
 
 function handleError(err) {
   console.log('Error:');
   console.log(err);
 }
 
-// Routes
 app.get('/', (req, res) => {
+  console.log('I AM APP GET / AND I RENDER INDEX WITH EJS');
   res.render('index', { user: req.user });
 });
 
 app.get('/error-codes', (req, res) => {
   res.end( JSON.stringify(errors) );
 });
-
-// app.post('/add-book', (req, res) => {
-//   db.collection(COL_BOOKS).insertOne(req.body, (err, result) => {
-//     if (err) return console.log(err);
-//     console.log('saved to database');
-//     res.end(JSON.stringify(result));
-//   })
-// });
-
 // goodreads.getBooksByAuthor('656983');
-
-app.post('/goodreads-search-books', async function searchGoodreads(req, res) {
+app.post('/api/books/search', async function searchGoodreads(req, res) {
   const FILTER_ALL = 'all';
   let query = req.body.query;
 
   const goodreadsJson = await goodreads.searchBooks( {q: query, field: FILTER_ALL} );
   const searchResults = goodreadsJson.search.results.work;
 
-  res.end( JSON.stringify(searchResults) );
-
-  // goodreads.searchBooks( {q: query, field: FILTER_ALL} )
-  //   .then( (result) => {
-  //     res.end(JSON.stringify(result.search.results.work));
-  //   }).catch( (error) => {
-  //     console.log('Error from goodreads searchBooks API: ' + error);
-  //   })
+  res.end( JSON.stringify( searchResults ) );
 });
 
-app.get('/book/:id', (req, res) => {
+app.get('/api/books/:id', (req, res) => {
   console.log(req.params.id);
   Book.findOne({
     
   });
 });
 
-app.get('/login/google',
-  passport.authenticate('google',
-    {
-      successRedirect: '/',
-      scope: [ 'profile', 'email' ]
-    }
-  )
-);
+app.get('/api/myProfile', ensureAuthenticated, async (req, res) => {
+  const currUser = await User.findById(req.session.passport.user);
+  res.end( JSON.stringify( currUser ));
+});
 
-app.get('/login/google/callback', 
-  passport.authenticate('google',
-    {
-      failureRedirect: '/' }
-    ),
-    function(req, res) {
-      res.redirect('/');
-    }
-);
+app.get('/api/currentUser', (req, res) => {
+  res.send(req.user || false);
+});
 
-app.get('/login/facebook',
-  passport.authenticate('facebook', { successRedirect: '/', scope:
-    [ 'profile' ]
-  })
-);
-app.get('/login/facebook/callback',
-  passport.authenticate('facebook', { failureRedirect: '/' }),
-  function(req, res) {
-    res.redirect('/');
-  });
-
-
-app.get('/profile', ensureAuthenticated, function(req, res) {
-  User.findById(req.session.passport.user, function(err, user) {
-    if(err) {
-      console.log(err);
-    } else {
-      res.render('profile', { user: user} );
-    }
-  });
+app.get('/api/logout', (req, res) => {
+  req.logout();
+  res.redirect('/');
 });
 
 // if (!ensureLogin(req, res)) {
@@ -444,10 +323,10 @@ app.get('/user-get-swipes-batch', ensureAuthenticated, (req, res) => {
               }
 
               if (isBookSwipedByCurrentUser) {
-                console.log('Skipping ' + bookInfo.title + ' due to user ' + currentUser.name + ' already swiped it.');
+                console.log('Skipping ' + bookInfo.title + ' due to user ' + currentUser.username + ' already swiped it.');
               };
               if (isBookOwnedByCurrentUser) {
-                console.log('Skipping ' + bookInfo.title + ' due to user ' + currentUser.name + ' already owning it.');
+                console.log('Skipping ' + bookInfo.title + ' due to user ' + currentUser.username + ' already owning it.');
               };
 
               // If not yet swiped by currentUser - push into available swipes
@@ -455,7 +334,7 @@ app.get('/user-get-swipes-batch', ensureAuthenticated, (req, res) => {
                 console.log('adding ' + currBookID + ' to swipes');
                 let addSwipe = {
                   ownerID: possibility._id,
-                  ownedBy: possibility.name,
+                  ownedBy: possibility.username,
                   bookID: currBookID,
                   author: bookInfo.author,
                   title: bookInfo.title,
@@ -577,7 +456,7 @@ app.post('/user-swipe-book', ensureAuthenticated, (req, res) => {
   });
 });
 
-app.get('/my-shelf', ensureAuthenticated, (req, res) => {
+app.get('/api/myBooks', ensureAuthenticated, (req, res) => {
   let currentUserID = req.session.passport.user;
 
   let myShelf = [];
@@ -644,9 +523,9 @@ app.get('/user-get-matches', ensureAuthenticated, (req, res) => {
           let myBookInfo = allBooks.find(book => book._id == myself.bookID);
           let otherBookInfo = allBooks.find(book => book._id == owner.bookID);
 
-          let addToMatches = {
+        let addToMatches = {
             myBook: {
-              owner: myInfo.name,
+              owner: myInfo.username,
               bookID: myself.bookID,
               author: myBookInfo.author,
               title: myBookInfo.title,
@@ -655,7 +534,7 @@ app.get('/user-get-matches', ensureAuthenticated, (req, res) => {
               desc: (myBookInfo.description ? myBookInfo.description.substr(0, MAX_DESC_LEN) : 0)
             },
             otherBook: {
-              owner: ownerInfo.name,
+              owner: ownerInfo.username,
               bookID: owner.bookID,
               author: otherBookInfo.author,
               title: otherBookInfo.title,

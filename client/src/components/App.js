@@ -1,22 +1,22 @@
 import React from 'react';
 import { BrowserRouter, Route } from 'react-router-dom';
-import Location from './Location';
+import { connect } from 'react-redux';
+import * as actions from '../actions';
+
 import Header from './Header';
 
-import BookAdd from './books/BookAdd';
-import BookDelete from './books/BookDelete';
+import BookSearch from './books/BookSearch';
 import BookEdit from './books/BookEdit';
 import BookList from './books/BookList';
 import BookShow from './books/BookShow';
 
+import MyBooks from './books/MyBooks';
+
+import MyProfile from './MyProfile';
 
 class App extends React.Component {
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            
-        };
+    componentDidMount() {
+        this.props.fetchUser();
     }
 
     render() {
@@ -25,21 +25,21 @@ class App extends React.Component {
                 <BrowserRouter>
                     <div>
                         <Header />
-                        <Route path="/" exact component={BookList} />
-                        <Route path="/mybooks/add" exact component={BookAdd} />
-                        <Route path="/mybooks/edit" exact component={BookEdit} />
-                        <Route path="/mybooks/delete" exact component={BookDelete} />
-                        <Route path="/mybooks/show" exact component={BookShow} />
+
+                        <div className="book-search ui container">
+                            <Route exact path="/" component={BookList} />
+                            <Route exact path="/myBooks" component={MyBooks} />
+                            <Route path="/myProfile" component={MyProfile} />
+                            <Route path="/books/list" component={BookList} />
+                            <Route path="/books/search" component={BookSearch} />
+                            <Route path="/books/edit" component={BookEdit} />
+                            <Route path="/books/show" component={BookShow} />
+                        </div>
                     </div>
                 </BrowserRouter>
-                <div>
-                    Karati - Home
-                </div>
-
-                <Location />
             </div>
         );
     }
 }
 
-export default App;
+export default connect(null, actions)(App);

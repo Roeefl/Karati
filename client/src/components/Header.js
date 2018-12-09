@@ -1,22 +1,64 @@
+import './Header.css';
+
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
+
 import Auth from './Auth';
+import CompHeader from './CompHeader';
 
-const Header = () => {
-    return (
-        <div className="ui secondary pointing menu">
-            <Link to="/" className="item">
-                Karati
-            </Link>
-            <div className="right menu">
-                <Link to="/" className="item">
-                    My Books
+class Header extends React.Component {
+    renderMyProfile() {
+        if (this.props.auth) {
+            return (
+                <Link to="/myProfile" className="item">
+                    <i className="icon smile outline" />
+                    My Profile
                 </Link>
+            );
+        }
+        return ;
+    }
 
-                <Auth />
+    render() {
+        return (
+            <div className="ui inverted vertical masthead center aligned segment">
+                <div className="ui container">
+                    <div className="top-header ui secondary inverted menu">
+                        <Link to="/" className="header item">
+                            <i className="icon book" />
+                            Karati
+                        </Link>
+    
+                        <Link to="/books/search" className="search item">
+                            <i className="icon search" />
+                            Search
+                        </Link>
+    
+                        <div className="right menu">
+                            <Link to="/mybBoks" className="item">
+                                <i className="icon list alternate outline" />
+                                My Books
+                            </Link>
+
+                            {this.renderMyProfile()}
+
+                            <Auth method="google" loggedIn={this.props.auth} />
+                        </div>
+                    </div>
+                </div>
+                
+                <CompHeader />
             </div>
-        </div>
-    );
+        );
+    }
 }
 
-export default Header;
+function mapStateToProps(state) {
+    console.log(state.auth);
+    return {
+        auth: state.auth
+    }
+};
+
+export default connect(mapStateToProps)(Header);

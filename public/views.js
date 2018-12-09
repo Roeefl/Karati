@@ -24,32 +24,6 @@
         }
     },
 
-    loading: {
-        render: function(callback) {
-            callback(`
-                <div id="loader-container">
-                    <div class="book">
-                        <div class="book__pages">
-                            <div class="book__page book__page--left"></div>
-                            <div class="book__page book__page--right"></div>
-                    
-                            <div class="book__page book__page--right book__page--animated"></div>
-                            <div class="book__page book__page--right book__page--animated"></div>
-                            <div class="book__page book__page--right book__page--animated"></div>
-                            <div class="book__page book__page--right book__page--animated"></div>
-                            <div class="book__page book__page--right book__page--animated"></div>
-                            <div class="book__page book__page--right book__page--animated"></div>
-                            <div class="book__page book__page--right book__page--animated"></div>
-                            <div class="book__page book__page--right book__page--animated"></div>
-                            <div class="book__page book__page--right book__page--animated"></div>
-                            <div class="book__page book__page--right book__page--animated"></div>
-                        </div>
-                    </div>
-                </div>
-            `);
-        }
-    },
-
     showbook: { 
         render: function(callback) {
             callback (`
@@ -543,7 +517,7 @@
                             </div>
                             <div class="view-control">
                                 <div id="view-control-container" class="view-inner-container">
-                                    <form class="search-books" action="/goodreads-search-books" method="GET" onsubmit="onAction('${this.id}', 'search', event)">
+                                    <form class="search-books" action="/bookSearch" method="GET" onsubmit="onAction('${this.id}', 'search', event)">
                                         <input type="text" placeholder="Tolkien" name="query">
                                         <button type="submit" class="btn-prime">Search using GoodReads API</button>
                                     </form>
@@ -559,38 +533,6 @@
                         </div>
                         `);
                     }
-                },
-        
-                search: function(event, done) {
-                    event.preventDefault();
-        
-                    var data = {
-                        query: event.target.query.value
-                    };
-        
-                    // $.post('/goodreads-search-books', data, results => {
-                    $.post(event.target.action, data, results => {
-                        let pData =  JSON.parse(results);
-
-                        if (pData.error) {
-                            if (pData.error == ERRORS.NOT_LOGGED_IN) {
-                                this.failedQuery = true;
-                            }
-                        } else {
-                            if (!Array.isArray(pData)) {
-                                this.children.push(views.book.new(pData.best_book));
-                            } else {
-                                for (let bookData of pData) {
-                                    // console.log(bookData);
-                                    this.children.push(
-                                        views.book.new(bookData.best_book, true)
-                                    );
-                                }
-                            }
-                        }
-
-                        done();
-                    });
                 }
             }
         }
