@@ -1,12 +1,12 @@
 import Axios from 'axios';
-import { UPDATE_SEARCH_RESULTS, BOOK_SELECTED, FETCH_USER } from './types';
+import { UPDATE_SEARCH_RESULTS, BOOK_SELECTED, FETCH_USER, UPDATE_MY_BOOKS } from './types';
 
 // Action Creator
-export const selectBook = (book) => {
+export const selectBook = (bookData) => {
     // Returns an Action
     return {
         type: BOOK_SELECTED,
-        payload: book
+        payload: bookData
     };
 };
 
@@ -27,3 +27,10 @@ export const fetchUser = () =>
             payload: res.data || null
         });
     };
+
+export const updateMyBooks = (myBooks) => {
+    return {
+        type: UPDATE_MY_BOOKS,
+        payload: myBooks
+    }
+}

@@ -5,7 +5,7 @@ class BookCard extends React.Component {
         super(props);
 
         this.state = {
-            src: this.props.data.image_url
+            src: this.props.src
         };
 
         this.imageRef = React.createRef();
@@ -22,26 +22,35 @@ class BookCard extends React.Component {
     }
 
     selectBook = () => {
-        this.props.onBookSelect(this.props.data);
+        this.props.onBookSelect(this.props.bookId);
     }
 
     componentDidMount() {
         this.imageRef.current.addEventListener('load', this.determinePhoto);
     }
 
-    render() {
-        return (
-            <div className="book-card">
-                <div className="book-card-img">
-                    <img ref={this.imageRef} src={this.state.src} alt={this.props.data.desc} />
-                </div>
+    renderButton() {
+        if (this.props.showInfoButton) {
+            return (
                 <div className="book-card-select">
                     <button
                         className="ui button primary"
                         onClick={this.selectBook} >
                         Info
                     </button>
-                </div> 
+                </div>
+            );
+        };
+        return;
+    }
+
+    render() {
+        return (
+            <div className="book-card">
+                <div className="book-card-img">
+                    <img ref={this.imageRef} src={this.state.src} alt={this.props.alt} />
+                </div>
+                {this.renderButton()}
             </div>
         );
     }

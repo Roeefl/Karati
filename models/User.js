@@ -7,6 +7,10 @@ const ownedBookSchema = new Schema(
             type: String,
             required: true
         },
+        goodreadsID: {
+            type: Number,
+            required: false
+        },
         dateAdded: {
             type: Date,
             required: false

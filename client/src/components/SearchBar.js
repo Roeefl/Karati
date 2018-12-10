@@ -17,7 +17,7 @@ class SearchBar extends React.Component {
                 <form
                     className="ui form"
                     onSubmit={this.onFormSubmit}>
-                      <h4 class="ui dividing header">Search the book Database</h4>
+                      <h4 className="ui dividing header">Search the book Database</h4>
                     <div className="ui action left icon input">
                         <i className="icon search"/>
                         <input

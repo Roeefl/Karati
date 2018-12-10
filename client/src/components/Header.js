@@ -8,6 +8,18 @@ import Auth from './Auth';
 import CompHeader from './CompHeader';
 
 class Header extends React.Component {
+    renderMyBooks() {
+        if (this.props.auth) {
+            return (
+                <Link to="/myBooks" className="item">
+                    <i className="icon list alternate outline" />
+                    My Books
+                </Link>
+            );
+        }
+        return;
+    }
+
     renderMyProfile() {
         if (this.props.auth) {
             return (
@@ -17,7 +29,7 @@ class Header extends React.Component {
                 </Link>
             );
         }
-        return ;
+        return;
     }
 
     render() {
@@ -36,13 +48,8 @@ class Header extends React.Component {
                         </Link>
     
                         <div className="right menu">
-                            <Link to="/mybBoks" className="item">
-                                <i className="icon list alternate outline" />
-                                My Books
-                            </Link>
-
+                            {this.renderMyBooks()}
                             {this.renderMyProfile()}
-
                             <Auth method="google" loggedIn={this.props.auth} />
                         </div>
                     </div>

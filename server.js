@@ -41,7 +41,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 app.use(express.static('public'));
 app.set('view engine', 'ejs');
-// app.use(express.static('client'));
+// app.use(express.static('client/build'));
 
 // Use application-level middleware for common functionality, including
 // logging, parsing, and session handling.
@@ -115,10 +115,26 @@ app.post('/api/books/search', async function searchGoodreads(req, res) {
   const FILTER_ALL = 'all';
   let query = req.body.query;
 
-  const goodreadsJson = await goodreads.searchBooks( {q: query, field: FILTER_ALL} );
+  let books = [];
+  let goodreadsJson;
+
+  try {
+    goodreadsJson = await goodreads.searchBooks( {q: query, field: FILTER_ALL} );
+  } catch(e) {
+      res.end( JSON.stringify( { books: books } ) );
+      return;
+  }
+
   const searchResults = goodreadsJson.search.results.work;
 
-  res.end( JSON.stringify( searchResults ) );
+  if ( !Array.isArray(searchResults) ) {
+    books.push(response.data.best_book);
+  } else {
+      for (let result of searchResults) {
+        books.push(result.best_book);
+      }
+  }
+  res.end( JSON.stringify( { books: books } ) );
 });
 
 app.get('/api/books/:id', (req, res) => {
@@ -181,7 +197,7 @@ function parseAuthorName(book) {
  * @param {*} bookID 
  * @param {*} res - response from post request
  */
-function addOwnedBookByUser(userID, bookID, callback) {
+function addOwnedBookByUser(userID, bookID, goodreadsID, callback) {
   getUser(userID, foundUser => {
     let isBookOwnedByUser = false;
     if (foundUser.ownedBooks) {
@@ -194,6 +210,7 @@ function addOwnedBookByUser(userID, bookID, callback) {
     } else {
       let newOwnedBook = {
         bookID: bookID,
+        goodreadsID: goodreadsID,
         dateAdded: Date.now()
       };
       
@@ -249,20 +266,45 @@ function addBookIfMissing(goodreadsID, callback) {
         console.log('Error from goodreads searchBooks API: ' + error);
       })
     }
-  })
-}
+  });
+};
+
+app.get('/api/myBooks', ensureAuthenticated, (req, res) => {
+  Book.find({}, (err, allBooks) => {
+    if (err) return handleError(err);
+
+    let currentUserID = req.session.passport.user;
+
+    getUser(currentUserID, currentUser => {
+      let myBooks = [];
+
+      for (let ownedBook of currentUser.ownedBooks) { 
+        myBooks.push(
+          allBooks.find(book => book._id == ownedBook.bookID)
+        );
+      }
+
+      res.end( JSON.stringify(
+        {
+          myBooks: myBooks
+        }
+      ) );
+      
+    });
+  });
+});
 
 /**
  * Adds a book selected by user to mark as 'owned' to ownedBooks collection.
  * If book does not exist in books collection, adds the book to it first, then to ownedBooks.
  */
-app.post('/user-add-owned-book', ensureAuthenticated, (req, res) => {
+app.post('/api/myBooks/add', ensureAuthenticated, (req, res) => {
   let currentUserID = req.session.passport.user;
   
   addBookIfMissing(req.body.goodreadsID, bookID => {
-    addOwnedBookByUser(currentUserID, bookID, saved => {
+    addOwnedBookByUser(currentUserID, bookID, req.body.goodreadsID, saved => {
       res.end(JSON.stringify(
-        {'saved': saved}
+        { bookAddedToMyBooks: saved}
       ));
     });
   });
@@ -280,7 +322,7 @@ function getUser(userID, callback) {
 
       callback(foundUser);
   });
-}
+};
 
 /**
  * If a book exists in the OwnedBook collection, it means that some user has declared that he owns that book and put it up for exchange.
@@ -452,39 +494,6 @@ app.post('/user-swipe-book', ensureAuthenticated, (req, res) => {
       }
 
       res.end(JSON.stringify(newSwipe));
-    });
-  });
-});
-
-app.get('/api/myBooks', ensureAuthenticated, (req, res) => {
-  let currentUserID = req.session.passport.user;
-
-  let myShelf = [];
-
-  Book.find({}, (err, allBooks) => {
-    if (err) return handleError(err);
-
-    getUser(currentUserID, currentUser => {
-      for (let ownedBook of currentUser.ownedBooks) { 
-        let ownedBookID = ownedBook.bookID;
-        let bookInfo = allBooks.find(book => book._id == ownedBookID);
-
-        let addToShelf = {
-          bookID: ownedBookID,
-          author: bookInfo.author,
-          title: bookInfo.title,
-          goodreadsID: bookInfo.goodreadsID,
-          imageURL: bookInfo.imageURL
-        }
-
-        myShelf.push(addToShelf);
-      }
-
-      if (myShelf.length > 0) {
-        res.end( JSON.stringify(myShelf) );
-      } else {
-        res.end( JSON.stringify({'error': errors.SHELF_IS_EMPTY}) );
-      }
     });
   });
 });

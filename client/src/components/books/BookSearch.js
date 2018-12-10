@@ -16,7 +16,8 @@ class BookSearch extends React.Component {
         ready: true
     };
 
-    onBookSelect = (bookData) => {
+    onBookSelect = (bookId) => {
+        let bookData = this.props.searchResults.find(book => book.id._ === bookId);
         this.props.selectBook(bookData);
     }
 
@@ -24,18 +25,9 @@ class BookSearch extends React.Component {
         this.setState({ ready: false });
 
         const response = await Axios.post('/api/books/search', { query: term } );
-
-        if (!Array.isArray(response.data)) {
-            this.props.updateSearchResults(response.data.best_book);
-        } else {
-            let genBooks = [];
-            for (let bookData of response.data) {
-                genBooks.push(bookData.best_book);
-            }
-
-            this.props.updateSearchResults(genBooks);
-        }
-
+        
+        console.log(response);
+        this.props.updateSearchResults(response.data.books);
         this.setState({ ready: true });
     }
 

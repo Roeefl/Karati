@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux';
 import { authReducer } from  './authReducer';
-import { UPDATE_SEARCH_RESULTS, BOOK_SELECTED } from '../actions/types';
+import { UPDATE_SEARCH_RESULTS, BOOK_SELECTED, UPDATE_MY_BOOKS } from '../actions/types';
 
 const bookSearchResultsReducer = (searchResults = [], action) => {
     if (action.type === UPDATE_SEARCH_RESULTS) {
@@ -18,10 +18,19 @@ const selectedBookReducer = (selectedBook = null, action) => {
     return selectedBook;
 };
 
+const myBooksReducer = (myBooks = [], action) => {
+    if (action.type === UPDATE_MY_BOOKS) {
+        return action.payload;
+    }
+
+    return myBooks;
+};
+
 export default combineReducers(
     {
         auth: authReducer,
         searchResults: bookSearchResultsReducer,
-        selectedBook: selectedBookReducer
+        selectedBook: selectedBookReducer,
+        myBooks: myBooksReducer
     }
 );

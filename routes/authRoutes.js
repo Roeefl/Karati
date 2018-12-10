@@ -14,6 +14,7 @@ module.exports = (app) => {
         passport.authenticate('google', { failureRedirect: '/' }),
         (req, res) => {
             res.redirect('http://localhost:3000/');
+            // res.redirect('/myBooks');
         }
     );
 

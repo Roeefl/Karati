@@ -5,14 +5,14 @@ import React from 'react';
 import BookCard from './books/BookCard';
 
 class SearchResults extends React.Component {
-    onBookSelect = (bookData) => {
-        this.props.onBookSelect(bookData);
+    onBookSelect = (bookId) => {
+        this.props.onBookSelect(bookId);
     }
 
     render() {
         const results = this.props.results.map( result => {
             return (
-                <BookCard key={result.id._} data={result} onBookSelect={this.onBookSelect} />
+                <BookCard key={result.id._} bookId={result.id._} src={result.image_url} alt={result.desc} showInfoButton={true} onBookSelect={this.onBookSelect} />
             );
         });
 
