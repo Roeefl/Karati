@@ -251,7 +251,7 @@ let views = {
                 children: [],
 
                 render: function(callback) {
-                    request('my-shelf', data => {
+                    request('/api/myBooks', data => {
                         let pData = JSON.parse(data);
         
                         if (pData.error) {
@@ -270,7 +270,8 @@ let views = {
                                 `);
                             }
                         } else {
-                            for (let bookData of pData) {
+                            console.log(pData.myBooks);
+                            for (let bookData of pData.myBooks) {
                                 this.children.push(
                                     views.book.new(bookData, false)
                                 );
@@ -291,7 +292,7 @@ let views = {
     book: {
         new: function(bookData, isFromGR) {
             return {
-                id: bookData.id._,
+                id: (bookData.id ? bookData.id._ : (bookData._id || Date.now())),
                 bookInfo: bookData,
                 isFromGoodreads: isFromGR,
 
@@ -408,7 +409,7 @@ let views = {
                 notLoggedIn: false,
         
                 getBatch: function(e, done) {
-                    request('/user-get-swipes-batch', data => {
+                    request('/api/matches/browse', data => {
                         let pData = JSON.parse(data);
         
                         // console.log(views.swipe.availableSwipes);
@@ -568,22 +569,13 @@ let views = {
                     $.post(event.target.action, data, results => {
                         let pData =  JSON.parse(results);
 
-                        if (pData.error) {
-                            if (pData.error == 30) {
-                                //  'NOT_LOGGED_IN'  : '30'
-                                this.failedQuery = true;
-                            }
-                        } else {
-                            if (!Array.isArray(pData)) {
-                                this.children.push(views.book.new(pData.best_book));
-                            } else {
-                                for (let bookData of pData) {
-                                    // console.log(bookData);
-                                    this.children.push(
-                                        views.book.new(bookData.best_book, true)
-                                    );
-                                }
-                            }
+                        console.log(pData.books);
+
+                        for (let book of pData.books) {
+                            // console.log(bookData);
+                            this.children.push(
+                                views.book.new(book, true)
+                            );
                         }
 
                         done();

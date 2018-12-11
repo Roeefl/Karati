@@ -12,30 +12,34 @@ const methodConfig = {
 
 class Auth extends React.Component {
     renderLink() {
+        const { iconName } = methodConfig[this.props.method];
+
         switch (this.props.loggedIn) {
             case null:
                 return (
-                    <span></span>
+                    <div className="auth item">
+                    </div>
                 );
             case false:
                 return (
-                    <a href="/login/google">Google Login</a>
+                    <a className="auth item" href="/login/google">
+                        <i className={`icon small ${iconName}`} />
+                        Google Login
+                    </a>
                 );
             default:
                 return (
-                    <a href="/api/logout">Log Out</a>
+                    <a className="auth item" href="/api/logout">
+                        <i className={`icon small sign-out`} />
+                        Log Out
+                    </a>
                 );
         }
     }
 
     render() {
-        const { iconName } = methodConfig[this.props.method];
-
         return (
-            <div className="auth item">
-                <i className={`icon small ${iconName}`} />
-                {this.renderLink()}
-            </div>
+            this.renderLink()
         );
     }
 }

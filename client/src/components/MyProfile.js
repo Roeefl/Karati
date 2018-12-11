@@ -14,7 +14,9 @@ class MyProfile extends React.Component {
             <div className="my-profile">
                 <div className="ui card">
                     <div className="image">
-                        <img src="https://semantic-ui.com/images/avatar/large/elliot.jpg" />
+                        <img
+                            src="https://semantic-ui.com/images/avatar/large/elliot.jpg"
+                            alt="Profile Placeholder" />
                     </div>
                     <div className="content">
                         <div className="header">{this.props.auth.username}</div>

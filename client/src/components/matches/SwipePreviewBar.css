@@ -1,0 +1,9 @@
+.swipe-preview-bar .image {
+    width: 100%;
+    height: 95px;
+}
+
+.swipe-preview-bar .first-img {
+    border: 6px solid lightgreen;
+    border-radius: 30px;
+}

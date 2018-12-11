@@ -14,6 +14,11 @@ import MyBooks from './books/MyBooks';
 
 import MyProfile from './MyProfile';
 
+import MyMatches from './MyMatches';
+
+import Browse from './matches/Browse';
+import Swipe from './matches/Swipe';
+
 class App extends React.Component {
     componentDidMount() {
         this.props.fetchUser();
@@ -29,11 +34,14 @@ class App extends React.Component {
                         <div className="book-search ui container">
                             <Route exact path="/" component={BookList} />
                             <Route exact path="/myBooks" component={MyBooks} />
+                            <Route exact path="/myMatches" component={MyMatches} />
                             <Route path="/myProfile" component={MyProfile} />
                             <Route path="/books/list" component={BookList} />
                             <Route path="/books/search" component={BookSearch} />
                             <Route path="/books/edit" component={BookEdit} />
                             <Route path="/books/show" component={BookShow} />
+                            <Route path="/matches/browse" component={Browse} />
+                            <Route path="/matches/swipe" component={Swipe} />
                         </div>
                     </div>
                 </BrowserRouter>

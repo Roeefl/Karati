@@ -1,0 +1,23 @@
+.search-results .book-card-img {
+    height: 220px !important;
+    padding: 6px;
+}
+
+.my-books .book-card-img {
+    height: 270px !important;
+    padding: 6px;
+}
+
+.matches .book-card .image {
+    width: 150px;
+    height: auto;
+}
+
+.matches .book-card .image img {
+    height: 180px !important;
+    padding: 6px;
+}
+
+.book-card-title-author {
+    min-height: 180px !important;
+}

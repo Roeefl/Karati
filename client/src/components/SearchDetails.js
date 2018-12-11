@@ -1,6 +1,7 @@
 import React from 'react';
 import Axios from 'axios';
 import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 
 class SearchDetails extends React.Component {
     state = {
@@ -25,15 +26,28 @@ class SearchDetails extends React.Component {
 
     addToMyBooks = async () => {
         this.setState( { addBookComponentType: 2 } ); // Fetching
-        const res = await Axios.post('/api/myBooks/add', { goodreadsID: this.props.selectedBook.id._ } );
 
-        console.log(res);
+        try {
+            const res = await Axios.post('/api/myBooks/add', { goodreadsID: this.props.selectedBook.id._ } );
+            console.log(res);
 
-        if (res.data.error) {
-            this.setState( { addBookComponentType: 1 } ); // Add Button
-            return;
+            if (res.data.error) {
+                this.setState( { addBookComponentType: 1 } ); // Add Button
+                return;
+            }
+            this.setState( { addBookComponentType: (res.data.bookAddedToMyBooks ? 3 : 4) } ); // Successfully added / already own
+        } catch(error) {
+            console.log('/api/myBooks/add failed with error: ' + error);
         }
-        this.setState( { addBookComponentType: (res.data.bookAddedToMyBooks ? 3 : 4) } ); // Successfully added / already own
+    }
+
+    renderMyBooksLink() {
+        return (
+            <Link to="/myBooks" className="enforce-green">
+                <i className="icon list alternate outline" />
+                My Books
+            </Link>
+        );
     }
 
     renderAddButton() {
@@ -61,7 +75,7 @@ class SearchDetails extends React.Component {
                         <div className="header">
                             Book was saved to your books.
                         </div>
-                        <p>Go to <b>My Books</b> to see all your books.</p>
+                        <p>Go to  {this.renderMyBooksLink()} to see all your books.</p>
                     </div>
                 );
             default:
@@ -70,7 +84,7 @@ class SearchDetails extends React.Component {
                         <div className="header">
                             You already own this book.
                         </div>
-                        <p>Go to <b>My Books</b> to see all your books.</p>
+                        <p>Go to {this.renderMyBooksLink()} to see all your books.</p>
                     </div>
                 );
         }

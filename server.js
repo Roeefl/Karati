@@ -110,31 +110,38 @@ app.get('/', (req, res) => {
 app.get('/error-codes', (req, res) => {
   res.end( JSON.stringify(errors) );
 });
+
 // goodreads.getBooksByAuthor('656983');
 app.post('/api/books/search', async function searchGoodreads(req, res) {
   const FILTER_ALL = 'all';
   let query = req.body.query;
 
   let books = [];
-  let goodreadsJson;
 
   try {
-    goodreadsJson = await goodreads.searchBooks( {q: query, field: FILTER_ALL} );
+    const goodreadsJson = await goodreads.searchBooks( {q: query, field: FILTER_ALL} );
+    const searchResults = goodreadsJson.search.results.work;
+
+    if ( !Array.isArray(searchResults) ) {
+      books.push(response.data.best_book);
+    } else {
+        for (let result of searchResults) {
+          books.push(result.best_book);
+        }
+    }
+    res.end( JSON.stringify(
+      {
+        books: books
+      }
+    ));
   } catch(e) {
-      res.end( JSON.stringify( { books: books } ) );
+      res.end( JSON.stringify(
+        {
+          books: books
+        }
+      ));
       return;
   }
-
-  const searchResults = goodreadsJson.search.results.work;
-
-  if ( !Array.isArray(searchResults) ) {
-    books.push(response.data.best_book);
-  } else {
-      for (let result of searchResults) {
-        books.push(result.best_book);
-      }
-  }
-  res.end( JSON.stringify( { books: books } ) );
 });
 
 app.get('/api/books/:id', (req, res) => {
@@ -331,8 +338,8 @@ function getUser(userID, callback) {
  * 1 - If the userID in the OwnedBook record matches the userID of the current user - it's his own book and he shouldn't see it while swiping
  * 2 - If he already swept on it prior, he shouldn't see it either anymore.
  */
-app.get('/user-get-swipes-batch', ensureAuthenticated, (req, res) => {
-  const MAX_BATCH_SIZE = 30;
+app.get('/api/matches', ensureAuthenticated, (req, res) => {
+  const MAX_BATCH_SIZE = 20;
 
   let currentUserID = req.session.passport.user;
   let swipes = []; // init empty array for books available for swiping
@@ -343,7 +350,7 @@ app.get('/user-get-swipes-batch', ensureAuthenticated, (req, res) => {
         find({}).
         where('_id').ne(currentUserID).
         limit(MAX_BATCH_SIZE).
-        select('name ownedBooks').
+        select('username ownedBooks').
         exec(function(err, usersWithPossibleBooksForSwiping) {
           for (let possibility of usersWithPossibleBooksForSwiping) {
             for (let ownedBook of possibility.ownedBooks) {
@@ -365,36 +372,39 @@ app.get('/user-get-swipes-batch', ensureAuthenticated, (req, res) => {
               }
 
               if (isBookSwipedByCurrentUser) {
-                console.log('Skipping ' + bookInfo.title + ' due to user ' + currentUser.username + ' already swiped it.');
+                // console.log('Skipping ' + bookInfo.title + ' due to user ' + currentUser.username + ' already swiped it.');
               };
               if (isBookOwnedByCurrentUser) {
-                console.log('Skipping ' + bookInfo.title + ' due to user ' + currentUser.username + ' already owning it.');
+                // console.log('Skipping ' + bookInfo.title + ' due to user ' + currentUser.username + ' already owning it.');
               };
 
               // If not yet swiped by currentUser - push into available swipes
               if (!isBookSwipedByCurrentUser && !isBookOwnedByCurrentUser) {
-                console.log('adding ' + currBookID + ' to swipes');
+                // console.log('adding to swipes');
+                // console.log(bookInfo)
                 let addSwipe = {
                   ownerID: possibility._id,
                   ownedBy: possibility.username,
                   bookID: currBookID,
                   author: bookInfo.author,
                   title: bookInfo.title,
-                  imageURL: bookInfo.imageURL
+                  imageURL: bookInfo.imageURL,
+                  desc: bookInfo.description,
+                  numofPages: bookInfo.numOfPages
                 }
                 
-                console.log(swipes.length);
+                // console.log(swipes.length);
                 swipes.push(addSwipe);
               }
               // console.log('pushed userID ' + possibility._id+ ' with bookID ' + ownedBook.bookID);
             }
           }
 
-          if (swipes.length > 0) {
-            res.end( JSON.stringify(swipes) );
-          } else {
-            res.end( JSON.stringify({'error': errors.END_OF_RESULTS}) );
-          }
+          res.end( JSON.stringify(
+            {
+              matchResults: swipes
+            }
+          ));
         });
     });
   });
@@ -469,20 +479,22 @@ function checkForMatch(currentUser, owner, swipedBookID, callback) {
   }
 }
 
-app.post('/user-swipe-book', ensureAuthenticated, (req, res) => {
+app.post('/api/matches/swipe', ensureAuthenticated, (req, res) => {
   let currentUserID = req.session.passport.user;
+
+  // console.log(req.body);
 
   getUser(currentUserID, currentUser => {
     let newSwipe = {
       bookID: req.body.bookID,
-      like: (req.body.like == 'true'),
+      like: req.body.like,
       dateAdded: Date.now()
     };
       
     currentUser.swipes.push(newSwipe);
     currentUser.save(function (err, saved) {  
       if (err) return handleError(err);
-      console.log('/user-swipe-book saved swipe ' + req.body.bookID + ' to user ' + currentUserID);
+      console.log('/api/matches/swipe: saved new swipe (' + newSwipe.like + ') for book ' + newSwipe.bookID + ' for user ' + currentUserID);
 
       if (newSwipe.like) {
         // if swipe was a YES - alert both users with a mail
@@ -493,17 +505,21 @@ app.post('/user-swipe-book', ensureAuthenticated, (req, res) => {
         });
       }
 
-      res.end(JSON.stringify(newSwipe));
+      res.end(JSON.stringify(
+        {
+          newSwipe: newSwipe
+        }
+      ));
     });
   });
 });
 
 const MAX_DESC_LEN = 200;
 
-app.get('/user-get-matches', ensureAuthenticated, (req, res) => {
+app.get('/api/myMatches', ensureAuthenticated, (req, res) => {
   let currentUserID = req.session.passport.user;
   let currentUserObjectID = new ObjectId(req.session.passport.user);
-  let returnMatches = [];
+  let myMatches = [];
   
   Book.find({}, function (err, allBooks) { 
 
@@ -552,15 +568,20 @@ app.get('/user-get-matches', ensureAuthenticated, (req, res) => {
               desc: (otherBookInfo.description ? otherBookInfo.description.substr(0, MAX_DESC_LEN) : 0)
             },
             matchedOn: match.dateMatched,
-            status: match.status
+            status: match.status,
+            id: match._id
           };
 
-          returnMatches.push(addToMatches);
+          myMatches.push(addToMatches);
         }
     
-        if (returnMatches.length > 0) {
+        if (myMatches.length > 0) {
           res.end(
-            JSON.stringify(returnMatches)
+            JSON.stringify(
+              {
+                myMatches: myMatches
+              }
+            )
           );
         } else {
           res.end( JSON.stringify(

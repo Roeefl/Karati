@@ -1,3 +1,7 @@
 .book-search {
     margin-top: 20px;
 }
+
+.enforce-green {
+    color: green !important;
+}

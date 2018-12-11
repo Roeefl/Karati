@@ -2,21 +2,24 @@ import Axios from 'axios';
 
 import './MyBooks.css';
 
+import React from 'react';
+
 import { connect } from 'react-redux';
 import { updateMyBooks } from '../../actions';
-
-import React from 'react';
 
 import BookCard from './BookCard';
 
 class MyBooks extends React.Component   {
     fetchMyBooks = async () => {
-        const res = await Axios.get('/api/mybooks');
+        try {
+            const res = await Axios.get('/api/myBooks');
+            console.log(res.data);
 
-        console.log(res.data);
-
-        if (res.data.error != 30) {
-            this.props.updateMyBooks(res.data.myBooks);
+            if (res.data.error !== 30) {
+                this.props.updateMyBooks(res.data.myBooks);
+            }
+        } catch(error) {
+            console.log('/api/myBooks failed with error: ' + error);
         }
     }
 
@@ -26,18 +29,27 @@ class MyBooks extends React.Component   {
 
     render() {
         const results = this.props.myBooks.map( book => {
-            console.log(book);
+            let trimmedDesc = book.description.substring(0, 200);
             return (
-                <BookCard key={book._id} src={book.imageURL} alt={book.description} onBookSelect={null} showInfoButton={false} />
+                <div className="book-card-container three wide column" key={book._id}>
+                    <BookCard
+                        bookId={book._id}
+                        src={book.imageURL}
+                        desc={trimmedDesc}
+                        title={book.title}
+                        author={book.author}
+                        numOfPages={book.numOfPages}
+                        onBookSelect={null} />
+                </div>
             );
         });
 
         return (
-            <div className="search-results ten wide column">
-                <div className="search-results-count ui segment">
+            <div className="my-books ten wide column">
+                <div className="my-books-count ui segment">
                     You own {this.props.myBooks.length} Books
                 </div>
-                <div className="search-results-grid ui segment">
+                <div className="my-books-grid ui link cards grid">
                     {results}
                 </div>
             </div>

@@ -1,4 +1,4 @@
-.search-results-grid {
+/* .search-results-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     grid-gap: 0 40px;
@@ -7,4 +7,4 @@
 
 .search-results-grid img {
     width: 100px;
-}
+} */

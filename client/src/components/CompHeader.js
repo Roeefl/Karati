@@ -14,8 +14,8 @@ const CompHeader = (props) => {
 }
 
 CompHeader.defaultProps = {
-    primary: 'Karati - Home',
-    secondary: 'This is the front page'
+    primary: 'Karati',
+    secondary: 'Uniting People through Reading'
 }
 
 export default CompHeader;

@@ -22,13 +22,17 @@ class BookSearch extends React.Component {
     }
 
     onSearchSubmit = async (term) => {
-        this.setState({ ready: false });
+        this.setState( { ready: false } );
 
-        const response = await Axios.post('/api/books/search', { query: term } );
-        
-        console.log(response);
-        this.props.updateSearchResults(response.data.books);
-        this.setState({ ready: true });
+        try {
+            const response = await Axios.post('/api/books/search', { query: term } );
+            console.log(response);
+            this.props.updateSearchResults(response.data.books);
+        } catch(error) {
+            console.log('/api/books/search failed with error: ' + error);
+        }
+
+        this.setState( { ready: true } );
     }
 
     renderContent() {
@@ -66,7 +70,7 @@ class BookSearch extends React.Component {
 }
 
 const mapStateToProps = (state) => {
-    console.log(state);
+    // console.log(state);
 
     return {
         searchResults: state.searchResults

@@ -1,3 +1,4 @@
+import './BookCard.css';
 import React from 'react';
 
 class BookCard extends React.Component {
@@ -8,11 +9,11 @@ class BookCard extends React.Component {
             src: this.props.src
         };
 
-        this.imageRef = React.createRef();
+        this.imgRef = React.createRef();
     }
     
     determinePhoto = () => {
-        if (this.imageRef.current.src.includes('nophoto')) {
+        if (this.imgRef.current.src.includes('nophoto')) {
             this.setState(
                 {
                     src: 'http://www.lse.ac.uk/International-History/Images/Books/NoBookCover.png'
@@ -22,35 +23,48 @@ class BookCard extends React.Component {
     }
 
     selectBook = () => {
-        this.props.onBookSelect(this.props.bookId);
+        if (this.props.onBookSelect)
+            this.props.onBookSelect(this.props.bookId);
     }
 
     componentDidMount() {
-        this.imageRef.current.addEventListener('load', this.determinePhoto);
+        this.imgRef.current.addEventListener('load', this.determinePhoto);
     }
 
-    renderButton() {
-        if (this.props.showInfoButton) {
-            return (
-                <div className="book-card-select">
-                    <button
-                        className="ui button primary"
-                        onClick={this.selectBook} >
-                        Info
-                    </button>
-                </div>
+    renderNumOfPages() {
+        if (this.props.numOfPages) {
+            return  (
+                <span className="number-of-pages">
+                    <i className="icon file alternate outline"></i>
+                    {this.props.numOfPages} Pages
+                </span>
             );
-        };
+        }
+
         return;
     }
 
     render() {
         return (
-            <div className="book-card">
-                <div className="book-card-img">
-                    <img ref={this.imageRef} src={this.state.src} alt={this.props.alt} />
+            <div className="book-card ui card">
+                <div className="image">
+                    <img className="book-card-img" ref={this.imgRef} src={this.state.src} alt={this.props.desc} onClick={this.selectBook} />
                 </div>
-                {this.renderButton()}
+                <div className="content book-card-title-author">
+                    <div className="header">{this.props.title}</div>
+                    <div className="meta">
+                        {this.props.author}
+                    </div>
+                    <div className="description">
+                        {this.props.desc}
+                    </div>
+                </div>
+                <div className="extra content">
+                    <span className="right floated">
+                        Good
+                    </span>
+                    {this.renderNumOfPages()}
+                </div>
             </div>
         );
     }

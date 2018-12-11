@@ -7,29 +7,47 @@ import { connect } from 'react-redux';
 import Auth from './Auth';
 import CompHeader from './CompHeader';
 
-class Header extends React.Component {
-    renderMyBooks() {
+class Header extends React.Component { 
+    renderSwipe() {
         if (this.props.auth) {
             return (
-                <Link to="/myBooks" className="item">
-                    <i className="icon list alternate outline" />
-                    My Books
+                <Link to="/matches/swipe" className="swipe item">
+                    <i className="icon heart outline" />
+                    Swipe
                 </Link>
             );
         }
         return;
     }
 
-    renderMyProfile() {
+    renderRightMenu() {
         if (this.props.auth) {
             return (
-                <Link to="/myProfile" className="item">
-                    <i className="icon smile outline" />
-                    My Profile
-                </Link>
+                <div className="right menu">
+                    <Link to="/myMatches" className="item">
+                        <i className="icon list alternate outline" />
+                        My Matches
+                    </Link>
+
+                    <Link to="/myBooks" className="item">
+                        <i className="icon list alternate outline" />
+                        My Books
+                    </Link>
+
+                    <Link to="/myProfile" className="item">
+                        <i className="icon smile outline" />
+                        My Profile
+                    </Link>
+                    
+                    <Auth method="google" loggedIn={this.props.auth} />
+                </div>
             );
         }
-        return;
+        return (
+            <div className="right menu">
+                <Auth method="google" loggedIn={this.props.auth} />
+            </div>
+        );
     }
 
     render() {
@@ -46,12 +64,15 @@ class Header extends React.Component {
                             <i className="icon search" />
                             Search
                         </Link>
+
+                        <Link to="/matches/browse" className="browse item">
+                            <i className="icon handshake outline" />
+                            Browse
+                        </Link>
+
+                        {this.renderSwipe()}
     
-                        <div className="right menu">
-                            {this.renderMyBooks()}
-                            {this.renderMyProfile()}
-                            <Auth method="google" loggedIn={this.props.auth} />
-                        </div>
+                        {this.renderRightMenu()}
                     </div>
                 </div>
                 
@@ -62,7 +83,7 @@ class Header extends React.Component {
 }
 
 function mapStateToProps(state) {
-    console.log(state.auth);
+    // console.log(state.auth);
     return {
         auth: state.auth
     }
