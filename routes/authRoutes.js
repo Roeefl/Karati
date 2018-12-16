@@ -10,11 +10,15 @@ module.exports = (app) => {
         )
     );
 
+// app.get('/login/google', (req, res) => {
+//     console.log(req);
+//     res.end(req.user || false);
+//     });
+
     app.get('/login/google/callback',
         passport.authenticate('google', { failureRedirect: '/' }),
         (req, res) => {
             res.redirect('http://localhost:3000/');
-            // res.redirect('/myBooks');
         }
     );
 
@@ -33,4 +37,13 @@ module.exports = (app) => {
             res.redirect('/');
         }
     );
+
+    app.get('/api/currentUser', (req, res) => {
+        res.send(req.user || false);
+    });
+    
+    app.get('/api/logout', (req, res) => {
+        req.logout();
+        res.redirect('/');
+    });   
 }

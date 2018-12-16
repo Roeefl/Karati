@@ -1,0 +1,1 @@
+export const NOT_LOGGED_IN = 'You are not logged in. Please sign up or sign in to view this content.';

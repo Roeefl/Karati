@@ -2,6 +2,8 @@ import React from 'react';
 import Axios from 'axios';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { updateMyShelf } from '../actions';
+
 
 class SearchDetails extends React.Component {
     state = {
@@ -24,28 +26,32 @@ class SearchDetails extends React.Component {
         // }
     }
 
-    addToMyBooks = async () => {
+    addToMyShelf = async () => {
         this.setState( { addBookComponentType: 2 } ); // Fetching
 
         try {
-            const res = await Axios.post('/api/myBooks/add', { goodreadsID: this.props.selectedBook.id._ } );
+            const res = await Axios.post('/api/myShelf', { goodreadsID: this.props.selectedBook.id._ } );
             console.log(res);
 
             if (res.data.error) {
                 this.setState( { addBookComponentType: 1 } ); // Add Button
                 return;
             }
-            this.setState( { addBookComponentType: (res.data.bookAddedToMyBooks ? 3 : 4) } ); // Successfully added / already own
+            this.setState( { addBookComponentType: (res.data.bookAddedToMyShelf ? 3 : 4) } ); // Successfully added / already own
+
+            if (res.data.bookAddedToMyShelf) {
+                this.props.updateMyShelf();
+            }
         } catch(error) {
-            console.log('/api/myBooks/add failed with error: ' + error);
+            console.log('/api/myShelf failed with error: ' + error);
         }
     }
 
-    renderMyBooksLink() {
+    renderMyShelfLink() {
         return (
-            <Link to="/myBooks" className="enforce-green">
+            <Link to="/myShelf" className="enforce-green">
                 <i className="icon list alternate outline" />
-                My Books
+                My Shelf
             </Link>
         );
     }
@@ -59,10 +65,10 @@ class SearchDetails extends React.Component {
             case 1:
                 return (
                     <button
-                        className="add-to-my-books ui button green"
-                        onClick={this.addToMyBooks}>
+                        className="add-to-my-shelf ui button green"
+                        onClick={this.addToMyShelf}>
                         <i className="icon add" />
-                        Add to My Books
+                        Add to My Shelf
                     </button>
                 );
             case 2:
@@ -75,7 +81,7 @@ class SearchDetails extends React.Component {
                         <div className="header">
                             Book was saved to your books.
                         </div>
-                        <p>Go to  {this.renderMyBooksLink()} to see all your books.</p>
+                        <p>Go to  {this.renderMyShelfLink()} to see all your books.</p>
                     </div>
                 );
             default:
@@ -84,7 +90,7 @@ class SearchDetails extends React.Component {
                         <div className="header">
                             You already own this book.
                         </div>
-                        <p>Go to {this.renderMyBooksLink()} to see all your books.</p>
+                        <p>Go to {this.renderMyShelfLink()} to see all your books.</p>
                     </div>
                 );
         }
@@ -147,5 +153,6 @@ const mapStateToProps = (state) => {
 }
 
 export default connect(
-    mapStateToProps
+    mapStateToProps,
+    { updateMyShelf }
 )(SearchDetails);

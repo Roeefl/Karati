@@ -1,5 +1,6 @@
 import React from 'react';
-import Spinner from './Spinner';
+s
+import Spinner from './shared/Spinner';
 
 class Location extends React.Component {
     state = {

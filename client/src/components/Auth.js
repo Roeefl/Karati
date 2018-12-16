@@ -27,6 +27,14 @@ class Auth extends React.Component {
                         Google Login
                     </a>
                 );
+                // return (
+                //   <button
+                //         className="auth ui labeled inverted button green icon"
+                //         onClick={this.googleLogin} >
+                //         <i className={`icon small ${iconName}`} />
+                //         Google Login
+                //   </button>  
+                // );
             default:
                 return (
                     <a className="auth item" href="/api/logout">

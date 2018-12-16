@@ -1,7 +1,7 @@
 import React from 'react';
 
 import SwipePreviewBar from './SwipePreviewBar';
-import BookCard from '../books/BookCard';
+import BookCard from './BookCard';
 
 class SwipeContainer extends React.Component {
     likeBook = () => {
@@ -13,16 +13,16 @@ class SwipeContainer extends React.Component {
     }
 
     render() {
-        let book = this.props.matchResults[0];
+        let book = this.props.books[0];
         let trimmedDesc = book.desc.substring(0, 140);
 
         return (
-            <div className="container">
+            <div className="ui container">
                 <div>
-                    Found {this.props.matchResults.length} Available Matches
+                    Fetched {this.props.books.length} Available Matches
                 </div>
 
-                <SwipePreviewBar results={this.props.matchResults} />
+                <SwipePreviewBar books={this.props.books} />
 
                 <div className="book-card-container">
                     <BookCard

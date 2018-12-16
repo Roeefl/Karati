@@ -3,7 +3,7 @@ import './SwipePreviewBar.css';
 
 class SwipePreviewBar extends React.Component {
     render() {
-        const images = this.props.results.slice(0, 8).map( (currBook, index) => {
+        const images = this.props.books.slice(0, 8).map( (currBook, index) => {
             const isFirst = (index === 0 ? 'first-img' : '')
 
             return (

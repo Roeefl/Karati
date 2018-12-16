@@ -9,13 +9,19 @@ const bookSchema = new Schema(
         },
         author: {
             type: String,
-            required: true
+            required: true,
+            default: 'John Doe'
         },
         title: {
             type: String,
-            required: true
+            required: true,
+            default: 'Tales of Haze Mountain'
         },
-        created: {
+        createdAt: {
+            type: Date,
+            required: false
+        },
+        lastMarkedAsOwned: {
             type: Date,
             required: false
         },
@@ -25,7 +31,8 @@ const bookSchema = new Schema(
         },
         description: {
             type: String,
-            required: false
+            required: false,
+            default: 'No Description Available'
         },
         numOfPages: {
             type: Number,

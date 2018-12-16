@@ -11,7 +11,7 @@ class Header extends React.Component {
     renderSwipe() {
         if (this.props.auth) {
             return (
-                <Link to="/matches/swipe" className="swipe item">
+                <Link to="/books/swipe" className="swipe item">
                     <i className="icon heart outline" />
                     Swipe
                 </Link>
@@ -29,9 +29,9 @@ class Header extends React.Component {
                         My Matches
                     </Link>
 
-                    <Link to="/myBooks" className="item">
+                    <Link to="/myShelf" className="item">
                         <i className="icon list alternate outline" />
-                        My Books
+                        My Shelf
                     </Link>
 
                     <Link to="/myProfile" className="item">
@@ -59,13 +59,8 @@ class Header extends React.Component {
                             <i className="icon book" />
                             Karati
                         </Link>
-    
-                        <Link to="/books/search" className="search item">
-                            <i className="icon search" />
-                            Search
-                        </Link>
 
-                        <Link to="/matches/browse" className="browse item">
+                        <Link to="/books/browse" className="browse item">
                             <i className="icon handshake outline" />
                             Browse
                         </Link>
@@ -83,7 +78,7 @@ class Header extends React.Component {
 }
 
 function mapStateToProps(state) {
-    // console.log(state.auth);
+    // console.log(state.auth);    
     return {
         auth: state.auth
     }

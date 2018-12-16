@@ -1,10 +1,12 @@
 import React from 'react';
 
-import BookCard from '../books/BookCard';
+import { connect } from 'react-redux';
+
+import BookCard from './BookCard';
 
 class BrowseContainer extends React.Component {
     render() {
-        const books = this.props.matchResults.map( book => {
+        const books = this.props.books.map( book => {
             // console.log(book);
             let trimmedDesc = book.desc.substring(0, 200);
             // console.log("key: "  + book.bookID);
@@ -29,7 +31,7 @@ class BrowseContainer extends React.Component {
         return (
             <div className="">
                 <div className="ui segment">
-                    Found {this.props.matchResults.length} Available Matches
+                    Fetched {this.props.books.length} Books
                 </div>
 
                 <div className="ui container grid">
@@ -40,4 +42,14 @@ class BrowseContainer extends React.Component {
     }
 }
 
-export default BrowseContainer;
+
+function mapStateToProps(state) {
+    return {
+        auth: state.auth
+    }
+};
+
+export default connect(
+    mapStateToProps,
+    { }
+)(BrowseContainer);

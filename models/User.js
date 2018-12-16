@@ -1,39 +1,8 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema; 
 
-const ownedBookSchema = new Schema(
-    {
-        bookID: {
-            type: String,
-            required: true
-        },
-        goodreadsID: {
-            type: Number,
-            required: false
-        },
-        dateAdded: {
-            type: Date,
-            required: false
-        }
-    }
-);
-
-const swipeSchema = new Schema(
-    {
-        bookID: {
-            type: String,
-            required: true
-        },
-        like: {
-            type: Boolean,
-            required: true
-        },
-        dateAdded: {
-            type: Date,
-            required: false
-        }    
-    }
-);
+const ownedBookSchema = require('./OwnedBook');
+const swipeSchema = require('./Swipe');
 
 const userSchema = new Schema (
     {
@@ -59,7 +28,11 @@ const userSchema = new Schema (
             type: String,
             required: true
         },
-        created: {
+        createdAt: {
+            type: Date,
+            required: false
+        },
+        lastLogin: {
             type: Date,
             required: false
         },
@@ -70,6 +43,11 @@ const userSchema = new Schema (
         swipes: {
             type: [swipeSchema],
             required: false
+        },
+        passedIntro: {
+            type: Boolean,
+            required: true,
+            default: false
         }
     }
 );

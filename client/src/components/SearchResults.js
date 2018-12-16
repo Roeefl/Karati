@@ -9,8 +9,9 @@ class SearchResults extends React.Component {
         this.props.onBookSelect(bookId);
     }
 
-    render() {
-        console.log(this.props.results);
+    renderContent = () => {
+        console.log(this.props);
+        
         const results = this.props.results.map( result => {
             return (
                 <div className="book-card-container four wide column" key={result.id._}>
@@ -26,11 +27,28 @@ class SearchResults extends React.Component {
             );
         });
 
+        if (this.props.noDimmer && !this.props.ready) {
+            return (
+                <div className="ui segment">
+                    <div className="ui active loader">
+                        Retrieving Books...
+                    </div> 
+                </div>
+            );
+        };
+
+        return (
+            <div className="ui link cards grid">
+                {results}
+            </div>
+        );
+    }
+
+    render() {
+        // console.log(this.props.results);
         return (
             <div className="search-results ten wide column">
-                <div className="ui link cards grid">
-                    {results}
-                </div>
+                {this.renderContent()}
             </div>
         );
     }

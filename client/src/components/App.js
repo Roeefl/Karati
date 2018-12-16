@@ -1,23 +1,27 @@
 import React from 'react';
-import { BrowserRouter, Route } from 'react-router-dom';
+import { BrowserRouter, Route, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import * as actions from '../actions';
 
+import './App.css';
+
 import Header from './Header';
 
-import BookSearch from './books/BookSearch';
-import BookEdit from './books/BookEdit';
-import BookList from './books/BookList';
-import BookShow from './books/BookShow';
+// import BookEdit from './books/BookEdit';
+import Book from './books/Book';
 
-import MyBooks from './books/MyBooks';
+import MyShelf from './shelf/MyShelf';
+import SearchBooks from './shelf/SearchBooks';
 
 import MyProfile from './MyProfile';
 
 import MyMatches from './MyMatches';
 
-import Browse from './matches/Browse';
-import Swipe from './matches/Swipe';
+import Browse from './books/Browse';
+import Swipe from './books/Swipe';
+
+import FrontPage from './FrontPage';
+import Intro from './Intro';
 
 class App extends React.Component {
     componentDidMount() {
@@ -31,18 +35,29 @@ class App extends React.Component {
                     <div>
                         <Header />
 
-                        <div className="book-search ui container">
-                            <Route exact path="/" component={BookList} />
-                            <Route exact path="/myBooks" component={MyBooks} />
+                        <main className="ui container">
+                            <Route exact path="/" component={ () => (
+                                (this.props.auth && !this.props.auth.passedIntro) ? (
+                                        <Redirect to="/intro" />
+                                    ) : (
+                                        <FrontPage />
+                                    )
+                                )}
+                            />
+                            
+                            <Route path="/intro" component={Intro} />
+
+                            <Route exact path="/myShelf" component={MyShelf} />
+                            <Route path="/myShelf/search" component={SearchBooks} />
                             <Route exact path="/myMatches" component={MyMatches} />
                             <Route path="/myProfile" component={MyProfile} />
-                            <Route path="/books/list" component={BookList} />
-                            <Route path="/books/search" component={BookSearch} />
-                            <Route path="/books/edit" component={BookEdit} />
-                            <Route path="/books/show" component={BookShow} />
-                            <Route path="/matches/browse" component={Browse} />
-                            <Route path="/matches/swipe" component={Swipe} />
-                        </div>
+
+                            {/* <Route path="/books/edit" component={BookEdit} /> */}
+
+                            <Route path="/books/browse" component={Browse} />
+                            <Route path="/books/swipe" component={Swipe} />
+                            <Route path="/book/" component={Book} />
+                        </main>
                     </div>
                 </BrowserRouter>
             </div>
@@ -50,4 +65,13 @@ class App extends React.Component {
     }
 }
 
-export default connect(null, actions)(App);
+function mapStateToProps(state) {
+    console.log(state.auth);    
+    return {
+        auth: state.auth
+    }
+};
+
+export default connect(
+    mapStateToProps, actions
+)(App);

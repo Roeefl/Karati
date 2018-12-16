@@ -189,7 +189,7 @@ let views = {
                             </div>
                         `);
                     } else {
-                        request('/user-get-matches', data => {
+                        request('/api/myMatches', data => {
                             let pData = JSON.parse(data);
             
                             if (pData.error) {
@@ -205,7 +205,7 @@ let views = {
                                     `);
                                 }
                             } else {
-                                for (let match of pData) {
+                                for (let match of pData.myMatches) {
                                     this.matches.push(views.match.new(match));
                                 }
                                 
@@ -251,7 +251,7 @@ let views = {
                 children: [],
 
                 render: function(callback) {
-                    request('/api/myBooks', data => {
+                    request('/api/myShelf', data => {
                         let pData = JSON.parse(data);
         
                         if (pData.error) {
@@ -270,8 +270,8 @@ let views = {
                                 `);
                             }
                         } else {
-                            console.log(pData.myBooks);
-                            for (let bookData of pData.myBooks) {
+                            console.log(pData.myShelf);
+                            for (let bookData of pData.myShelf) {
                                 this.children.push(
                                     views.book.new(bookData, false)
                                 );

@@ -1,46 +1,63 @@
-import Axios from 'axios';
-
 import React from 'react';
 import { connect } from 'react-redux';
-import { updateMyMatches } from '../actions';
+import { fetchMyMatches } from '../actions';
 
 import MatchCard from './MatchCard';
+import Message from './shared/Message';
+import Spinner from './shared/Spinner';
+import * as errors from './shared/errors';
 
 class MyMatches extends React.Component {
-    fetchMyMatches = async () => {
-        try {
-            const res = await Axios.get('/api/myMatches');
-            console.log(res.data);
-
-            if (res.data.error !== 30) {
-                this.props.updateMyMatches(res.data.myMatches);
-            }
-        } catch(error) {
-            console.log('/api/myMatches failed with error: ' + error);
-        }
-    }
-
     componentDidMount() {
-        this.fetchMyMatches();
+        this.props.fetchMyMatches();
     }
 
-    render() {
+    renderContent() {
+        if (!this.props.myMatches) {
+            return (
+                <Spinner message="Fetching Matches..."/>
+            );
+        };
+
+        if (!this.props.auth) {
+            return (
+                <Message 
+                    color='red'
+                    lines={[
+                        errors.NOT_LOGGED_IN
+                    ]} />
+            );
+        };
+
+        if (this.props.myMatches.length <= 0 ) {
+            return (
+                <Message 
+                    color='red'
+                    lines={[
+                        'You do not have any matches yet. Add more books to your shelf to increase your odds!'
+                    ]} />
+            );
+        };
+
         const matches = this.props.myMatches.map( match => {
             return (
-                <div className="match-card-container three wide column" key={match.id}>
+                <div className="match-card-container eight wide column" key={match.id}>
                     <MatchCard matchData={match} />
                 </div>
             );
         });
 
         return (
-            <div className="my-matches ui container grid">
-                <div className="my-matches-count ui segment">
-                    You have {this.props.myMatches.length} Matches
-                </div>
-                <div className="my-matches-grid ui link cards grid">
-                    {matches}
-                </div>
+            <div className="my-matches-grid ui link cards grid">
+                {matches}
+            </div>
+        );
+    }
+    
+    render() {
+        return (
+            <div className="my-matches ui container">
+                {this.renderContent()}
             </div>
         );
     }
@@ -48,11 +65,12 @@ class MyMatches extends React.Component {
 
 function mapStateToProps(state) {
     return {
+        auth: state.auth, 
         myMatches: state.myMatches
     }
 };
 
 export default connect(
     mapStateToProps,
-    { updateMyMatches }
+    { fetchMyMatches }
 )(MyMatches);

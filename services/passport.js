@@ -19,6 +19,8 @@ passport.use(new GoogleStrategy (
         const existingUser = await User.findOne( { oauthID: profile.id } );
 
         if (existingUser) {
+            existingUser.lastLogin = Date.now();
+            await existingUser.save();
             return done(null, existingUser);
         }
 
@@ -27,11 +29,14 @@ passport.use(new GoogleStrategy (
                 oauthID: profile.id,
                 username: profile.displayName,
                 email: profile.emails[0].value,
-                created: Date.now(),
+                createdAt: Date.now(),
                 fullName: {
                     first: profile.name.givenName,
                     last: profile.name.familyName
-                }
+                },
+                passedIntro: false,
+                ownedBooks: [],
+                swipes: []
             }
         );
 
@@ -51,6 +56,8 @@ passport.use(new FacebookStrategy (
         const existingUsesr = await User.findOne( { oauthID: profile.id } );
 
         if (existingUser) {
+            existingUser.lastLogin = Date.now();
+            await existingUser.save();
             return done(null, existingUser);
         }
     
@@ -58,7 +65,10 @@ passport.use(new FacebookStrategy (
             {
                 oauthID: profile.id,
                 name: profile.displayName,
-                created: Date.now()
+                createdAt: Date.now(),
+                passedIntro: false,
+                ownedBooks: [],
+                swipes: []
             }
         );
     
