@@ -7,17 +7,19 @@ import { myBooksReducer } from './myBooks';
 import { recentlyAddedRedcuer } from './recentlyAdded';
 import { booksReducer } from './books';
 import { myMatchesReducer } from './myMatches';
-import { showBookReducer } from './showBook';
+import { selectBookFromMongoReducer } from './selectBookFromMongo';
+import { retrieveBookFromGoodreadsReducer } from './retrieveBookFromGoodreads';
 
 export default combineReducers(
     {
         auth: authReducer,
         searchResults: bookSearchReducer,
         selectedBook: selectedBookReducer,
-        showBook: showBookReducer,
         myBooks: myBooksReducer,
         myMatches: myMatchesReducer,
         books: booksReducer,
-        recentlyAdded: recentlyAddedRedcuer
+        recentlyAdded: recentlyAddedRedcuer,
+        selectedBookFromDB: selectBookFromMongoReducer,
+        selectedBookFromSearch: retrieveBookFromGoodreadsReducer
     }
 );

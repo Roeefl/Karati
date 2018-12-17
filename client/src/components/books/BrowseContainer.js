@@ -19,7 +19,7 @@ class BrowseContainer extends React.Component {
                         title={book.title}
                         author={book.author}
                         numOfPages={book.numOfPages}
-                        onBookSelect={null} />
+                        linkTo={'/book/' + book.bookID} />
                         
                     <div>
                         Offered for exchange by {book.ownedBy}

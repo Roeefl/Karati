@@ -21,12 +21,7 @@ class BookCard extends React.Component {
     //             }
     //         )
     //     }
-    // }
-
-    selectBook = () => {
-        if (this.props.onBookSelect)
-            this.props.onBookSelect(this.props.bookId);
-    }
+    // }    
 
     // componentDidMount() {
     //     this.imgRef.current.addEventListener('load', this.determinePhoto);
@@ -46,9 +41,8 @@ class BookCard extends React.Component {
     }
 
     render() {
-        let linkTo = '/book/:' + this.props.bookId;
         return (
-            <Link to={linkTo} className="enforce-green">
+            <Link to={this.props.linkTo} className="enforce-green">
                 <div className="book-card ui card">
                     <div className="image">
                         <img className="book-card-img" ref={this.imgRef} src={this.props.src} alt={this.props.desc} />

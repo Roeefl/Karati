@@ -1,5 +1,13 @@
 import Axios from 'axios';
-import { SHOW_BOOK, UPDATE_SEARCH_RESULTS, BOOK_SELECTED, FETCH_USER, UPDATE_MY_BOOKS, UPDATE_BOOKS, UPDATE_MY_MATCHES, UPDATE_RECENTLY_ADDED } from './types';
+import { UPDATE_SEARCH_RESULTS,
+    BOOK_SELECTED,
+    FETCH_USER,
+    UPDATE_MY_BOOKS,
+    UPDATE_BOOKS,
+    UPDATE_MY_MATCHES,
+    UPDATE_RECENTLY_ADDED,
+    SELECT_BOOK_FROM_DB,
+    RETRIEVE_BOOK_FROM_GOODREADS } from './types';
 
 // Action Creator
 export const selectBook = (bookData) => {
@@ -10,20 +18,56 @@ export const selectBook = (bookData) => {
     };
 };
 
-export const showBook = (bookId) => 
+export const resetBookFromDB = () => {
+    return {
+        type: SELECT_BOOK_FROM_DB,
+        payload: false
+    }
+};
+
+
+export const resetBookFromGoodreads = () => {
+    return {
+        type: RETRIEVE_BOOK_FROM_GOODREADS,
+        payload: false
+    }
+};
+
+export const selectBookFromDB = (bookID) => 
     async (dispatch) => { 
         try {
-            const res = await Axios.get('/api/books/' + bookId);
+            const res = await Axios.get('/api/books/' + bookID);
+            console.log(res.data.book);
 
             dispatch( {
-                type: SHOW_BOOK,
-                payload: res.data.book || {}
+                type: SELECT_BOOK_FROM_DB,
+                payload: res.data.book || null
             });
         } catch(error) {
-            console.log('Failed to fetchUser ' + error);
+            console.log('Error on selectBookFromDB ' + error);
 
             dispatch( {
-                type: SHOW_BOOK,
+                type: SELECT_BOOK_FROM_DB,
+                payload: false
+            });
+        }
+    };
+
+export const retrieveBookFromGoodreads = (bookID) => 
+    async (dispatch) => { 
+        try {
+            const res = await Axios.get('/api/myShelf/search/book/' + bookID);
+            console.log(res.data.book);
+
+            dispatch( {
+                type: RETRIEVE_BOOK_FROM_GOODREADS,
+                payload: res.data.book || null
+            });
+        } catch(error) {
+            console.log('Error on retrieveBookFromGoodreads ' + error);
+
+            dispatch( {
+                type: RETRIEVE_BOOK_FROM_GOODREADS,
                 payload: false
             });
         }

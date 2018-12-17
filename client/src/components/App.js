@@ -12,6 +12,7 @@ import Book from './books/Book';
 
 import MyShelf from './shelf/MyShelf';
 import SearchBooks from './shelf/SearchBooks';
+import SearchBookExpanded from './shelf/SearchBookExpanded';
 
 import MyProfile from './MyProfile';
 
@@ -22,6 +23,8 @@ import Swipe from './books/Swipe';
 
 import FrontPage from './FrontPage';
 import Intro from './Intro';
+
+
 
 class App extends React.Component {
     componentDidMount() {
@@ -48,7 +51,9 @@ class App extends React.Component {
                             <Route path="/intro" component={Intro} />
 
                             <Route exact path="/myShelf" component={MyShelf} />
-                            <Route path="/myShelf/search" component={SearchBooks} />
+                            <Route exact path="/myShelf/search" component={SearchBooks} />
+                            <Route path="/myShelf/search/book/:bookId" component={SearchBookExpanded} />
+
                             <Route exact path="/myMatches" component={MyMatches} />
                             <Route path="/myProfile" component={MyProfile} />
 
@@ -56,7 +61,7 @@ class App extends React.Component {
 
                             <Route path="/books/browse" component={Browse} />
                             <Route path="/books/swipe" component={Swipe} />
-                            <Route path="/book/" component={Book} />
+                            <Route path="/book/:bookId" component={Book} />
                         </main>
                     </div>
                 </BrowserRouter>

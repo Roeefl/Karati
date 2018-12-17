@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
 const errors = require('../config/errors');
-// const ensureAuthenticated = require ('../services/ensureAuthenticated');
 
 const GoodReadsAPI = require('goodreads-api-node');
 const Goodreads_KEY = require('../config/goodreads');
@@ -9,78 +8,10 @@ const goodreads = GoodReadsAPI(Goodreads_KEY);
 
 const User = mongoose.model('users');
 const Book = mongoose.model('books');
+const Match = mongoose.model('matches');
 
-function ensureAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) { return next(); }
-    
-    res.end( JSON.stringify( {
-        'error': errors.NOT_LOGGED_IN
-    } )
-    );
-};
-
-getUser = (userID, callback) => {
-  User.findOne(
-    {
-      _id: new ObjectId(userID)
-    }, function( err, foundUser) {
-      if (!foundUser) {
-        console.log('FATAL ERROR on retrieving user ' + userID + ' from MongoDB.');
-        return false;
-      };
-
-      callback(foundUser);
-  });
-};
-
-/**
- * Check for ANY book match between two users
- * @param {*} currentUser 
- * @param {*} ownerID 
- */
-checkForMatch = (liked, currentUser, owner, swipedBookID, callback) => {
-  // so currently I already KNOW that currentUser has JUST swiped yes on some book that ownerID possesses.
-  // now need to loop over the swipes array of ownerID and check if he has done a YES swipe on ANY book that currentUser has on his ownedBooks array
-  if (!liked || !owner.swipes) {
-    callback(false);
-    return;
-  };
-
-  for (let swipe of owner.swipes) {
-    if (swipe.like) {
-      let findMatch = currentUser.ownedBooks.find( ownedBook => ownedBook.bookID == swipe.bookID );
-      
-      if ( findMatch ) {
-
-        let saveMatch = new Match({
-          firstUser: {
-            userID: currentUser._id,
-            bookID: swipedBookID
-          },
-          secondUser: {
-            userID: owner._id,
-            bookID: swipe.bookID
-          },
-          dateMatched: Date.now(),
-          status: matchStatus.PENDING
-        });
-
-        saveMatch.save(function (err, saved) {
-          if (err) return handleError(err);
-        
-          console.log('Match Saved:');
-          console.log(saved);
-
-          callback(true);
-          return;
-          // TODO: Mail alert both users with deep link to match when a new match
-        });
-      }
-    }
-  }
-
-  callback(false) ;
-};
+const middleware = require('../common/middleware');
+const matchStatus = require('../config/matchStatus');
 
 alertUsersWithMail = (user1, user2) => {
   let msg = {
@@ -106,14 +37,14 @@ module.exports = (app) => {
    * 1 - If the userID in the OwnedBook record matches the userID of the current user - it's his own book and he shouldn't see it while swiping
    * 2 - If he already swept on it prior, he shouldn't see it either anymore.
    */
-  app.get('/api/books', ensureAuthenticated, (req, res) => {
+  app.get('/api/books', middleware.ensureAuthenticated, (req, res) => {
       const MAX_BATCH_SIZE = 20;
     
       let currentUserID = req.session.passport.user;
       let swipes = []; // init empty array for books available for swiping
     
       Book.find({}, function (err, allBooks) {
-        getUser(currentUserID, currentUser => {
+        middleware.getUser(currentUserID, currentUser => {
           User.
             find({}).
             where('_id').ne(currentUserID).
@@ -222,70 +153,175 @@ module.exports = (app) => {
     }
   });
     
-  // app.get('/api/books/:id', (req, res) => {
-  //   console.log(req.params.id);
+  app.get('/api/books/:id', async (req, res) => {
+    console.log(req.params.id);
 
-  //     Book.findOne(
-  //       {
-  //         _id: new ObjectId(req.params.id)
-  //       }, function( err, foundBook) {
-  //         if (!foundBook) {
-  //           console.log('FATAL ERROR on retrieving book ' + req.params.id + ' from MongoDB');
-  //           return false;
-  //         };
+    const foundBook = await Book.findOne(
+        {
+          _id: new ObjectId(req.params.id)
+        }
+    );
 
-  //         res.end(JSON.stringify(
-  //           {
-  //             book: foundBook
-  //           }
-  //         ))
-  //     });
-  // });
-
-  function likeOrRejectBook(currentUserID, ownerID, bookID, liked, callback ) {
-    getUser(currentUserID, currentUser => {
-      let likedOrRejected = {
-        bookID: bookID,
-        like: liked,
-        dateAdded: Date.now()
+      if (!foundBook) {
+        console.log('ERROR on retrieving book ' + req.params.id + ' from MongoDB');
+        res.end(JSON.stringify(
+            {
+              'error': errors.NO_BOOK
+            }
+        ));
+        return false;
       };
-        
-      currentUser.swipes.push(likedOrRejected);
 
-      currentUser.save(function (err, saved) {  
-        if (err) return handleError(err);
+      res.end(JSON.stringify(
+        {
+          book: foundBook
+        }
+      ));
+  });
 
-        console.log('Saved swipe (' + liked + ') for book ' + bookID + ' for user ' + currentUserID);
+  app.get('/api/myShelf/search/book/:id', async (req, res) => {
+    console.log(req.params.id);
 
-        // if swipe was a YES - alert both users with a mail
-          getUser(ownerID, owner => {
-            checkForMatch(liked, currentUser, owner, bookID, () => {
-              // alertUsersWithMail(currentUser, owner);
-              callback(likedOrRejected);
+    const result = await goodreads.showBook(req.params.id);
+
+    // console.log(result.book);
+
+    if (!result) {
+      console.log('ERROR on retrieving book ' + req.params.id + ' from Goodreads');
+      res.end(JSON.stringify(
+          {
+            'error': errors.NO_GOODREADS_RESULT
+          }
+      ));
+      return false;
+    }
+
+    res.end(JSON.stringify(
+      {
+        book: 
+          {
+            goodreadsID: req.params.id,
+            author: middleware.parseAuthorName(result.book),
+            title: result.book.title,
+            imageURL: result.book.image_url,
+            description: result.book.description,
+            numOfPages: result.book.num_pages
+          }
+      }
+    ));
+  });
+
+  /**
+   * Check for ANY book match between two users
+   * @param {*} currentUser 
+   * @param {*} ownerID 
+   */
+  checkForMatch = (liked, currentUser, owner, swipedBookID) => {
+    // so currently I already KNOW that currentUser has JUST swiped yes on some book that ownerID possesses.
+    // now need to loop over the swipes array of ownerID and check if he has done a YES swipe on ANY book that currentUser has on his ownedBooks array
+    return new Promise( (resolve, reject) => {
+
+      if (!liked || !owner.swipes) {
+        resolve(false);
+        return;
+      };
+
+      let foundMatch = false;
+
+      for (let swipe of owner.swipes) {
+        if (swipe.like) {
+          let findMatch = currentUser.ownedBooks.find( ownedBook => ownedBook.bookID == swipe.bookID );
+          
+          if ( findMatch ) {
+
+            let saveMatch = new Match({
+              firstUser: {
+                userID: currentUser._id,
+                bookID: swipedBookID
+              },
+              secondUser: {
+                userID: owner._id,
+                bookID: swipe.bookID
+              },
+              dateMatched: Date.now(),
+              status: matchStatus.PENDING
             });
+
+            saveMatch.save(function (err, saved) {
+              if (err) {
+                reject(err);
+                return;
+              };
+            
+              console.log('Match Saved:');
+              console.log(saved);
+
+              foundMatch = true;
+              // TODO: Mail alert both users with deep link to match when a new match
+            });
+          }
+        }
+      }
+
+      resolve(foundMatch);
+    });
+  };
+
+  likeOrRejectBook = (currentUserID, ownerID, bookID, liked) => {
+    return new Promise( (resolve, reject) => {
+
+      middleware.getUser(currentUserID, currentUser => {
+        let likedOrRejected = {
+          bookID: bookID,
+          like: liked,
+          dateAdded: Date.now()
+        };
+          
+        currentUser.swipes.push(likedOrRejected);
+
+        currentUser.save(function (err, saved) {  
+          if (err) {
+            reject(err);
+            return;
+          };
+
+          console.log('Saved swipe [' + liked + '] for book ' + bookID + ' for user ' + currentUserID);
+
+          if (!liked) {
+            resolve(false);
+            return;
+          }
+
+          // if swipe was a YES - alert both users with a mail
+          middleware.getUser(ownerID, async (owner) => {
+            const newMatch = await checkForMatch(liked, currentUser, owner, bookID);
+            // alertUsersWithMail(currentUser, owner);
+            resolve(true);
           });
+
+        });
       });
     });
   };
 
-  app.post('/api/books/liked', ensureAuthenticated, (req, res) => {
-    likeOrRejectBook( req.session.passport.user, req.body.ownerID, req.body.bookID, true, (likedOrRejected) => {
-      res.end(JSON.stringify(
-        {
-          likedOrRejected: likedOrRejected
-        }
-      ));
-    });
+  app.post('/api/books/liked', middleware.ensureAuthenticated, async (req, res) => {
+    const liked = await likeOrRejectBook( req.session.passport.user, req.body.ownerID, req.body.bookID, true);
+
+    res.end(JSON.stringify(
+      {
+        liked: liked
+      }
+    ));
   });
 
-  app.post('/api/books/rejected', ensureAuthenticated, (req, res) => {
-    likeOrRejectBook( req.session.passport.user, req.body.ownerID, req.body.bookID, false, (likedOrRejected) => {
-      res.end(JSON.stringify(
-        {
-          likedOrRejected: likedOrRejected
-        }
-      ));
-    });
+  app.post('/api/books/rejected', middleware.ensureAuthenticated, async (req, res) => {
+    const liked = await likeOrRejectBook( req.session.passport.user, req.body.ownerID, req.body.bookID, false);
+
+    res.end(JSON.stringify(
+      {
+        liked: liked
+      }
+    ));
   });
 
   app.get('/api/recent', async (req, res) => {

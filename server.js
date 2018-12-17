@@ -21,7 +21,6 @@ const Goodreads_KEY = require('./config/goodreads');
 
 require('dotenv').config();
 
-const matchStatus = require('./config/matchStatus');
 const errors = require('./config/errors');
 
 const sendGridMail = require('@sendgrid/mail');
@@ -30,6 +29,8 @@ sendGridMail.setApiKey(process.env.SENDGRID_API_KEY);
 const goodreads = GoodReadsAPI(Goodreads_KEY);
 
 const app = express();
+
+const middleware = require('./common/middleware');
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
@@ -66,20 +67,6 @@ app.use(
 const passportService = require('./services/passport');
 passportService(app);
 
-function getUser(userID, callback) {
-  User.findOne(
-    {
-      _id: new ObjectId(userID)
-    }, function( err, foundUser) {
-      if (!foundUser) {
-        console.log('FATAL ERROR on retrieving user ' + userID + ' from MongoDB.');
-        return false;
-      };
-
-      callback(foundUser);
-  });
-};
-
 const PORT = process.env.PORT || 9000;
 
 mongoose.connect(process.env.ATLAS_CONNECTION, {useNewUrlParser: true} );
@@ -93,16 +80,6 @@ db.once('open', function() {
     });
     console.log('Mongoose connected to MongoDB Atlas');
 });
-
-// const ensureAuthenticated = require ('./services/ensureAuthenticated');
-function ensureAuthenticated(req, res, next) {
-  if (req.isAuthenticated()) { return next(); }
-  
-  res.end( JSON.stringify( {
-      'error': errors.NOT_LOGGED_IN
-  } )
-  );
-};
 
 require('./routes/authRoutes')(app);
 require('./routes/bookRoutes')(app);
@@ -121,18 +98,18 @@ app.get('/error-codes', (req, res) => {
   res.end( JSON.stringify(errors) );
 });
 
-app.get('/api/myProfile', ensureAuthenticated, async (req, res) => {
+app.get('/api/myProfile', middleware.ensureAuthenticated, async (req, res) => {
   const currUser = await User.findById(req.session.passport.user);
   res.end( JSON.stringify( currUser ));
 });
 
-app.get('/api/myShelf', ensureAuthenticated, (req, res) => {
+app.get('/api/myShelf', middleware.ensureAuthenticated, (req, res) => {
   Book.find({}, (err, allBooks) => {
     if (err) return handleError(err);
 
     let currentUserID = req.session.passport.user;
 
-    getUser(currentUserID, currentUser => {
+    middleware.getUser(currentUserID, currentUser => {
       let myShelf = [];
 
       for (let ownedBook of currentUser.ownedBooks) { 
@@ -155,119 +132,119 @@ app.get('/api/myShelf', ensureAuthenticated, (req, res) => {
  * Adds a book selected by user to mark as 'owned' to ownedBooks collection.
  * If book does not exist in books collection, adds the book to it first, then to ownedBooks.
  */
-app.post('/api/myShelf', ensureAuthenticated, (req, res) => {
+app.post('/api/myShelf', middleware.ensureAuthenticated, async (req, res) => {
   let currentUserID = req.session.passport.user;
   
-  addOrUpdateTimeStampForBook(req.body.goodreadsID, bookID => {
-    addOwnedBookByUser(currentUserID, bookID, req.body.goodreadsID, saved => {
-      res.end(JSON.stringify(
-        { bookAddedToMyShelf: saved}
-      ));
-    });
-  });
+  let bookID = await addOrUpdateTimeStampForBook(req.body.goodreadsID);
+
+  let saved = await addOwnedBookByUser(currentUserID, bookID, req.body.goodreadsID);
+
+  res.end(JSON.stringify(
+    { bookAddedToMyShelf: saved}
+  ));
+
 });
 
 /**
- * Receives a goodreads book object and parses the author name
- * @param {*} book - Goodreads book object
+ * Adds book record to books collection if does not exist in it
+ * @param {*} goodreadsID 
  */
-function parseAuthorName(book) {
-  if (book && book.authors && book.authors.author) {
-    if (Array.isArray(book.authors.author)) {
-      // Array of authors - return name of first
-      return book.authors.author[0].name;
-    } else {
-      // Not array - return  name of single author
-      return book.authors.author.name
-    }
-  } else {
-    return 'AUTHOR_NAME_NOT_FOUND';
-  }
+addOrUpdateTimeStampForBook = (goodreadsID) => {
+  return new Promise( (resolve, reject) => {
+
+      Book.findOne( {
+        goodreadsID: goodreadsID
+      }, async function (err, existingBook) {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        if (existingBook) {
+          console.log('updating timeStamp for book: ' + existingBook.id);
+          existingBook.lastMarkedAsOwned = Date.now();
+          await existingBook.save();
+
+          resolve(existingBook.id);
+          return;
+        }
+
+        // book not yet in Mongo collection books - so add it
+        console.log('Adding book to MongoDB /books: ' + goodreadsID);
+
+        const result = await goodreads.showBook(goodreadsID)
+
+        let saveBook = new Book(
+          { goodreadsID: goodreadsID,
+            author: middleware.parseAuthorName(result.book),
+            title: result.book.title,
+            createdAt: Date.now(),
+            lastMarkedAsOwned: Date.now(),
+            imageURL: result.book.image_url,
+            description: result.book.description,
+            numOfPages: result.book.num_pages
+          }
+        );
+
+        const saved = await saveBook.save();
+        console.log('Book added succesfully to MongoDB /books: ' + saved.id);
+        resolve(saved.id);
+
+      });
+
+    });
 };
 
 /**
  * Attaches a current book in the DB to a current user record in the DB in the collection ownedbooks
  * @param {*} userID 
  * @param {*} bookID 
- * @param {*} res - response from post request
+ * @param {*} goodreadsID
  */
-function addOwnedBookByUser(userID, bookID, goodreadsID, callback) {
-  getUser(userID, foundUser => {
-    let isBookOwnedByUser = false;
-    if (foundUser.ownedBooks) {
-      isBookOwnedByUser = foundUser.ownedBooks.find( book => book.bookID === bookID );
-    }
+addOwnedBookByUser = (userID, bookID, goodreadsID) => {
+  return new Promise( (resolve, reject) => {
 
-    if (isBookOwnedByUser) {
-      console.log('BookID ' + bookID + ' is already linked to UserID ' + userID);
-      callback(false);
-    } else {
-      let newOwnedBook = {
-        bookID: bookID,
-        goodreadsID: goodreadsID,
-        dateAdded: Date.now()
-      };
-      
-      foundUser.ownedBooks.push(newOwnedBook);
-
-      if (!foundUser.passedIntro && foundUser.ownedBooks.length >= 5) {
-        foundUser.passedIntro = true;
+    middleware.getUser(userID, foundUser => {
+      let isBookOwnedByUser = false;
+      if (foundUser.ownedBooks) {
+        isBookOwnedByUser = foundUser.ownedBooks.find( book => book.bookID === bookID );
       }
+  
+      if (isBookOwnedByUser) {
 
-      foundUser.save(function (err, saved) {  
-        if (err) return handleError(err);
-        console.log('addBookToUser saved book ' + bookID + ' to ' + userID);
-        callback(true);
-      });
-    }
-  });
-};
+        console.log('BookID ' + bookID + ' is already linked to UserID ' + userID);
+        resolve(false);
+        return;
 
-/**
- * Adds book record to books collection if does not exist in it
- * @param {*} goodreadsID 
- * @param {*} callback 
- */
-function addOrUpdateTimeStampForBook(goodreadsID, callback) {
-  Book.findOne( {
-    goodreadsID: goodreadsID
-  }, async function (err, existingBook) {
-    if (err) return handleError(err);
-
-    if (existingBook) { // book already in books collection - just grab the objectID from it and callback
-      console.log('updating timeStamp for book: ' + existingBook.id);
-
-      existingBook.lastMarkedAsOwned = Date.now();
-      await existingBook.save();
-
-      callback(existingBook.id);
-    }
-    else { // book not yet in Mongo collection books - so add it
-      // console.log('Adding book to DB! ' + goodreadsID);
-
-      const result = await goodreads.showBook(goodreadsID)
-
-      let saveBook = new Book(
-        { goodreadsID: goodreadsID,
-          author: parseAuthorName(result.book),
-          title: result.book.title,
-          createdAt: Date.now(),
-          lastMarkedAsOwned: Date.now(),
-          imageURL: result.book.image_url,
-          description: result.book.description,
-          numOfPages: result.book.num_pages
+      } else {
+        let newOwnedBook = {
+          bookID: bookID,
+          goodreadsID: goodreadsID,
+          dateAdded: Date.now()
+        };
+        
+        foundUser.ownedBooks.push(newOwnedBook);
+  
+        if (!foundUser.passedIntro && foundUser.ownedBooks.length >= 5) {
+          foundUser.passedIntro = true;
         }
-      );
+  
+        foundUser.save(function (err, saved) {  
+          if (err) {
+            reject(err);
+            return;
+          }
 
-      const saved = await saveBook.save();
-      
-      console.log('saved: ' + saved);
-      callback(saved.id);
-    }
+          console.log('addBookToUser saved book ' + bookID + ' to ' + userID);
+          resolve(true);
+        });
+      }
+    });
+
   });
 };
 
-app.get('/api/myMatches', ensureAuthenticated, (req, res) => {
+app.get('/api/myMatches', middleware.ensureAuthenticated, (req, res) => {
   const MAX_DESC_LEN = 100;
   let currentUserID = req.session.passport.user;
   let currentUserObjectID = new ObjectId(req.session.passport.user);

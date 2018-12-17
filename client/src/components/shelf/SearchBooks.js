@@ -20,10 +20,10 @@ class SearchBooks extends React.Component {
         ready: true
     };
 
-    onBookSelect = (bookId) => {
-        let bookData = this.props.searchResults.find(book => book.id._ === bookId);
-        this.props.selectBook(bookData);
-    }
+    // onBookSelect = (bookId) => {
+    //     let bookData = this.props.searchResults.find(book => book.id._ === bookId);
+    //     this.props.selectBook(bookData);
+    // }
 
     onSearchSubmit = async (term) => {
         try {
@@ -91,7 +91,6 @@ class SearchBooks extends React.Component {
                     <div className="ui row">
                         <SearchResults
                             results={this.props.searchResults}
-                            onBookSelect={this.onBookSelect}
                             noDimmer={this.props.noDimmer || false} 
                             ready={ (this.state.ready) } />
 

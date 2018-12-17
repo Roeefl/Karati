@@ -28,7 +28,9 @@ class Matches extends React.Component {
 
         try {
             const apiURL = '/api/books/' + (liked ? 'liked' : 'rejected');
-            await Axios.post(apiURL, data);
+            const res = await Axios.post(apiURL, data);
+
+            console.log(res);
 
             this.props.updateBooks();
         } catch(error) {

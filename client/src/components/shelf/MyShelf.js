@@ -46,7 +46,7 @@ class MyShelf extends React.Component   {
                         title={book.title}
                         author={book.author}
                         numOfPages={book.numOfPages}
-                        onBookSelect={null} />
+                        linkTo={'/book/' + book._id} />
                 </div>
             );
         });

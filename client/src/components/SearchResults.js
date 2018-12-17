@@ -5,10 +5,6 @@ import React from 'react';
 import BookCard from './books/BookCard';
 
 class SearchResults extends React.Component {
-    onBookSelect = (bookId) => {
-        this.props.onBookSelect(bookId);
-    }
-
     renderContent = () => {
         console.log(this.props);
         
@@ -22,7 +18,7 @@ class SearchResults extends React.Component {
                         title={result.title}
                         author={result.author.name}
                         numOfPages={null}
-                        onBookSelect={this.onBookSelect} />
+                        linkTo={'/myShelf/search/book/' + result.id._} />
                 </div>
             );
         });
