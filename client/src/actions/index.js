@@ -7,7 +7,8 @@ import { UPDATE_SEARCH_RESULTS,
     UPDATE_MY_MATCHES,
     UPDATE_RECENTLY_ADDED,
     SELECT_BOOK_FROM_DB,
-    RETRIEVE_BOOK_FROM_GOODREADS } from './types';
+    RETRIEVE_BOOK_FROM_GOODREADS,
+    UPDATE_MY_SWIPE_HISTORY    } from './types';
 
 // Action Creator
 export const selectBook = (bookData) => {
@@ -133,6 +134,25 @@ export const fetchMyMatches = () =>
 
             dispatch( {
                 type: UPDATE_MY_MATCHES,
+                payload: false
+            });
+        }
+    };
+
+export const fetchMySwipeHistory = () =>
+    async (dispatch) => {
+        try {
+            const res = await Axios.get('/api/mySwipeHistory');
+
+            dispatch( {
+                type: UPDATE_MY_SWIPE_HISTORY,
+                payload: res.data.mySwipeHistory || []
+            });
+        } catch(error) {
+            console.log('/api/mySwipeHistory failed with error: ' + error);
+
+            dispatch( {
+                type: UPDATE_MY_SWIPE_HISTORY,
                 payload: false
             });
         }

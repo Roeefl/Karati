@@ -34,6 +34,11 @@ class Header extends React.Component {
                         My Shelf
                     </Link>
 
+                    <Link to="/mySwipes" className="item">
+                        <i className="icon list alternate outline" />
+                        My Swipes
+                    </Link>
+
                     <Link to="/myProfile" className="item">
                         <i className="icon smile outline" />
                         My Profile

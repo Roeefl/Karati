@@ -21,7 +21,17 @@ class BookContent extends React.Component {
                         'Error in book component'
                     ]} />
             );
-        }
+        };
+
+        const genres = this.props.book.genres.map( genre => {
+            return (
+                <div className="ui blue icon label book-genre" key={ Math.random().toFixed(8) * 100000000 }>
+                    <i className="ui bookmark outline icon" />
+                    {genre}
+                    <div className="detail">Genre</div>
+                </div>
+            );
+        });
     
         return (
             <div className="ui grid book-content">
@@ -58,7 +68,7 @@ class BookContent extends React.Component {
                             </div>
                             <span className="ui red ribbon label">Summary</span>
                             <div className="description ui segment">
-                                {this.props.book.description}
+                                <div dangerouslySetInnerHTML={{ __html: this.props.book.description }} />
                             </div>
                         </div>
                     </div>
@@ -67,8 +77,12 @@ class BookContent extends React.Component {
                             <i className="ui bookmark outline icon" /> {this.props.book.numOfPages} Pages
                         </div>
                         <div className="ui book-anecdote">
-                            <i className="ui thumbs up outline icon" /> Amazing Book!
+                            <i className="ui bookmark outline icon" /> Published On: {this.props.book.publicationYear}
                         </div>
+                        <div className="ui book-anecdote">
+                            <i className="ui bookmark up outline icon" /> Average Rating: {this.props.book.averageRating}
+                        </div>
+                        {genres}
                     </div>
                 </div>
             </div>

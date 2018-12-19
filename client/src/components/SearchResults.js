@@ -7,7 +7,17 @@ import BookCard from './books/BookCard';
 class SearchResults extends React.Component {
     renderContent = () => {
         console.log(this.props);
-        
+
+        if (!this.props.ready) {
+            return (
+                <div className="ui segment retrieving-books">
+                    <div className="ui huge indeterminate text active loader">
+                        Retrieving Books...
+                    </div> 
+                </div>
+            );
+        };
+
         const results = this.props.results.map( result => {
             return (
                 <div className="book-card-container four wide column" key={result.id._}>
@@ -22,16 +32,6 @@ class SearchResults extends React.Component {
                 </div>
             );
         });
-
-        if (this.props.noDimmer && !this.props.ready) {
-            return (
-                <div className="ui segment">
-                    <div className="ui active loader">
-                        Retrieving Books...
-                    </div> 
-                </div>
-            );
-        };
 
         return (
             <div className="ui link cards grid">

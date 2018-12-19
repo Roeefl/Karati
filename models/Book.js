@@ -37,6 +37,19 @@ const bookSchema = new Schema(
         numOfPages: {
             type: Number,
             required: false
+        },
+        publicationYear:{
+            type: String,
+            required: false
+        },
+        averageRating: {
+            type: Number,
+            required: false
+        },
+        genres: {
+            type: [String],
+            required: false,
+            default: []
         }
     }
 );

@@ -9,6 +9,7 @@ import { booksReducer } from './books';
 import { myMatchesReducer } from './myMatches';
 import { selectBookFromMongoReducer } from './selectBookFromMongo';
 import { retrieveBookFromGoodreadsReducer } from './retrieveBookFromGoodreads';
+import { swipeHistoryReducer } from './swipeHistory';
 
 export default combineReducers(
     {
@@ -20,6 +21,7 @@ export default combineReducers(
         books: booksReducer,
         recentlyAdded: recentlyAddedRedcuer,
         selectedBookFromDB: selectBookFromMongoReducer,
-        selectedBookFromSearch: retrieveBookFromGoodreadsReducer
+        selectedBookFromSearch: retrieveBookFromGoodreadsReducer,
+        swipeHistory: swipeHistoryReducer
     }
 );

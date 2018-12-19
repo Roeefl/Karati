@@ -6,3 +6,7 @@
 .book-content .book-ribbons {
     color: black;
 }
+
+.book-content .book-genre {
+    cursor: pointer
+}

@@ -23,9 +23,6 @@ require('dotenv').config();
 
 const errors = require('./config/errors');
 
-const sendGridMail = require('@sendgrid/mail');
-sendGridMail.setApiKey(process.env.SENDGRID_API_KEY);
-
 const goodreads = GoodReadsAPI(Goodreads_KEY);
 
 const app = express();
@@ -71,6 +68,7 @@ const PORT = process.env.PORT || 9000;
 
 mongoose.connect(process.env.ATLAS_CONNECTION, {useNewUrlParser: true} );
 let db = mongoose.connection;
+
 db.on('error', function () {
   console.log('connection error on mongoose')
 });
@@ -107,24 +105,26 @@ app.get('/api/myShelf', middleware.ensureAuthenticated, (req, res) => {
   Book.find({}, (err, allBooks) => {
     if (err) return handleError(err);
 
-    let currentUserID = req.session.passport.user;
+    middleware.getUser(req.session.passport.user)
+      .then(currentUser => {
+        let myShelf = [];
 
-    middleware.getUser(currentUserID, currentUser => {
-      let myShelf = [];
-
-      for (let ownedBook of currentUser.ownedBooks) { 
-        myShelf.push(
-          allBooks.find(book => book._id == ownedBook.bookID)
-        );
-      }
-
-      res.end( JSON.stringify(
-        {
-          myShelf: myShelf
+        for (let ownedBook of currentUser.ownedBooks) { 
+          myShelf.push(
+            allBooks.find(book => book._id == ownedBook.bookID)
+          );
         }
-      ) );
+  
+        res.end( JSON.stringify(
+          {
+            myShelf: myShelf
+          }
+        ) );
+      })
+      .catch(error => {
+        console.log(error);
+      });
       
-    });
   });
 });
 
@@ -172,24 +172,16 @@ addOrUpdateTimeStampForBook = (goodreadsID) => {
         // book not yet in Mongo collection books - so add it
         console.log('Adding book to MongoDB /books: ' + goodreadsID);
 
-        const result = await goodreads.showBook(goodreadsID)
+        const result = await goodreads.showBook(goodreadsID);
 
-        let saveBook = new Book(
-          { goodreadsID: goodreadsID,
-            author: middleware.parseAuthorName(result.book),
-            title: result.book.title,
-            createdAt: Date.now(),
-            lastMarkedAsOwned: Date.now(),
-            imageURL: result.book.image_url,
-            description: result.book.description,
-            numOfPages: result.book.num_pages
-          }
-        );
+        // console.log(result.book);
+        // console.log(result.book.popular_shelves.shelf);
 
-        const saved = await saveBook.save();
+        let bookData = middleware.parseBookDataObjFromGoodreads(goodreadsID, result);
+        const saved = await bookData.save();
+
         console.log('Book added succesfully to MongoDB /books: ' + saved.id);
         resolve(saved.id);
-
       });
 
     });
@@ -203,44 +195,46 @@ addOrUpdateTimeStampForBook = (goodreadsID) => {
  */
 addOwnedBookByUser = (userID, bookID, goodreadsID) => {
   return new Promise( (resolve, reject) => {
-
-    middleware.getUser(userID, foundUser => {
-      let isBookOwnedByUser = false;
-      if (foundUser.ownedBooks) {
-        isBookOwnedByUser = foundUser.ownedBooks.find( book => book.bookID === bookID );
-      }
-  
-      if (isBookOwnedByUser) {
-
-        console.log('BookID ' + bookID + ' is already linked to UserID ' + userID);
-        resolve(false);
-        return;
-
-      } else {
-        let newOwnedBook = {
-          bookID: bookID,
-          goodreadsID: goodreadsID,
-          dateAdded: Date.now()
-        };
-        
-        foundUser.ownedBooks.push(newOwnedBook);
-  
-        if (!foundUser.passedIntro && foundUser.ownedBooks.length >= 5) {
-          foundUser.passedIntro = true;
+    middleware.getUser(userID)
+      .then(foundUser => {
+        let isBookOwnedByUser = false;
+        if (foundUser.ownedBooks) {
+          isBookOwnedByUser = foundUser.ownedBooks.find( book => book.bookID === bookID );
         }
+    
+        if (isBookOwnedByUser) {
   
-        foundUser.save(function (err, saved) {  
-          if (err) {
-            reject(err);
-            return;
+          console.log('BookID ' + bookID + ' is already linked to UserID ' + userID);
+          resolve(false);
+          return;
+  
+        } else {
+          let newOwnedBook = {
+            bookID: bookID,
+            goodreadsID: goodreadsID,
+            dateAdded: Date.now()
+          };
+          
+          foundUser.ownedBooks.push(newOwnedBook);
+    
+          if (!foundUser.passedIntro && foundUser.ownedBooks.length >= 5) {
+            foundUser.passedIntro = true;
           }
-
-          console.log('addBookToUser saved book ' + bookID + ' to ' + userID);
-          resolve(true);
-        });
-      }
-    });
-
+    
+          foundUser.save(function (err, saved) {  
+            if (err) {
+              reject(err);
+              return;
+            }
+  
+            console.log('addBookToUser saved book ' + bookID + ' to ' + userID);
+            resolve(true);
+          });
+        }
+      })
+      .catch(error => {
+        console.log(error);
+      });
   });
 };
 

@@ -15,9 +15,9 @@ class MatchCard extends React.Component {
 
         return (
             <div className="match-card ui placeholder segment">
-                <div class="ui two column very relaxed stackable grid">
+                <div className="ui two column very relaxed stackable grid">
 
-                    <div class="middle aligned column">
+                    <div className="middle aligned column">
                         <div className="match-book other-book">
                             <div className="match-book-container">
                                 <div className="owner">
@@ -46,7 +46,7 @@ class MatchCard extends React.Component {
                         </div>
                     </div>
 
-                    <div class="middle aligned column">
+                    <div className="middle aligned column">
                         <div className="match-book my-book">
                             <div className="match-book-container">
                                 <div className="owner">
@@ -72,7 +72,7 @@ class MatchCard extends React.Component {
                         </div>
                     </div>
 
-                    <div class="ui vertical divider">
+                    <div className="ui vertical divider">
                         <div className="swap">
                             <button className="swap-books">
                                 <i className="fas fa-retweet"></i>

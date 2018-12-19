@@ -1,0 +1,9 @@
+.swipe-card {
+    background-color: #EBEDEF !important;
+}
+
+.swipe-card .swipe-img {
+    height: 140px !important;
+    padding: 6px;
+    width: unset !important;
+}

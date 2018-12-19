@@ -7,3 +7,4 @@ export const UPDATE_BOOKS = 'update_books';
 export const UPDATE_RECENTLY_ADDED = 'update_recently_added';
 export const SELECT_BOOK_FROM_DB = 'select_book_from_mongo';
 export const RETRIEVE_BOOK_FROM_GOODREADS = 'retrieve_book_from_goodreads';
+export const UPDATE_MY_SWIPE_HISTORY = 'update_my_swipe_history';

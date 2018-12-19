@@ -13,20 +13,8 @@ const Match = mongoose.model('matches');
 const middleware = require('../common/middleware');
 const matchStatus = require('../config/matchStatus');
 
-alertUsersWithMail = (user1, user2) => {
-  let msg = {
-    to: user1.email,
-    from: 'getkarati@gmail.com',
-    subject: 'You have a new match in Karati!',
-    text: 'Match',
-    html: '<div>You have a new match in Karati!</div>'
-  };
-  // Freeze in Dev Mode to save SendGrid quota
-  // sendGridMail.send(msg);
-
-  msg.to = user2.email;
-  // sendGridMail.send(msg);
-};
+const sendGridMail = require('@sendgrid/mail');
+sendGridMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 module.exports = (app) => {
 
@@ -44,7 +32,10 @@ module.exports = (app) => {
       let swipes = []; // init empty array for books available for swiping
     
       Book.find({}, function (err, allBooks) {
-        middleware.getUser(currentUserID, currentUser => {
+
+        middleware.getUser(currentUserID)
+        .then(currentUser => {
+
           User.
             find({}).
             where('_id').ne(currentUserID).
@@ -105,7 +96,10 @@ module.exports = (app) => {
                 }
               ));
             });
-        });
+          }).catch(error => {
+            console.log(error);
+          });
+
       });
     
       // TODO flatten-aggregation-group make this workz
@@ -185,6 +179,7 @@ module.exports = (app) => {
     const result = await goodreads.showBook(req.params.id);
 
     // console.log(result.book);
+    // console.log(result.book.popular_shelves.shelf);
 
     if (!result) {
       console.log('ERROR on retrieving book ' + req.params.id + ' from Goodreads');
@@ -196,37 +191,52 @@ module.exports = (app) => {
       return false;
     }
 
+    let bookData = middleware.parseBookDataObjFromGoodreads(req.params.id, result);
+    // console.log(bookData);
     res.end(JSON.stringify(
       {
-        book: 
-          {
-            goodreadsID: req.params.id,
-            author: middleware.parseAuthorName(result.book),
-            title: result.book.title,
-            imageURL: result.book.image_url,
-            description: result.book.description,
-            numOfPages: result.book.num_pages
-          }
+        book: bookData
       }
     ));
   });
+
+  alertUsersWithMail = (user1, user2) => {
+    return new Promise( (resolve, reject) => {
+
+      let msg = {
+        to: user1.email,
+        from: 'getkarati@gmail.com',
+        subject: 'You have a new match in Karati!',
+        text: 'Match',
+        html: '<div>You have a new match in Karati!</div>'
+      };
+
+      // Freeze in Dev Mode to save SendGrid quota
+      sendGridMail.send(msg);
+
+
+      msg.to = user2.email;
+      sendGridMail.send(msg);
+      console.log('Sent 2 mails');
+
+      resolve(true);
+    });
+  };
 
   /**
    * Check for ANY book match between two users
    * @param {*} currentUser 
    * @param {*} ownerID 
    */
-  checkForMatch = (liked, currentUser, owner, swipedBookID) => {
+  checkForMatch = (currentUser, owner, swipedBookID) => {
     // so currently I already KNOW that currentUser has JUST swiped yes on some book that ownerID possesses.
     // now need to loop over the swipes array of ownerID and check if he has done a YES swipe on ANY book that currentUser has on his ownedBooks array
     return new Promise( (resolve, reject) => {
 
-      if (!liked || !owner.swipes) {
+      if (!owner.swipes) {
         resolve(false);
         return;
       };
-
-      let foundMatch = false;
 
       for (let swipe of owner.swipes) {
         if (swipe.like) {
@@ -253,73 +263,71 @@ module.exports = (app) => {
                 return;
               };
             
-              console.log('Match Saved:');
-              console.log(saved);
+              console.log('Match Saved between ' + currentUser.username + ' and ' + owner.username);
 
-              foundMatch = true;
+              resolve(true);
               // TODO: Mail alert both users with deep link to match when a new match
             });
           }
         }
       }
-
-      resolve(foundMatch);
     });
   };
 
-  likeOrRejectBook = (currentUserID, ownerID, bookID, liked) => {
+  addSwipeToUser = (user, bookID, liked) => {
     return new Promise( (resolve, reject) => {
-
-      middleware.getUser(currentUserID, currentUser => {
-        let likedOrRejected = {
+        let newSwipe = {
           bookID: bookID,
           like: liked,
           dateAdded: Date.now()
         };
           
-        currentUser.swipes.push(likedOrRejected);
+        user.swipes.push(newSwipe);
 
-        currentUser.save(function (err, saved) {  
+        user.save(function (err, saved) {  
           if (err) {
             reject(err);
             return;
           };
 
-          console.log('Saved swipe [' + liked + '] for book ' + bookID + ' for user ' + currentUserID);
-
-          if (!liked) {
-            resolve(false);
-            return;
-          }
-
-          // if swipe was a YES - alert both users with a mail
-          middleware.getUser(ownerID, async (owner) => {
-            const newMatch = await checkForMatch(liked, currentUser, owner, bookID);
-            // alertUsersWithMail(currentUser, owner);
-            resolve(true);
-          });
-
+          console.log('Saved swipe [' + liked + '] for book ' + bookID + ' for user ' + user.username);
+          resolve(true);
         });
-      });
     });
   };
 
+  checkForMatchWrapper = async (currentUser, ownerID, lastSwipedBookID ) => {
+    let owner = await middleware.getUser( ownerID );
+
+    let foundNewMatch = await checkForMatch( currentUser, owner, lastSwipedBookID );
+
+    if (foundNewMatch) {
+        let mailSuccess = await alertUsersWithMail(currentUser, owner);
+    }
+  };
+
   app.post('/api/books/liked', middleware.ensureAuthenticated, async (req, res) => {
-    const liked = await likeOrRejectBook( req.session.passport.user, req.body.ownerID, req.body.bookID, true);
+    let currentUser = await middleware.getUser( req.session.passport.user );
+
+    let added = await addSwipeToUser( currentUser, req.body.bookID, true );
 
     res.end(JSON.stringify(
       {
-        liked: liked
+        added: added
       }
     ));
+
+    checkForMatchWrapper( currentUser, req.body.ownerID, req.body.bookID );
   });
 
   app.post('/api/books/rejected', middleware.ensureAuthenticated, async (req, res) => {
-    const liked = await likeOrRejectBook( req.session.passport.user, req.body.ownerID, req.body.bookID, false);
+    let currentUser = await middleware.getUser( req.session.passport.user );
+
+    let added = await addSwipeToUser( currentUser, req.body.bookID, false )
 
     res.end(JSON.stringify(
       {
-        liked: liked
+        added: added
       }
     ));
   });
@@ -342,6 +350,41 @@ module.exports = (app) => {
       res.end(JSON.stringify(
         { recentlyAdded: recentlyAddedBooks }
       ));
+    });
+  });
+
+  app.get('/api/mySwipeHistory', middleware.ensureAuthenticated, (req, res) => {
+    Book.find({}, (err, allBooks) => {
+      if (err) return handleError(err);
+  
+      middleware.getUser(req.session.passport.user)
+        .then(currentUser => {
+          let mySwipeHistory = [];
+  
+          for (let s = currentUser.swipes.length - 1; s >= 0; s--) { 
+            let swipe = currentUser.swipes[s];
+            
+            mySwipeHistory.push(
+              {
+                _id: swipe._id,
+                bookID: swipe.bookID,
+                liked: swipe.like,
+                dateAdded: swipe.dateAdded,
+                book: allBooks.find(book => book._id == swipe.bookID)
+              }
+            );
+          }
+    
+          res.end( JSON.stringify(
+            {
+              mySwipeHistory: mySwipeHistory
+            }
+          ) );
+        })
+        .catch(error => {
+          console.log(error);
+        });
+        
     });
   });
 }

@@ -53,7 +53,7 @@ class BookCard extends React.Component {
                             {this.props.author}
                         </div>
                         <div className="description">
-                            {this.props.desc}
+                            <div dangerouslySetInnerHTML={{ __html: this.props.desc }} />
                         </div>
                     </div>
                     <div className="extra content">

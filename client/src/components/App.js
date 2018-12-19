@@ -15,6 +15,7 @@ import SearchBooks from './shelf/SearchBooks';
 import SearchBookExpanded from './shelf/SearchBookExpanded';
 
 import MyProfile from './MyProfile';
+import MySwipes from './MySwipes';
 
 import MyMatches from './MyMatches';
 
@@ -23,8 +24,6 @@ import Swipe from './books/Swipe';
 
 import FrontPage from './FrontPage';
 import Intro from './Intro';
-
-
 
 class App extends React.Component {
     componentDidMount() {
@@ -56,6 +55,8 @@ class App extends React.Component {
 
                             <Route exact path="/myMatches" component={MyMatches} />
                             <Route path="/myProfile" component={MyProfile} />
+
+                            <Route path="/mySwipes" component={MySwipes} />
 
                             {/* <Route path="/books/edit" component={BookEdit} /> */}
 

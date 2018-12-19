@@ -52,7 +52,7 @@ class Intro extends React.Component {
                     percent={ this.props.myShelf.length * 20 }
                     label='Add 5 books to your shelf to complete!' />
 
-                <SearchBooks limit={4} noDimmer={true}/>
+                <SearchBooks limit={5}/>
             </div>
         );
     }

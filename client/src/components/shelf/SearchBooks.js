@@ -45,24 +45,8 @@ class SearchBooks extends React.Component {
 
     renderContent() {
         console.log(this.props);
-        
-         if (!this.state.ready) {
-            if (this.props.noDimmer) {
-                return (
-                    <div className="ui container">
-                        <div className="ui segment">
-                            Searching for books...
-                        </div>
-                    </div>
-                );
-            }
 
-            return (
-                <Spinner message="Searching for books..."/>
-            );
-        }
-
-        if (!this.props.searchResults) {
+        if (!this.props.searchResults && this.state.ready) {
             return (
                 <Message 
                     color='violet'
@@ -91,7 +75,6 @@ class SearchBooks extends React.Component {
                     <div className="ui row">
                         <SearchResults
                             results={this.props.searchResults}
-                            noDimmer={this.props.noDimmer || false} 
                             ready={ (this.state.ready) } />
 
                         <SearchDetails />

@@ -8,3 +8,7 @@
 .search-results-grid img {
     width: 100px;
 } */
+
+.retrieving-books {
+    height: 60vh !important;
+}
