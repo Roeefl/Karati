@@ -11,7 +11,8 @@
     "start": "node server.js",
     "server": "nodemon server.js",
     "client": "npm run start --prefix client",
-    "dev": "concurrently \"npm run server\" \"npm run client\""
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "test": "jest"
   },
   "author": "",
   "license": "ISC",

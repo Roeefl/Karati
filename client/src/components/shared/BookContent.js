@@ -39,7 +39,10 @@ class BookContent extends React.Component {
                 <div className="ui left aligned eight wide column grid">
                     <div className="center aligned four wide column">
                         <div className="image">
-                            <img className="book-card-img" src={this.props.book.imageURL} alt={this.props.book.description} />
+                            <img
+                                className="book-card-img"
+                                src={this.props.book.imageURL}
+                                alt={this.props.book.description} />
                         </div>
                     </div>
                     <div className="left aligned ten wide column">

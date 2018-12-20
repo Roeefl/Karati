@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema; 
 
+const commentSchema = require ('./Comment');
+
 const bookSchema = new Schema(
     {
         goodreadsID: {
@@ -48,6 +50,11 @@ const bookSchema = new Schema(
         },
         genres: {
             type: [String],
+            required: false,
+            default: []
+        },
+        comments: {
+            type: [commentSchema],
             required: false,
             default: []
         }

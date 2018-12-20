@@ -5,22 +5,8 @@ const ObjectId = mongoose.Types.ObjectId;
 
 const errors = require("../config/errors");
 
-parseAuthorName = (book) => {
-  if (book && book.authors && book.authors.author) {
-    if (Array.isArray(book.authors.author)) {
-      // Array of authors - return name of first
-      return book.authors.author[0].name;
-    } else {
-      // Not array - return  name of single author
-      return book.authors.author.name;
-    }
-  } else {
-    return "AUTHOR_NAME_NOT_FOUND";
-  }
-};
-
-const bookGenres =  [   'adventure', 'action', 'fantasy', 'fiction', 'classics', 'science', 'psychology', 'nonfiction', 'mystery', 'thriller', 
-                        'romance', 'biography', 'history', 'contemporary', 'horror' ];
+const parseAuthorName = require('./parseAuthorName');
+const parseBookGenres = require('./parseBookGenres');
 
 module.exports = {
   ensureAuthenticated: function(req, res, next) {
@@ -54,20 +40,7 @@ module.exports = {
   },
 
   parseBookDataObjFromGoodreads: function(goodreadsID, result) {
-    let genres = [];
-
-    console.log(result.book.popular_shelves.shelf);
-    for (let s = 0; s < result.book.popular_shelves.shelf.length; s++) {
-      let genre = result.book.popular_shelves.shelf[s].name.toLowerCase();
-
-      // console.log(genre);
-
-      if (bookGenres.find( g => g === genre ) && result.book.popular_shelves.shelf[s].count >= 100 ) {
-        genres.push(genre);
-      }
-    };
-
-    // console.log(genres);
+    let genres = parseBookGenres(result.book.popular_shelves);
 
     return new Book(
       {
@@ -81,7 +54,8 @@ module.exports = {
           numOfPages: result.book.num_pages,
           publicationYear: result.book.publication_year,
           averageRating: result.book.average_rating,
-          genres: genres
+          genres: genres,
+          comments: []
         }
     );
   }

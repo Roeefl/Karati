@@ -80,7 +80,11 @@ module.exports = (app) => {
                       title: bookInfo.title,
                       imageURL: bookInfo.imageURL,
                       desc: bookInfo.description, 
-                      numofPages: bookInfo.numOfPages
+                      numofPages: bookInfo.numOfPages,
+                      publicationYear: bookInfo.publicationYear,
+                      averageRating: bookInfo.averageRating,
+                      genres: bookInfo.genres,
+                      comments: bookInfo.comments
                     }
                     
                     // console.log(swipes.length);
@@ -306,7 +310,7 @@ module.exports = (app) => {
     }
   };
 
-  app.post('/api/books/liked', middleware.ensureAuthenticated, async (req, res) => {
+  app.put('/api/books/liked', middleware.ensureAuthenticated, async (req, res) => {
     let currentUser = await middleware.getUser( req.session.passport.user );
 
     let added = await addSwipeToUser( currentUser, req.body.bookID, true );
@@ -320,7 +324,7 @@ module.exports = (app) => {
     checkForMatchWrapper( currentUser, req.body.ownerID, req.body.bookID );
   });
 
-  app.post('/api/books/rejected', middleware.ensureAuthenticated, async (req, res) => {
+  app.put('/api/books/rejected', middleware.ensureAuthenticated, async (req, res) => {
     let currentUser = await middleware.getUser( req.session.passport.user );
 
     let added = await addSwipeToUser( currentUser, req.body.bookID, false )

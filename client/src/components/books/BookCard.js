@@ -45,7 +45,11 @@ class BookCard extends React.Component {
             <Link to={this.props.linkTo} className="enforce-green">
                 <div className="book-card ui card">
                     <div className="image">
-                        <img className="book-card-img" ref={this.imgRef} src={this.props.src} alt={this.props.desc} />
+                        <img
+                            className="book-card-img"
+                            ref={this.imgRef}
+                            src={this.props.src}
+                            alt={this.props.desc} />
                     </div>
                     <div className="content book-card-title-author">
                         <div className="header">{this.props.title}</div>

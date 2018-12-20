@@ -5,5 +5,6 @@ module.exports = {
     'SHELF_IS_EMPTY'        : '32',
     'NO_MATCHES'            : '33',
     'NO_GOODREADS_RESULT'   : 'Book not found on goodreads using given ID.',
-    'NO_BOOK'               : 'Book not found on MongoDB.'
+    'NO_BOOK'               : 'Book not found on MongoDB.',
+    'NO_AUTHOR'             : 'Could not parse author name'
 };
