@@ -3,11 +3,6 @@ import './MatchCard.css';
 import React from 'react';
 
 class MatchCard extends React.Component {
-    // selectBook = () => {
-    //     if (this.props.onBookSelect)
-    //         this.props.onBookSelect(this.props.bookId);
-    // }
-
     render() {
         console.log(this.props.matchData);
         let myBook = this.props.matchData.myBook;

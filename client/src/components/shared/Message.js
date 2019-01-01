@@ -4,7 +4,23 @@ import React from 'react';
 import './Message.css';
 
 class Message extends React.Component {
+    state ={
+        closed: false
+    };
+
+    close = () => {
+        this.setState({
+            closed: true
+        });
+    }
+    
     render() {
+        if (this.state.closed) {
+            return (
+                <div></div>
+            );
+        }
+        
         const lines = this.props.lines.map( line => {
             return (
                 <li key={ Math.random().toFixed(8) * 100000000 }>
@@ -15,8 +31,9 @@ class Message extends React.Component {
     
         return (
             <div className={`ui info message ${this.props.color}`}>
+                <i className="close icon" onClick={this.close} />
                 <div className="header">
-                    Hey { ( this.props.auth ? this.props.auth.username : 'John Doe' ) } !  
+                    Hey { ( this.props.userData ? this.props.userData.username : 'John Doe' ) } !  
                 </div>
                 <ul className="list">
                     {lines}
@@ -36,7 +53,7 @@ Message.defaultProps = {
 
 function mapStateToProps(state) {
     return {
-        auth: state.auth
+        userData: state.userData
     }
 };
 

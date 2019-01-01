@@ -4,21 +4,27 @@ import './SearchBooks.css';
 
 import React from 'react';
 import { connect } from 'react-redux';
-import { selectBook, updateSearchResults } from '../../actions';
+import { selectBook, updateSearchResults, setCurrentComponent } from '../../actions';
 
-import SearchBar from '../SearchBar';
-import SearchResults from '../SearchResults';
-import SearchDetails from '../SearchDetails';
+import SearchBar from '../search/SearchBar';
+import SearchResults from '../search/SearchResults';
 
-import Spinner from '../shared/Spinner';
 import Message from '../shared/Message';
 
-const DEFAULT_SEARCH_LIMIT = 8;
+const DEFAULT_SEARCH_LIMIT = 10;
 
 class SearchBooks extends React.Component {
     state = {
         ready: true
     };
+
+    componentDidMount() {
+        this.props.setCurrentComponent({
+            primary: 'Search Books',
+            secondary: 'Search for books in our database to add to your shelf',
+            icon: 'search'
+        });
+    }
 
     // onBookSelect = (bookId) => {
     //     let bookData = this.props.searchResults.find(book => book.id._ === bookId);
@@ -68,17 +74,10 @@ class SearchBooks extends React.Component {
 
         return (
             <div>
-                <div className="ui segment">
-                    Found {this.props.searchResults.length} Results
-                </div>
-                <div className="search-container ui container grid">
-                    <div className="ui row">
+                <div className="search-container ui container">
                         <SearchResults
                             results={this.props.searchResults}
                             ready={ (this.state.ready) } />
-
-                        <SearchDetails />
-                    </div>
                 </div>
             </div>
         );
@@ -104,5 +103,5 @@ const mapStateToProps = (state) => {
 
 export default connect(
     mapStateToProps,
-    { selectBook, updateSearchResults }
+    { selectBook, updateSearchResults, setCurrentComponent }
 )(SearchBooks);

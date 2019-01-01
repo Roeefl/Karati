@@ -13,7 +13,7 @@ class SearchBar extends React.Component {
         this.props.onSubmit(this.state.term);
     }
 
-    roger = (event) => {
+    updateTerm = (event) => {
         this.setState( { term: event.target.value } );
         
         clearTimeout(this.state.currTimer);
@@ -42,7 +42,7 @@ class SearchBar extends React.Component {
                             type="text"
                             placeholder="A song of Ice and Fire..." 
                             value={ this.state.term }
-                            onChange={ this.roger } />
+                            onChange={ this.updateTerm } />
                         <button className="ui button green">Search</button>
                     </div>
                 </form>

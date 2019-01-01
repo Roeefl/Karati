@@ -1,14 +1,20 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { fetchMyMatches } from '../actions';
+import { fetchMyMatches, setCurrentComponent, selectUserToShowMatchesWith } from '../../actions';
 
-import MatchCard from './MatchCard';
-import Message from './shared/Message';
-import Spinner from './shared/Spinner';
-import * as errors from './shared/errors';
+import MatchesWithUserCard from './MatchesWithUserCard';
+import Message from '../shared/Message';
+import Spinner from '../shared/Spinner';
+import * as errors from '../shared/errors';
 
 class MyMatches extends React.Component {
     componentDidMount() {
+        this.props.setCurrentComponent({
+            primary: 'My Matches',
+            secondary: 'View matches with users',
+            icon: 'options'
+        });
+
         this.props.fetchMyMatches();
     }
 
@@ -19,12 +25,12 @@ class MyMatches extends React.Component {
             );
         };
 
-        if (!this.props.auth) {
+        if (this.props.myMatches.error) {
             return (
                 <Message 
                     color='red'
                     lines={[
-                        errors.NOT_LOGGED_IN
+                        this.props.myMatches.error
                     ]} />
             );
         };
@@ -34,22 +40,24 @@ class MyMatches extends React.Component {
                 <Message 
                     color='red'
                     lines={[
-                        'You do not have any matches yet. Add more books to your shelf to increase your odds!'
+                        errors.NO_MATCHES
                     ]} />
             );
         };
 
-        const matches = this.props.myMatches.map( match => {
+        console.log(this.props.myMatches);
+
+        const matchesWithUsers = this.props.myMatches.map( matchWithUser => {
             return (
-                <div className="match-card-container eight wide column" key={match.id}>
-                    <MatchCard matchData={match} />
+                <div className="column" key={matchWithUser.ownerInfo._id} >
+                    <MatchesWithUserCard data={matchWithUser} />
                 </div>
             );
         });
 
         return (
-            <div className="my-matches-grid ui link cards grid">
-                {matches}
+            <div className="my-matches-grid ui four column grid">
+                {matchesWithUsers}
             </div>
         );
     }
@@ -65,12 +73,12 @@ class MyMatches extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        auth: state.auth, 
+        userData: state.userData, 
         myMatches: state.myMatches
     }
 };
 
 export default connect(
     mapStateToProps,
-    { fetchMyMatches }
+    { fetchMyMatches, setCurrentComponent, selectUserToShowMatchesWith }
 )(MyMatches);

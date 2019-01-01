@@ -1,0 +1,32 @@
+.first-gradient {
+    height: 100vh;
+    width: 100%;
+    box-shadow: rgba(35, 4, 35, 0.1) 0px 3.7px 23.53px !important;
+    background: linear-gradient(135deg, rgb(230, 230, 230) 45%, rgba(30, 30, 30, 0.7) 0%, rgb(73, 118, 150) 100%) !important;
+    padding-top: 60px;
+}
+
+.text-white {
+    color: rgb(230, 230, 230) !important;
+}
+
+.text-black {
+    color: rgb(30, 30, 30);
+}
+
+.bg-black {
+    background-color: rgb(30, 30, 30);
+}
+
+.bg-white {
+    background-color: rgb(230, 230, 230);
+}
+
+.books-feed {
+    padding: 50px;
+    min-height: 30vh;
+}
+
+.books-feed .header {
+    padding-bottom: 30px !important;
+}

@@ -1,3 +1,20 @@
-main  {
-    margin-top: 20px;
+.rtl {
+    direction: rtl;
+}
+
+.route-container {
+    background-color: white;
+}
+
+.route-container > * {
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+main {
+    min-height: 90vh;
+}
+
+.front-page + .route-container {
+    display: none;
 }

@@ -4,7 +4,7 @@ import './Matches.css';
 
 import React from 'react';
 import { connect } from 'react-redux'   ;
-import { updateBooks } from '../../actions';
+import { updateBooks, fetchUser, setCurrentComponent } from '../../actions';
 
 import SwipeContainer from './SwipeContainer';
 import BrowseContainer from './BrowseContainer';
@@ -15,6 +15,12 @@ import * as errors from '../shared/errors';
 
 class Matches extends React.Component {
     componentDidMount() {
+        this.props.setCurrentComponent({
+            primary: 'Matches',
+            secondary: 'Browse matches around your location',
+            icon: 'delicious'
+        });
+
         this.props.updateBooks();
     }
 
@@ -23,23 +29,26 @@ class Matches extends React.Component {
 
         var data = {
             bookID: book.bookID,
-            ownerID: book.ownerID
+            ownerID: book.ownerID,
+            myUserID: this.props.userData._id
         };
 
         try {
-            const apiURL = '/api/books/' + (liked ? 'liked' : 'rejected');
+            const apiURL = '/api/swipe/' + (liked ? 'liked' : 'rejected');
             const res = await Axios.put(apiURL, data);
 
-            console.log(res);
+            // console.log(res);
 
             this.props.updateBooks();
+
+            this.props.fetchUser();
         } catch(error) {
             console.log('onLikeOrRejectBook Axios post - failed with error: ' + error);
         }
     }
 
     renderContent() {
-        console.log(this.props);
+        // console.log(this.props);
 
         if (!this.props.books) {
             return (
@@ -47,7 +56,7 @@ class Matches extends React.Component {
             );
         };
 
-        if (!this.props.auth) {
+        if (!this.props.userData) {
             return (
                 <Message 
                     color='red'
@@ -92,15 +101,15 @@ class Matches extends React.Component {
 }
 
 const mapStateToProps = (state) => {
-    console.log(state);
+    // console.log(state);
 
     return {
-        auth: state.auth,
+        userData: state.userData,
         books: state.books
     };
 }
 
 export default connect(
     mapStateToProps,
-    { updateBooks }
+    { updateBooks, fetchUser, setCurrentComponent}
 )(Matches);

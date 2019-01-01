@@ -1,5 +1,8 @@
 import './Auth.css';
+
 import React from 'react';
+
+import HeaderMenu from './HeaderMenu';
 
 const methodConfig = {
     google: {
@@ -14,35 +17,48 @@ class Auth extends React.Component {
     renderLink() {
         const { iconName } = methodConfig[this.props.method];
 
-        switch (this.props.loggedIn) {
-            case null:
-                return (
-                    <div className="auth item">
-                    </div>
-                );
-            case false:
-                return (
-                    <a className="auth item" href="/login/google">
-                        <i className={`icon small ${iconName}`} />
-                        Google Login
-                    </a>
-                );
-                // return (
-                //   <button
-                //         className="auth ui labeled inverted button green icon"
-                //         onClick={this.googleLogin} >
-                //         <i className={`icon small ${iconName}`} />
-                //         Google Login
-                //   </button>  
-                // );
-            default:
-                return (
-                    <a className="auth item" href="/api/logout">
-                        <i className={`icon small sign-out`} />
+        if (!this.props.userData) {
+            return (
+                <div className="user-data item">
+                </div>
+            );
+        }
+
+        if (this.props.userData.error) {
+            return (
+                <a className="user-data item" href="/login/google">
+                    <i className={`icon green small ${iconName}`} />
+                    Google Login
+                </a>
+            );
+        }
+
+        const links = [
+            {
+                to: '/myProfile',
+                text: 'My Profile',
+                icon: 'user outline'
+            },
+            {
+                to: '/mySettings',
+                text: 'Settings',
+                icon: 'settings'
+            }
+        ];
+
+        return (
+            <div className="item menu">
+                <div className="item">
+                    <HeaderMenu title={this.props.userData.username} links={links}/>
+                </div>
+                <div className="item">
+                    <a className="user-data item" href="/api/logout">
+                        <i className={`icon green small sign-out`} />
                         Log Out
                     </a>
-                );
-        }
+                </div>
+            </div>
+        );
     }
 
     render() {

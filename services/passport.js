@@ -1,6 +1,6 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth2').Strategy;
-const FacebookStrategy = require('passport-facebook').Strategy;
+// const FacebookStrategy = require('passport-facebook').Strategy;
 
 const mongoose = require('mongoose');
 
@@ -34,6 +34,7 @@ passport.use(new GoogleStrategy (
                     first: profile.name.givenName,
                     last: profile.name.familyName
                 },
+                bio: '',
                 passedIntro: false,
                 ownedBooks: [],
                 swipes: []
@@ -46,37 +47,37 @@ passport.use(new GoogleStrategy (
     }
 ));
 
-passport.use(new FacebookStrategy (
-{
-    clientID: process.env.FACEBOOK_CLIENT_ID,
-    clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
-    callbackURL: process.env.FACEBOOK_CALLBACK_URL,
-},
-    async function(request, accessToken, refreshToken, profile, done) {
-        const existingUsesr = await User.findOne( { oauthID: profile.id } );
+// passport.use(new FacebookStrategy (
+// {
+//     clientID: process.env.FACEBOOK_CLIENT_ID,
+//     clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
+//     callbackURL: process.env.FACEBOOK_CALLBACK_URL,
+// },
+//     async function(request, accessToken, refreshToken, profile, done) {
+//         const existingUsesr = await User.findOne( { oauthID: profile.id } );
 
-        if (existingUser) {
-            existingUser.lastLogin = Date.now();
-            await existingUser.save();
-            return done(null, existingUser);
-        }
+//         if (existingUser) {
+//             existingUser.lastLogin = Date.now();
+//             await existingUser.save();
+//             return done(null, existingUser);
+//         }
     
-        newUser = new User(
-            {
-                oauthID: profile.id,
-                name: profile.displayName,
-                createdAt: Date.now(),
-                passedIntro: false,
-                ownedBooks: [],
-                swipes: []
-            }
-        );
+//         newUser = new User(
+//             {
+//                 oauthID: profile.id,
+//                 name: profile.displayName,
+//                 createdAt: Date.now(),
+//                 passedIntro: false,
+//                 ownedBooks: [],
+//                 swipes: []
+//             }
+//         );
     
-        const savedUser = await newUser.save();
-        console.log('saving user to mongoose');
-        done(null, savedUser);
-    }
-));
+//         const savedUser = await newUser.save();
+//         console.log('saving user to mongoose');
+//         done(null, savedUser);
+//     }
+// ));
 
 // Configure Passport authenticated session persistence
 passport.serializeUser(function(user, done) {

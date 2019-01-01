@@ -1,21 +1,24 @@
 import React from 'react';
+import './CompHeader.css';
 
 const CompHeader = (props) => {
+    // console.log(props);
+
     return (
-        <div className="ui text container">
-            <h1 className="ui inverted header">
-                {props.primary}
-            </h1>
-            <h2>
-                {props.secondary}
-            </h2>
+        <div className="comp-header ui center aligned icon header">
+            <i className={`${props.header.icon} icon`}></i>
+            <div className="content">
+                {props.header.primary}
+                <div className="sub header">
+                    {props.header.secondary}
+                </div>
+            </div>
         </div>
     );
 }
 
 CompHeader.defaultProps = {
-    primary: 'Karati',
-    secondary: 'Uniting People through Reading'
+    title: 'קראתי'
 }
 
 export default CompHeader;

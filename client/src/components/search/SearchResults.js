@@ -2,10 +2,10 @@ import './SearchResults.css';
 
 import React from 'react';
 
-import BookCard from './books/BookCard';
+import BookCard from '../books/BookCard/BookCard';
 
 class SearchResults extends React.Component {
-    renderContent = () => {
+    renderContent() {
         console.log(this.props);
 
         if (!this.props.ready) {
@@ -20,7 +20,7 @@ class SearchResults extends React.Component {
 
         const results = this.props.results.map( result => {
             return (
-                <div className="book-card-container four wide column" key={result.id._}>
+                <div className="book-card-container column" key={result.id._}>
                     <BookCard
                         bookId={result.id._}
                         src={result.image_url}
@@ -34,7 +34,7 @@ class SearchResults extends React.Component {
         });
 
         return (
-            <div className="ui link cards grid">
+            <div className="ui link cards five column grid">
                 {results}
             </div>
         );
@@ -43,7 +43,7 @@ class SearchResults extends React.Component {
     render() {
         // console.log(this.props.results);
         return (
-            <div className="search-results ten wide column">
+            <div className="search-results">
                 {this.renderContent()}
             </div>
         );

@@ -57,6 +57,11 @@ const bookSchema = new Schema(
             type: [commentSchema],
             required: false,
             default: []
+        },
+        likes: {
+            type: Number,
+            required: false,
+            default: 0
         }
     }
 );

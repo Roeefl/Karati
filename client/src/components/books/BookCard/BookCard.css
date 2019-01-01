@@ -1,9 +1,9 @@
-.search-results .book-card-img {
-    height: 220px !important;
+.search-results .book-card .image img {
+    height: 280px !important;
     padding: 6px;
 }
 
-.my-shelf .book-card-img {
+.my-shelf .book-card .image img {
     height: 270px !important;
     padding: 6px;
 }
@@ -15,11 +15,6 @@
 
 .matches .book-card .image img {
     height: 180px !important;
-    padding: 6px;
-}
-
-.front-page .book-card .image img {
-    /* height: 120px !important; */
     padding: 6px;
 }
 

@@ -1,7 +1,7 @@
 import React from 'react';
 
 import SwipePreviewBar from './SwipePreviewBar';
-import BookCard from './BookCard';
+import BookCard from './BookCard/BookCard';
 
 class SwipeContainer extends React.Component {
     likeBook = () => {
@@ -41,16 +41,16 @@ class SwipeContainer extends React.Component {
 
                 <div className="actions">
                     <div
-                        className="ui negative deny button labeled icon button"
+                        className="ui negative labeled icon button"
                         onClick={this.rejectBook} >
                         <i className="icon thumbs down outline"></i>
                         No Thanks
                     </div>
                     <div
-                        className="ui positive right labeled icon button"
+                        className="ui positive labeled icon button"
                         onClick={this.likeBook} >
-                        Yep, I want this
                         <i className="icon heart outline"></i>
+                        Yep, I want this
                     </div>
                 </div>
             </div>

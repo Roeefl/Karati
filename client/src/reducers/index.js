@@ -1,27 +1,34 @@
 import { combineReducers } from 'redux';
 
-import { authReducer } from  './auth';
+import { reducer as reduxForm } from 'redux-form';
+
+import { userDataReducer } from  './userData';
 import { selectedBookReducer } from  './selectedBook';
 import { bookSearchReducer } from './bookSearch';
-import { myBooksReducer } from './myBooks';
-import { recentlyAddedRedcuer } from './recentlyAdded';
+import { myShelfReducer } from './myShelf';
+import { feedsReducer } from './feeds';
 import { booksReducer } from './books';
 import { myMatchesReducer } from './myMatches';
 import { selectBookFromMongoReducer } from './selectBookFromMongo';
 import { retrieveBookFromGoodreadsReducer } from './retrieveBookFromGoodreads';
 import { swipeHistoryReducer } from './swipeHistory';
+import { matchesWithUserReducer } from './matchesWithUser';
+import { currentComponentReducer } from './currentComponent';
 
 export default combineReducers(
     {
-        auth: authReducer,
+        form: reduxForm,
+        userData: userDataReducer,
         searchResults: bookSearchReducer,
         selectedBook: selectedBookReducer,
-        myBooks: myBooksReducer,
+        myBooks: myShelfReducer,
         myMatches: myMatchesReducer,
         books: booksReducer,
-        recentlyAdded: recentlyAddedRedcuer,
+        feeds: feedsReducer,
         selectedBookFromDB: selectBookFromMongoReducer,
         selectedBookFromSearch: retrieveBookFromGoodreadsReducer,
-        swipeHistory: swipeHistoryReducer
+        swipeHistory: swipeHistoryReducer,
+        matchesWithUser: matchesWithUserReducer,
+        currentComponent: currentComponentReducer
     }
 );

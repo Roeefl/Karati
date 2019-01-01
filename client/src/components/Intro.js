@@ -68,7 +68,7 @@ class Intro extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        auth: state.auth,
+        userData: state.userData,
         myShelf: state.myBooks
     }
 };

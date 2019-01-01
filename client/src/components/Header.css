@@ -1,3 +1,12 @@
-.top-header i {
+/* .top-header i {
     color: lightgreen;
+} */
+
+.header-link .item {
+    color: black !important;
+}
+
+.dropdown .menu .item .icon {
+    color: #DB2828 !important;
+    /* color: #6435C9 !important; */
 }

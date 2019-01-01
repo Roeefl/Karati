@@ -1,5 +1,7 @@
 const passport = require('passport');
 
+const middleware = require('../common/middleware');
+
 module.exports = (app) => {
     app.get('/login/google',
         passport.authenticate('google',
@@ -38,8 +40,10 @@ module.exports = (app) => {
         }
     );
 
-    app.get('/api/currentUser', (req, res) => {
-        res.send(req.user || false);
+    app.get('/api/currentUser', middleware.ensureAuthenticated, (req, res) => {
+        res.end(JSON.stringify(
+            { currentUser: req.user }
+        ));
     });
     
     app.get('/api/logout', (req, res) => {

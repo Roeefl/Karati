@@ -1,22 +1,28 @@
 import { connect } from 'react-redux';
 
-import { fetchMySwipeHistory } from '../actions';
+import { fetchMySwipeHistory, setCurrentComponent } from '../../actions';
 
 import React from 'react';
 
 import SwipeCard from './SwipeCard';
 
-import Message from './shared/Message';
-import Spinner from './shared/Spinner';
-import * as errors from './shared/errors';
+import Message from '../shared/Message';
+import Spinner from '../shared/Spinner';
+import * as errors from '../shared/errors';
 
 class MySwipes extends React.Component {
     componentDidMount() {
         this.props.fetchMySwipeHistory();
+
+        this.props.setCurrentComponent({
+            primary: 'Your Swipe History',
+            secondary: 'View your previous swipes',
+            icon: 'thumbs up outline'
+        });
     }
 
     renderContent() {
-        if (!this.props.auth) {
+        if (!this.props.userData) {
             return (
                 <Message 
                     color='red'
@@ -49,14 +55,14 @@ class MySwipes extends React.Component {
 
     render() {
         return (
-            <div className="my-swipes">
+            <div className="my-swipes ui container">
                 <Message
                     color='violet'
                     lines={[
                         `You've swiped on ${this.props.swipeHistory.length || 0} books so far`
                     ]} />
 
-                <div className="my-swipes ui centered grid">
+                <div className="ui centered grid">
                     <div className="ui ten wide column">
                         {this.renderContent()}
                     </div>
@@ -68,12 +74,12 @@ class MySwipes extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        auth: state.auth,
+        userData: state.userData,
         swipeHistory: state.swipeHistory
     }
 };
 
 export default connect(
     mapStateToProps,
-    { fetchMySwipeHistory }
+    { fetchMySwipeHistory, setCurrentComponent }
 )(MySwipes);

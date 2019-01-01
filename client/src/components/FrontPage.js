@@ -1,112 +1,143 @@
 import React from 'react';
 
+import './FrontPage.css';
+
 import { connect } from 'react-redux'   ;
-import { updateRecentlyAdded } from '../actions';
+import { updateFeeds } from '../actions';
+
+import { Link } from 'react-router-dom';
 
 import Message from './shared/Message';
 import Spinner from './shared/Spinner';
 
-import BookCard from './books/BookCard';
+import FeedCard from './books/FeedCard';
 
-import logo from '../icons/karati-50.png';
+import icon256 from '../icons/256.png';
+// import icon64 from '../icons/64.png';
+// import icon128 from '../icons/128.png';
 
 class FrontPage extends React.Component {
     componentDidMount() {
-        // if (this.props.auth && !this.props.auth.passedIntro) {
-        // }
-
-        this.props.updateRecentlyAdded();
+        this.props.updateFeeds();
     }
 
-    renderContent() {
-        if (!this.props.recentlyAdded) {
+    renderFeed(feed, dark) {
+        if (!feed || !feed.data) {
+            const spinnerMsg = `Fetching ${feed.title.colored} ${feed.title.rest}...`;
+
             return (
-                <Spinner message="Fetching Recently Added Books..."/>
+                <Spinner message={spinnerMsg} />
             );
         }
 
-        if (this.props.recentlyAdded.length <= 0 ) {
+        if (feed.data.length === 0 ) {
             return (
                 <Message 
                     color='red'
                     lines={[
-                        'No recently added books found in the system. Odd.'
+                        `No ${feed.title} found in the system. Super strange`
                     ]} />
             );
         }
 
-        const recentlyAdded = this.props.recentlyAdded.map( book => {
+        // console.log(feed);
+
+        const feedColumns = feed.data.slice(0,4).map( book => {
             return (
-                <div className="book-card-container two wide column" key={book._id}>
-                    <BookCard
+                <div className="feed-item four wide column" key={book._id}>
+                    <FeedCard
+                        dark={dark}
                         bookId={book._id}
                         src={book.imageURL}
-                        desc={''}
                         title={book.title}
                         author={book.author}
-                        numOfPages={book.numOfPages}
                         linkTo={'/book/' + book._id} />
                 </div>
             );
         });
 
         return (
-            <div className="my-matches-grid ui link cards grid">
-                {recentlyAdded}
+            <div className="ui link cards grid">
+                {feedColumns}
+            </div>
+        );
+    }
+
+    renderBookFeeds() {
+        let dark = false;
+
+        const feeds = this.props.feeds.map( feed => {
+            let bgColor = (dark ? 'bg-black' : 'bg-white');
+            let textColor = (dark ? 'text-white' : 'text-blak');
+            dark = !dark;
+
+            return (
+                <div className={`books-feed ui vertical stripe ${bgColor}`} key={feed.title.colored}>
+                    <div className="ui container    ">
+                        <h1 className={`ui centered header ${textColor}`}>
+                            <i className={`icon ${feed.iconName} ${feed.iconColor}`} />
+                            {feed.title.colored} {feed.title.rest}
+                        </h1>
+
+                        {this.renderFeed(feed, dark)}         
+                    </div>           
+                </div>
+            );
+        });
+
+        return (
+            <div className="feeds">
+                {feeds}
             </div>
         );
     }
 
     render() {
         return (
-            <div className="front-page ui container">
+            <div className="front-page">
 
-                <div className="ui vertical stripe segment">
+                <div className="ui vertical stripe first-gradient">
                     <div className="ui middle aligned stackable grid container">
-                        <div className="row">
-                            <div className="ten wide column">
-                            <img src={logo} alt='karati-logo' className="ui bordered rounded image" />
-                                <h3 className="ui header">Karati is a book swapping app</h3>
-                                <p>Which allows easy and enjoyable book exchange with people nearby</p>
-                            </div>
-                        </div>
-                        <div className="row">
-                            <div className="center aligned column">
-                                <a className="ui large green button" href="/login/google">Sign up to give it a try</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="ui vertical stripe quote segment">
-                    <div className="ui equal width stackable internally celled grid">
-                        <div className="center aligned row">
+                        <div className="center aligned row rtl app-logo">
                             <div className="column">
-                                <h3>"Amazing"</h3>
-                                <p>The developer</p>
+                                <h1 className="ui header">קראתי</h1>
+                                <h3 className="ui header">קראת? החלפת!</h3>
                             </div>
-                            <div className="column">
-                                <h3>"This app sucks ass"</h3>
-                                <p>Again, the developer.
-                                </p>
+                        </div>
+                        <div className="centered row">
+                            <div className="one wide column">
+                            </div>
+                            <div className="center aligned four wide column">
+                                <h1>Give away your old, dusty books</h1>
+                                <em>Add some of my old books up for exchange</em>
+                                <Link to="/myShelf">
+                                    <div className="ui huge violet labeled icon button">
+                                        <i className="icon zip white large" />
+                                        My Shelf
+                                    </div>
+                                </Link>
+                            </div>
+                            <div className="six wide column ui center aligned">
+                                    <img src={icon256} alt="karati-logo"/>
+                            </div>
+                            <div className="four wide center aligned column">
+                                <h1>Dive into new, untold adventures</h1>
+                                <em>See whats up for grabs around my location</em>
+                                <Link to="/books/browse">
+                                    <div className="ui huge orange labeled icon button">
+                                        <i className="icon delicious white large" />
+                                        Books Nearby
+                                    </div>
+                                </Link>
+                            </div>
+                            <div className="one wide column">
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div className="ui vertical stripe segment">
-                    <div className="ui text container">
-                        <h3 className="ui header">Add your books and browse books of others</h3>
-                        <p>It takes less than a minute to get going</p>
-                        <a className="ui large green button" href='https://www.urbandictionary.com/define.php?term=kbye'>Leave me alone, dude</a>
-                    </div>
-                </div>
+                {this.renderBookFeeds()}
 
-                <h3 className="ui block header green inverted">
-                    Recently Added
-                </h3>
-
-                {this.renderContent()}
             </div>
         );
     }
@@ -114,12 +145,41 @@ class FrontPage extends React.Component {
 
 const mapStateToProps = (state) => {
     return {
-        auth: state.auth,
-        recentlyAdded: state.recentlyAdded
+        userData: state.userData,
+        
+        feeds: [
+            {
+                data: state.feeds.recentlyAdded,
+                title: {
+                    colored: 'Recently',
+                    rest: 'marked as owned'
+                },
+                iconName: 'paper plane outline',
+                iconColor: 'orange'
+            },
+            {
+                data: state.feeds.mostPopular,
+                title: {
+                    colored: 'Most',
+                    rest: 'popular books'
+                },
+                iconName: 'heartbeat',
+                iconColor:' pink'
+            },
+            {
+                title: {
+                    colored: 'Owned',
+                    rest: 'by the most people'
+                },
+                data: state.feeds.mostPopular,
+                iconName: 'hand paper outline',
+                iconColor: 'blue'
+            }
+        ]
     };
 }
 
 export default connect(
     mapStateToProps,
-    { updateRecentlyAdded }
+    { updateFeeds }
 )(FrontPage);

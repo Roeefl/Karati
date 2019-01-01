@@ -6,5 +6,8 @@ module.exports = {
     'NO_MATCHES'            : '33',
     'NO_GOODREADS_RESULT'   : 'Book not found on goodreads using given ID.',
     'NO_BOOK'               : 'Book not found on MongoDB.',
-    'NO_AUTHOR'             : 'Could not parse author name'
+    'NO_AUTHOR'             : 'Could not parse author name',
+    'DOES_NOT_OWN_BOOK'     : 'You have to own this book to submit a review for it.',
+    'ALREADY_COMMENTED'     : 'User already submitted a review for this book.',
+    'USERNAME_TAKEN'        : 'Useranme is already taken. choose another one.'
 };

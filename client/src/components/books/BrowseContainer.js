@@ -2,7 +2,7 @@ import React from 'react';
 
 import { connect } from 'react-redux';
 
-import BookCard from './BookCard';
+import BookCard from './BookCard/BookCard';
 
 class BrowseContainer extends React.Component {
     render() {
@@ -45,11 +45,11 @@ class BrowseContainer extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        auth: state.auth
+        userData: state.userData
     }
 };
 
 export default connect(
     mapStateToProps,
-    { }
+    {  }
 )(BrowseContainer);

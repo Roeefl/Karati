@@ -6,6 +6,7 @@ import * as actions from '../actions';
 import './App.css';
 
 import Header from './Header';
+import Footer from './Footer';
 
 // import BookEdit from './books/BookEdit';
 import Book from './books/Book';
@@ -14,19 +15,22 @@ import MyShelf from './shelf/MyShelf';
 import SearchBooks from './shelf/SearchBooks';
 import SearchBookExpanded from './shelf/SearchBookExpanded';
 
-import MyProfile from './MyProfile';
-import MySwipes from './MySwipes';
+import MyProfile from './profile/MyProfile';
+import MySwipes from './swipes/MySwipes';
 
-import MyMatches from './MyMatches';
+import MyMatches from './matches/MyMatches';
+import MatchesWithUser from './matches/MatchesWithUser';
 
 import Browse from './books/Browse';
 import Swipe from './books/Swipe';
 
 import FrontPage from './FrontPage';
 import Intro from './Intro';
+import CompHeader from './CompHeader';
 
 class App extends React.Component {
     componentDidMount() {
+        // console.log('fetchUser');
         this.props.fetchUser();
     }
 
@@ -37,33 +41,44 @@ class App extends React.Component {
                     <div>
                         <Header />
 
-                        <main className="ui container">
+                        <main>
                             <Route exact path="/" component={ () => (
-                                (this.props.auth && !this.props.auth.passedIntro) ? (
-                                        <Redirect to="/intro" />
+                                (this.props.userData && !this.props.userData.error && !this.props.userData.passedIntro) ? (
+                                        // <Redirect to="/intro" />
+                                        <FrontPage />
                                     ) : (
                                         <FrontPage />
                                     )
                                 )}
                             />
-                            
-                            <Route path="/intro" component={Intro} />
 
-                            <Route exact path="/myShelf" component={MyShelf} />
-                            <Route exact path="/myShelf/search" component={SearchBooks} />
-                            <Route path="/myShelf/search/book/:bookId" component={SearchBookExpanded} />
+                            <div className="route-container">
 
-                            <Route exact path="/myMatches" component={MyMatches} />
-                            <Route path="/myProfile" component={MyProfile} />
+                                <CompHeader header={this.props.currentComponent} />
 
-                            <Route path="/mySwipes" component={MySwipes} />
+                                <Route path="/intro" component={Intro} />
 
-                            {/* <Route path="/books/edit" component={BookEdit} /> */}
+                                <Route exact path="/myShelf" component={MyShelf} />
+                                <Route exact path="/myShelf/search" component={SearchBooks} />
+                                <Route path="/myShelf/search/book/:bookId" component={SearchBookExpanded} />
 
-                            <Route path="/books/browse" component={Browse} />
-                            <Route path="/books/swipe" component={Swipe} />
-                            <Route path="/book/:bookId" component={Book} />
+                                <Route exact path="/myMatches" component={MyMatches} />
+                                <Route exact path="/myMatches/:userId" component={MatchesWithUser} />
+
+                                <Route path="/myProfile" component={MyProfile} />
+
+                                <Route path="/mySwipes" component={MySwipes} />
+
+                                {/* <Route path="/books/edit" component={BookEdit} /> */}
+
+                                <Route path="/books/browse" component={Browse} />
+                                <Route path="/books/swipe" component={Swipe} />
+                                <Route path="/book/:bookId" component={Book} />
+                            </div>
+
                         </main>
+
+                        <Footer />
                     </div>
                 </BrowserRouter>
             </div>
@@ -72,9 +87,9 @@ class App extends React.Component {
 }
 
 function mapStateToProps(state) {
-    console.log(state.auth);    
     return {
-        auth: state.auth
+        userData: state.userData,
+        currentComponent: state.currentComponent
     }
 };
 

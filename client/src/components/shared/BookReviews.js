@@ -2,7 +2,7 @@ import React from 'react';
 
 import Message from '../shared/Message';
 
-class BookComments extends React.Component {
+class BookReviews extends React.Component {
     render() {
         if (this.props.book === false) {
             return (
@@ -15,7 +15,7 @@ class BookComments extends React.Component {
                 <Message 
                     color='red'
                     lines={[
-                        'Error in Book Comments Component'
+                        'Error in BookReviews Component'
                     ]} />
             );
         };
@@ -23,15 +23,17 @@ class BookComments extends React.Component {
         const imageURL = 'https://semantic-ui.com/images/avatar/large/elliot.jpg';
 
         const comments = this.props.book.comments.map( comment => {
+            console.log(comment);
+            
             return (
                 <div className="book-comment comment" key={ Math.random().toFixed(8) * 100000000 }>
 
-                    <a className="avatar">
-                        <img src={imageURL} />
-                    </a>
+                    <div className="avatar">
+                        <img src={imageURL} alt="avatar" />
+                    </div>
 
                     <div className="content">
-                        <div className="author">{comment.userID}</div>
+                        <div className="author">{comment.username}</div>
                         <div className="metadata">
                             <span className="date">{comment.dateAdded}</span>
                         </div>
@@ -39,7 +41,7 @@ class BookComments extends React.Component {
                             {comment.content}
                         </div>
                         <div className="actions">
-                            <div className="reply">Reply</div>
+
                         </div>
                     </div>
 
@@ -49,11 +51,11 @@ class BookComments extends React.Component {
     
         return (
             <div className="book-comments ui comments">
-                <h3 className="ui dividing header">Comments</h3>
+                <h3 className="ui dividing header">User Reviews </h3>
                 {comments}
             </div>
         );
     }
 }
 
-export default BookComments;
+export default BookReviews;

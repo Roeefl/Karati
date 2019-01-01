@@ -1,14 +1,53 @@
 import Axios from 'axios';
+
 import { UPDATE_SEARCH_RESULTS,
     BOOK_SELECTED,
     FETCH_USER,
     UPDATE_MY_BOOKS,
     UPDATE_BOOKS,
     UPDATE_MY_MATCHES,
-    UPDATE_RECENTLY_ADDED,
+    UPDATE_FEEDS,
     SELECT_BOOK_FROM_DB,
     RETRIEVE_BOOK_FROM_GOODREADS,
-    UPDATE_MY_SWIPE_HISTORY    } from './types';
+    UPDATE_MY_SWIPE_HISTORY,
+    SET_CURRENT_COMP,
+    MATCHES_USER_SELECTED    } from './types';
+
+export const submitProfileForm = (formValues, history) =>
+    async (dispatch) => { 
+        // console.log(history);
+        try {
+            const res = await Axios.post('/api/myProfile', {
+                first: formValues.first,
+                last: formValues.last,
+                username: formValues.username,
+                bio: formValues.bio
+            } );
+
+            if (res.data.error) {
+                console.log('BAD USERNAME, CHOOSE ANOTHER.');
+                history.push('/');
+            }
+
+            if (!res.data.currUser) {
+                return;
+            }
+
+            history.push('/');
+
+            dispatch( {
+                type: FETCH_USER,
+                payload: res.data.currUser || null
+            });
+        } catch(error) {
+            console.log('Error on submitProfileForm ' + error);
+
+            dispatch( {
+                type: FETCH_USER,
+                payload: false
+            });
+        }
+    };
 
 // Action Creator
 export const selectBook = (bookData) => {
@@ -19,6 +58,14 @@ export const selectBook = (bookData) => {
     };
 };
 
+export const selectUserToShowMatchesWith = (user) => {
+    // Returns an Action
+    return {
+        type: MATCHES_USER_SELECTED,
+        payload: user
+    };
+};
+
 export const resetBookFromDB = () => {
     return {
         type: SELECT_BOOK_FROM_DB,
@@ -26,11 +73,17 @@ export const resetBookFromDB = () => {
     }
 };
 
-
 export const resetBookFromGoodreads = () => {
     return {
         type: RETRIEVE_BOOK_FROM_GOODREADS,
         payload: false
+    }
+};
+
+export const setCurrentComponent = (compInfo) => {
+    return {
+        type: SET_CURRENT_COMP,
+        payload: compInfo
     }
 };
 
@@ -57,7 +110,7 @@ export const selectBookFromDB = (bookID) =>
 export const retrieveBookFromGoodreads = (bookID) => 
     async (dispatch) => { 
         try {
-            const res = await Axios.get('/api/myShelf/search/book/' + bookID);
+            const res = await Axios.post('/api/myShelf/search/book/' + bookID);
             console.log(res.data.book);
 
             dispatch( {
@@ -89,14 +142,14 @@ export const fetchUser = () =>
 
             dispatch( {
                 type: FETCH_USER,
-                payload: res.data || null
+                payload: res.data.currentUser || null
             });
         } catch(error) {
             console.log('Failed to fetchUser ' + error);
 
             dispatch( {
                 type: FETCH_USER,
-                payload: null
+                payload: { error: error.response.data.error }
             });
         }
     };
@@ -115,7 +168,7 @@ export const updateMyShelf = () =>
 
             dispatch( {
                 type: UPDATE_MY_BOOKS,
-                payload: false
+                payload: { error: error.response.data.error } 
             });
         }
     };
@@ -134,7 +187,7 @@ export const fetchMyMatches = () =>
 
             dispatch( {
                 type: UPDATE_MY_MATCHES,
-                payload: false
+                payload: { error: error.response.data.error }
             });
         }
     };
@@ -161,11 +214,11 @@ export const fetchMySwipeHistory = () =>
 export const updateBooks = () =>
     async (dispatch) => {
         try {
-            const res = await Axios.get('/api/books');
+            const res = await Axios.get('/api/availableSwipes');
 
             dispatch( {
                 type: UPDATE_BOOKS,
-                payload: res.data.books || []
+                payload: res.data.availableSwipes || []
             });
         } catch(error) {
             console.log('/api/books failed with error: ' + error);
@@ -177,20 +230,26 @@ export const updateBooks = () =>
         }
     };
 
-export const updateRecentlyAdded = () =>
+export const updateFeeds = () =>
     async (dispatch) => {
         try {
-            const res = await Axios.get('/api/recent');
+            const recent = await Axios.get('/api/recent');
+            const mostPopular = await Axios.get('/api/mostPopular');
+
+            const feeds = {
+                recentlyAdded: recent.data.recentlyAdded,
+                mostPopular: mostPopular.data.mostPopular
+            };
     
             dispatch( {
-                type: UPDATE_RECENTLY_ADDED,
-                payload: res.data.recentlyAdded || []
+                type: UPDATE_FEEDS,
+                payload: feeds || {}
             });
         } catch(error) {
             console.log('/api/recent failed with error: ' + error);
     
             dispatch( {
-                type: UPDATE_RECENTLY_ADDED,
+                type: UPDATE_FEEDS,
                 payload: false
             });
         }

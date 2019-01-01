@@ -3,9 +3,9 @@ import './MyShelf.css';
 import React from 'react';
 
 import { connect } from 'react-redux';
-import { updateMyShelf } from '../../actions';
+import { updateMyShelf, fetchUser, setCurrentComponent } from '../../actions';
 
-import BookCard from '../books/BookCard';
+import BookCard from '../books/BookCard/BookCard';
 
 import { Link } from 'react-router-dom'
 
@@ -14,27 +14,56 @@ import Spinner from '../shared/Spinner';
 
 class MyShelf extends React.Component   {
     componentDidMount() {
+        this.props.setCurrentComponent({
+            primary: 'Your Book Shelf',
+            secondary: 'View and update the books that you offer for swap',
+            icon: 'zip'
+        });
+
         this.props.updateMyShelf();
+        this.props.fetchUser();
     }
 
-    renderContent() {
-        if (!this.props.myShelf) {
-            return (
-                <Spinner message="Fetching Your Shelf..."/>
-            );
-        }
-
+    renderMessage() {
         if (this.props.myShelf.length <= 0 ) {
             return (
                 <Message 
                     color='red'
                     lines={[
-                        `You have not added any books to your shelf yet. Bad user! *System spanks ${ ( this.props.auth ? this.props.auth.username : 'John Doe' ) }*`
+                        `You have not added any books to your shelf yet. Bad user! *System spanks ${ ( this.props.userData ? this.props.userData.username : 'John Doe' ) }*`
                     ]} />
             );
         }
 
-        const shelfBooks = this.props.myShelf.map( book => {
+        return (
+            <Message
+                color='violet'
+                lines={[
+                    `You have ${this.props.myShelf.length || 0} Books on your shelf`
+                ]} />
+        );
+    }
+
+    renderContent() {
+        // console.log(this.props);
+
+        if (this.props.myShelf === false) {
+            return (
+                <Spinner message="Fetching Your Shelf..."/>
+            );
+        }
+
+        if (this.props.myShelf.error) {
+            return (
+                <Message 
+                    color='red'
+                    lines={[
+                        this.props.myShelf.error
+                    ]} />
+            );
+        };
+
+        const shelfBooks = this.props.myShelf.reverse().map( book => {
             let trimmedDesc = book.description.substring(0, 200);
 
             return (
@@ -52,20 +81,8 @@ class MyShelf extends React.Component   {
         });
 
         return (
-            <div className="my-matches-grid ui link cards grid">
-                {shelfBooks}
-            </div>
-        );
-    }
-
-    render() {
-        return (
-            <div className="my-shelf ten wide column">
-                <Message
-                    color='violet'
-                    lines={[
-                        `You have ${this.props.myShelf.length || 0} Books on your shelf`
-                    ]} />
+            <div>
+                {this.renderMessage()}
 
                 <div className="ui placeholder segment">
 
@@ -106,9 +123,17 @@ class MyShelf extends React.Component   {
                 </div>
 
                 <div className="my-shelf-grid ui link cards grid">
-                    {this.renderContent()}
+                    {shelfBooks}
                 </div>
 
+            </div>
+        );
+    }
+
+    render() {
+        return (
+            <div className="my-shelf ui container">
+                {this.renderContent()}
             </div>
         );
     }
@@ -116,12 +141,12 @@ class MyShelf extends React.Component   {
 
 const mapStateToProps = (state) => {
     return {
-        auth: state.auth,
+        userData: state.userData,
         myShelf: state.myBooks
     };
 }
 
 export default connect(
     mapStateToProps,
-    { updateMyShelf }
+    { updateMyShelf, fetchUser, setCurrentComponent }
 )(MyShelf);

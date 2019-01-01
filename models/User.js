@@ -3,6 +3,7 @@ const Schema = mongoose.Schema;
 
 const ownedBookSchema = require('./OwnedBook');
 const swipeSchema = require('./Swipe');
+const notificationSchema = require('./Notification');
 
 const userSchema = new Schema (
     {
@@ -16,13 +17,17 @@ const userSchema = new Schema (
         },
         fullName: {
             first: {
-                type: String,
+                type: String,   
                 required: false
             },
             last: {
                 type: String,
                 required: false
             }
+        },
+        bio: {
+            type: String,
+            required: false
         },
         email: {
             type: String,
@@ -42,6 +47,10 @@ const userSchema = new Schema (
         },
         swipes: {
             type: [swipeSchema],
+            required: false
+        },
+        notifications: {
+            type: [notificationSchema],
             required: false
         },
         passedIntro: {

@@ -5,53 +5,60 @@ import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 
 import Auth from './Auth';
-import CompHeader from './CompHeader';
 
-class Header extends React.Component { 
-    renderSwipe() {
-        if (this.props.auth) {
-            return (
-                <Link to="/books/swipe" className="swipe item">
-                    <i className="icon heart outline" />
-                    Swipe
-                </Link>
-            );
+import HeaderMenu from './HeaderMenu';
+
+import icon64 from '../icons/64.png';
+
+class Header extends React.Component {  
+    renderExplore() {
+        if (!this.props.userData || this.props.userData.error) {
+            return;
         }
-        return;
+
+        const links = [
+            {
+                to: '/books/browse',
+                text: 'Browse Books',
+                icon: 'delicious'
+            },
+            {
+                to: '/books/swipe',
+                text: 'Swipe',
+                icon: 'nintendo switch'
+            }
+        ];
+
+        return (
+            <HeaderMenu title='Explore Books Around You' links={links}/>
+        );
     }
 
-    renderRightMenu() {
-        if (this.props.auth) {
-            return (
-                <div className="right menu">
-                    <Link to="/myMatches" className="item">
-                        <i className="icon list alternate outline" />
-                        My Matches
-                    </Link>
-
-                    <Link to="/myShelf" className="item">
-                        <i className="icon list alternate outline" />
-                        My Shelf
-                    </Link>
-
-                    <Link to="/mySwipes" className="item">
-                        <i className="icon list alternate outline" />
-                        My Swipes
-                    </Link>
-
-                    <Link to="/myProfile" className="item">
-                        <i className="icon smile outline" />
-                        My Profile
-                    </Link>
-                    
-                    <Auth method="google" loggedIn={this.props.auth} />
-                </div>
-            );
+    renderMyStuff() {
+        if(!this.props.userData || this.props.userData.error) {
+            return;
         }
+
+        const links = [
+            {
+                to: '/myMatches',
+                text: 'My Matches',
+                icon: 'options'
+            },
+            {
+                to: '/myShelf',
+                text: 'My Shelf',
+                icon: 'zip'
+            },
+            {
+                to: '/mySwipes',
+                text: 'My Swipes',
+                icon: 'thumbs up outline'
+            }
+        ];
+
         return (
-            <div className="right menu">
-                <Auth method="google" loggedIn={this.props.auth} />
-            </div>
+            <HeaderMenu title='My Stuff' links={links}/>
         );
     }
 
@@ -59,33 +66,29 @@ class Header extends React.Component {
         return (
             <div className="ui inverted vertical masthead center aligned segment">
                 <div className="ui container">
-                    <div className="top-header ui secondary inverted menu">
+                    <div className="top-header ui large secondary inverted menu">
                         <Link to="/" className="header item">
-                            <i className="icon book" />
-                            Karati
+                            <img src={icon64} alt='karati-logo' className="ui rounded image" />
                         </Link>
 
-                        <Link to="/books/browse" className="browse item">
-                            <i className="icon handshake outline" />
-                            Browse
-                        </Link>
+                        {this.renderExplore()}
 
-                        {this.renderSwipe()}
+                        {this.renderMyStuff()}
     
-                        {this.renderRightMenu()}
+                        <div className="right menu">
+                            <Auth method="google" userData={this.props.userData} />
+                        </div>
                     </div>
                 </div>
-                
-                <CompHeader />
             </div>
         );
     }
 }
 
 function mapStateToProps(state) {
-    // console.log(state.auth);    
+    // console.log(state.userData);    
     return {
-        auth: state.auth
+        userData: state.userData
     }
 };
 

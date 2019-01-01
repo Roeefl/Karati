@@ -14,10 +14,35 @@ module.exports = {
       return next();
     }
 
-    res.end(
-      JSON.stringify({
+    res.status(401).send(
+      {
         error: errors.NOT_LOGGED_IN
-      })
+      }
+    );
+  },
+
+  ensureUserOwnsBook: async function(req, res, next) {
+    User.findOne(
+      {
+        _id: new ObjectId(req.session.passport.user)
+      },
+      function(err, currentUser) {
+        if (err || !currentUser) {
+          console.log('SUPER ERROR');
+        }
+
+        if ( currentUser.ownedBooks.find( book =>
+          book.bookID === req.body.bookID 
+        )) {
+          return next();
+        };
+
+        res.status(403).send(
+          {
+            error: errors.DOES_NOT_OWN_BOOK
+          }
+        );
+      }
     );
   },
 
@@ -58,5 +83,12 @@ module.exports = {
           comments: []
         }
     );
+  },
+
+  groupBy: function(xs, key) {
+    return xs.reduce(function(rv, x) {
+      (rv[x[key]] = rv[x[key]] || []).push(x);
+      return rv;
+    }, {});
   }
 };

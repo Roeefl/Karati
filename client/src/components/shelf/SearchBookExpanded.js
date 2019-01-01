@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { retrieveBookFromGoodreads, resetBookFromGoodreads } from '../../actions';
 
 import BookContent from '../shared/BookContent';
-import BookActions from '../shared/BookActions';
+import SearchResultBookActions from './SearchResultBookActions';
 
 class SearchBookExpanded extends React.Component {
     componentDidMount() {
@@ -17,7 +17,8 @@ class SearchBookExpanded extends React.Component {
     render() {
         return (
             <div className="book-container ui container">
-                <BookActions />
+                <SearchResultBookActions />
+                
                 <BookContent book={this.props.selectedBookFromSearch} />
             </div>
         );

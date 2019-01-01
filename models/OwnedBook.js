@@ -14,6 +14,11 @@ const ownedBookSchema = new Schema(
         dateAdded: {
             type: Date,
             required: false
+        },
+        available: {
+            type: Boolean,
+            required: false,
+            default: true
         }
     }
 );
