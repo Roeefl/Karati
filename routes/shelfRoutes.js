@@ -6,12 +6,12 @@ const User = mongoose.model("users");
 const Book = mongoose.model("books");
 const Match = mongoose.model("matches");
 
-const GoodReadsAPI = require("goodreads-api-node");
-const Goodreads_KEY = {
-    key: process.env.Goodreads_KEY,
-    secret: process.env.GOODREADS_SECRET
-  };
-const goodreads = GoodReadsAPI(Goodreads_KEY);
+const GoodReadsAPI = require('goodreads-api-node');
+const Goodreads_Credentials = {
+  key: process.env.GOODREADS_KEY,
+  secret: process.env.GOODREADS_SECRET
+};
+const goodreads = GoodReadsAPI(Goodreads_Credentials);
 
 getBookFromMongoByGoodreadsID = goodreadsID => {
     return new Promise((resolve, reject) => {

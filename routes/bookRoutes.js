@@ -4,11 +4,11 @@ const errors = require('../config/errors');
 const middleware = require('../common/middleware');
 
 const GoodReadsAPI = require('goodreads-api-node');
-const Goodreads_KEY = {
-  key: process.env.Goodreads_KEY,
+const Goodreads_Credentials = {
+  key: process.env.GOODREADS_KEY,
   secret: process.env.GOODREADS_SECRET
 };
-const goodreads = GoodReadsAPI(Goodreads_KEY);
+const goodreads = GoodReadsAPI(Goodreads_Credentials);
 
 const User = mongoose.model('users');
 const Book = mongoose.model('books');
