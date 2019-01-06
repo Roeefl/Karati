@@ -42,7 +42,7 @@ module.exports = (app) => {
 
     app.get('/api/currentUser', middleware.ensureAuthenticated, (req, res) => {
         res.end(JSON.stringify(
-            { currentUser: req.user }
+            { currUser: middleware.reverseNotifications(req.user) }
         ));
     });
     

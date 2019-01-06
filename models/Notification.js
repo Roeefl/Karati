@@ -3,6 +3,11 @@ const Schema = mongoose.Schema;
 
 const notification = new Schema (
     {
+        notifType: {
+            type: String,
+            required: false,
+            default: 'New Match'
+        },
         content: {
             type: String,
             required: true,
@@ -16,6 +21,11 @@ const notification = new Schema (
             type: Boolean,
             required: false,
             default: false
+        },
+        link: {
+            type: String,
+            required: false,
+            default: ''
         }
     }
 );

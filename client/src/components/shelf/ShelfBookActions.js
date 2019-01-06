@@ -3,6 +3,7 @@ import React from 'react';
 import { Redirect } from 'react-router-dom';
 
 import Spinner from '../shared/Spinner';
+import Modal from './Modal';
 
 class ShelfBookActions extends React.Component {
     state = {
@@ -89,6 +90,24 @@ class ShelfBookActions extends React.Component {
                 <Redirect to='/myShelf' />
             );
         }
+
+            // const modalActions = (
+            //     <React.Fragment>
+            //         <div className="ui positive button">
+            //             Yes
+            //         </div>
+            //         <div className="ui negative button">
+            //             No
+            //         </div>
+            //     </React.Fragment>
+            // );
+
+            // <Modal
+            // title="Remove Book"
+            // content="Are you sure you want to remove this book from your shelf?"
+            // actions={modalActions}
+            // onDismiss={}
+            // />
 
         return (
             <div className="write-book-review ui raised segment grid">            

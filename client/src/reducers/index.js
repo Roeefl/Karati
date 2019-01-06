@@ -3,7 +3,7 @@ import { combineReducers } from 'redux';
 import { reducer as reduxForm } from 'redux-form';
 
 import { userDataReducer } from  './userData';
-import { selectedBookReducer } from  './selectedBook';
+import { selectedBookFromBrowseReducer } from  './selectedBookFromBrowse';
 import { bookSearchReducer } from './bookSearch';
 import { myShelfReducer } from './myShelf';
 import { feedsReducer } from './feeds';
@@ -20,7 +20,7 @@ export default combineReducers(
         form: reduxForm,
         userData: userDataReducer,
         searchResults: bookSearchReducer,
-        selectedBook: selectedBookReducer,
+        selectedBookFromBrowse: selectedBookFromBrowseReducer,
         myBooks: myShelfReducer,
         myMatches: myMatchesReducer,
         books: booksReducer,

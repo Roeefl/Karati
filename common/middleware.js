@@ -9,6 +9,7 @@ const parseAuthorName = require('./parseAuthorName');
 const parseBookGenres = require('./parseBookGenres');
 
 module.exports = {
+
   ensureAuthenticated: function(req, res, next) {
     if (req.isAuthenticated()) {
       return next();
@@ -19,6 +20,19 @@ module.exports = {
         error: errors.NOT_LOGGED_IN
       }
     );
+  },
+
+  getUser: async function(req, res, next) {
+    if (req && req.session && req.session.passport && req.session.passport.user) {
+      req.currentUser = await User.findOne( 
+        { _id: new ObjectId(req.session.passport.user) } 
+      );
+
+      return next();
+    }
+
+    req.currentUser = null;
+    return next();
   },
 
   ensureUserOwnsBook: async function(req, res, next) {
@@ -44,24 +58,6 @@ module.exports = {
         );
       }
     );
-  },
-
-  getUser: function(userID) {
-    return new Promise((resolve, reject) => {
-      User.findOne(
-        {
-          _id: new ObjectId(userID)
-        },
-        function(err, foundUser) {
-          if (err || !foundUser) {
-            reject(err);
-            return;
-          }
-
-          resolve(foundUser);
-        }
-      );
-    });
   },
 
   parseBookDataObjFromGoodreads: function(goodreadsID, result) {
@@ -90,5 +86,14 @@ module.exports = {
       (rv[x[key]] = rv[x[key]] || []).push(x);
       return rv;
     }, {});
+  },
+
+  reverseNotifications: function(user) {
+    if (!user.notifications) {
+      return user;
+    }
+    
+    user.notifications.reverse();
+    return user;
   }
 };

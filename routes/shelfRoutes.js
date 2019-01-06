@@ -42,69 +42,62 @@ getBookFromMongoByGoodreadsID = goodreadsID => {
  * @param {*} bookID
  * @param {*} goodreadsID
  */
-addOwnedBookByUser = (userID, bookID, goodreadsID) => {
-    return new Promise((resolve, reject) => {
-        middleware
-            .getUser(userID)
-            .then(foundUser => {
-                let isBookOwnedByUser = false;
-                if (foundUser.ownedBooks) {
-                    isBookOwnedByUser = foundUser.ownedBooks.find(
-                        book => book.bookID === bookID
-                    );
-                }
+addOwnedBookByUser = (currentUser, userID, bookID, goodreadsID) => {
+    return new Promise( (resolve, reject) => {
+        let foundUser = req.currentUser;
+        
+        let isBookOwnedByUser = false;
+        if (foundUser.ownedBooks) {
+            isBookOwnedByUser = foundUser.ownedBooks.find(
+                book => book.bookID === bookID
+            );
+        }
 
-                if (isBookOwnedByUser) {
-                    console.log(
-                        "BookID " + bookID + " is already linked to UserID " + userID
-                    );
-                    resolve(false);
+        if (isBookOwnedByUser) {
+            console.log(
+                "BookID " + bookID + " is already linked to UserID " + userID
+            );
+            resolve(false);
+            return;
+        } else {
+            let newOwnedBook = {
+                bookID: bookID,
+                goodreadsID: goodreadsID,
+                dateAdded: Date.now()
+            };
+
+            foundUser.ownedBooks.push(newOwnedBook);
+
+            if (!foundUser.passedIntro && foundUser.ownedBooks.length >= 5) {
+                foundUser.passedIntro = true;
+            }
+
+            foundUser.save(function (err, saved) {
+                if (err) {
+                    reject(err);
                     return;
-                } else {
-                    let newOwnedBook = {
-                        bookID: bookID,
-                        goodreadsID: goodreadsID,
-                        dateAdded: Date.now()
-                    };
-
-                    foundUser.ownedBooks.push(newOwnedBook);
-
-                    if (!foundUser.passedIntro && foundUser.ownedBooks.length >= 5) {
-                        foundUser.passedIntro = true;
-                    }
-
-                    foundUser.save(function (err, saved) {
-                        if (err) {
-                            reject(err);
-                            return;
-                        }
-
-                        console.log("addBookToUser saved book " + bookID + " to " + userID);
-                        resolve(true);
-                    });
                 }
-            })
-            .catch(error => {
-                console.log(error);
+
+                console.log("addBookToUser saved book " + bookID + " to " + userID);
+                resolve(true);
             });
+        }
     });
 };
 
 module.exports = app => {
     // List all books on myShelf
-    app.get("/api/myShelf", middleware.ensureAuthenticated, async (req, res) => {
-        let currentUser = await middleware.getUser(req.session.passport.user);
-
+    app.get("/api/myShelf", middleware.ensureAuthenticated, middleware.getUser, async (req, res) => {
         let allBooks = await Book.find(
             {
                 "_id": {
                     "$in": 
-                        currentUser.ownedBooks.map( book => book.bookID )
+                        req.currentUser.ownedBooks.map( book => book.bookID )
                 }
             }
         );
 
-        let myShelf = currentUser.ownedBooks.map(myBook => {
+        let myShelf = req.currentUser.ownedBooks.map(myBook => {
             return allBooks.find(book =>
                 book._id == myBook.bookID
             );
@@ -116,77 +109,51 @@ module.exports = app => {
     });
 
     // Get one particular book on myShelf
-    app.get("/api/myShelf/:id", middleware.ensureAuthenticated, (req, res) => {
-        middleware
-            .getUser(req.session.passport.user)
-            .then(currentUser => {
-                res.json({
-                    book: allBooks.find(book =>
-                        book._id == req.params.id
-                    )
-                });
-            })
-            .catch(error => {
-                res.json({
-                    error: error
-                });
-            });
+    app.get("/api/myShelf/:id", middleware.ensureAuthenticated, middleware.getUser, (req, res) => {
+        res.json({
+            book: allBooks.find(book =>
+                book._id == req.params.id
+            )
+        });
     });
 
     // Update availability for a book on myShelf
-    app.put("/api/myShelf/:id", middleware.ensureAuthenticated, (req, res) => {
-        middleware
-        .getUser(req.session.passport.user)
-        .then(currentUser => {
+    app.put("/api/myShelf/:id", middleware.ensureAuthenticated, middleware.getUser, (req, res) => {
 
-            let currBook = currentUser.ownedBooks.find(book =>
-                book.bookID == req.params.id
-            );
+        let currBook = req.currentUser.ownedBooks.find(book =>
+            book.bookID == req.params.id
+        );
 
-            currBook.available = req.body.available;
+        currBook.available = req.body.available;
 
-            currentUser.save(function (err, saved) {
-                if (err) {
-                    console.log(err);
-                    return;
-                }
-                
-                res.json({
-                    updated: true
-                });
-            });
-        })
-        .catch(error => {
+        req.currentUser.save(function (err, saved) {
+            if (err) {
+                console.log(err);
+                return;
+            }
+            
             res.json({
-                error: error
+                updated: true
             });
         });
     });
 
     // Delete a book from myShelf
-    app.delete("/api/myShelf/:id", middleware.ensureAuthenticated, (req, res) => {
-        middleware
-            .getUser(req.session.passport.user)
-            .then(currentUser => {
+    app.delete("/api/myShelf/:id", middleware.ensureAuthenticated, middleware.getUser, (req, res) => {
+        let currentUser = req.currentUser;
 
-                currentUser.ownedBooks = currentUser.ownedBooks.filter( ownedBook => ownedBook.bookID != req.params.id);
+        currentUser.ownedBooks = currentUser.ownedBooks.filter( ownedBook => ownedBook.bookID != req.params.id);
 
-                currentUser.save(function (err, saved) {
-                    if (err) {
-                        console.log(err);
-                        return;
-                    }
-                    
-                    res.json({
-                        removed: true
-                    });
-                });
-            })
-            .catch(error => {
-                res.json({
-                    error: error
-                });
+        currentUser.save(function (err, saved) {
+            if (err) {
+                console.log(err);
+                return;
+            }
+            
+            res.json({
+                removed: true
             });
+        });
     });
 
     /**
@@ -194,7 +161,7 @@ module.exports = app => {
      * If book does not exist in books collection, adds the book to it first, then to ownedBooks.
      */
     // Add a book to myShelf
-    app.post("/api/myShelf", middleware.ensureAuthenticated, async (req, res) => {
+    app.post("/api/myShelf", middleware.ensureAuthenticated, middleware.getUser, async (req, res) => {
         let currentUserID = req.session.passport.user;
 
         let existingBook = await getBookFromMongoByGoodreadsID(
@@ -226,6 +193,7 @@ module.exports = app => {
         }
 
         let saved = await addOwnedBookByUser(
+            req.currentUsesr,
             currentUserID,
             bookID,
             req.body.goodreadsID

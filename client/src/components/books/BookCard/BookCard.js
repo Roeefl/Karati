@@ -16,9 +16,17 @@ class BookCard extends React.Component {
         return;
     }
 
+    selectBook = () => {
+        if (this.props.selectBook) {
+            this.props.selectBook(this.props.bookId);
+        }
+    }
+
     renderCard() {
         return (
-            <div className={`book-card ui card ${this.props.cardColor || ''}`}>
+            <div
+                className={`book-card ui card ${this.props.cardColor || ''}`}
+                onClick={this.selectBook}>
                 <div className="ui image">
                     <img
                         src={this.props.src}

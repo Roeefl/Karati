@@ -52,15 +52,13 @@ module.exports = (app) => {
    * 2 - If he already swept on it prior, he shouldn't see it either anymore.
    */
   // List all books available to swipe for user
-  app.get('/api/availableSwipes', middleware.ensureAuthenticated, async (req, res) => {
+  app.get('/api/availableSwipes', middleware.ensureAuthenticated, middleware.getUser, async (req, res) => {
     const MAX_BATCH_SIZE = 20;
 
     let currentUserID = req.session.passport.user;
     let swipes = []; // init empty array for books available for swiping
 
     let allBooks = await Book.find();
-
-    let currentUser = await middleware.getUser(currentUserID);
 
     User.
       find({}).
@@ -77,15 +75,15 @@ module.exports = (app) => {
             );
 
             let isBookSwipedByCurrentUser = false;
-            if (currentUser.swipes) {
-              isBookSwipedByCurrentUser = currentUser.swipes.find(swipe =>
+            if (req.currentUser.swipes) {
+              isBookSwipedByCurrentUser = req.currentUser.swipes.find(swipe =>
                 swipe.bookID == currBookID
               );
             }
 
             let isBookOwnedByCurrentUser = false;
-            if (currentUser.ownedBooks) {
-              isBookOwnedByCurrentUser = currentUser.ownedBooks.find(ownedBook =>
+            if (req.currentUser.ownedBooks) {
+              isBookOwnedByCurrentUser = req.currentUser.ownedBooks.find(ownedBook =>
                 ownedBook.bookID == currBookID
               );
             }
@@ -145,8 +143,6 @@ module.exports = (app) => {
   app.get('/api/books/:id', async (req, res) => {
     console.log(req.params.id);
 
-    const allUsers = await User.find({});
-
     const foundBook = await Book.findOne(
       {
         _id: new ObjectId(req.params.id)
@@ -155,17 +151,22 @@ module.exports = (app) => {
 
     if (!foundBook) {
       console.log('ERROR on retrieving book ' + req.params.id + ' from MongoDB');
+
       res.json({
         'error': errors.NO_BOOK
       });
+      
       return false;
     };
 
     for (let comment of foundBook.comments) {
-      let userInfo = allUsers.find(user =>
-        user._id == comment.userID
+      let userInfo = await User.findOne(
+        {
+          _id: new ObjectId(comment.userID)
+        }
       );
-        comment.username = (userInfo ? userInfo.username : 'Username Not Found');
+
+      comment.username = (userInfo ? userInfo.username : 'User Not Found');
     }
 
     res.json({
@@ -206,10 +207,8 @@ module.exports = (app) => {
     }
   });
   
-  app.post('/api/review', middleware.ensureAuthenticated, middleware.ensureUserOwnsBook, async (req, res) => {
-    let currentUser = await middleware.getUser( req.session.passport.user );
-
-    console.log(req.body);
+  app.post('/api/review', middleware.ensureAuthenticated, middleware.getUser, middleware.ensureUserOwnsBook, async (req, res) => {
+    // console.log(req.body);
     const { bookID, review } = req.body;
 
     let foundBook = await Book.findOne(
@@ -231,7 +230,7 @@ module.exports = (app) => {
     };
 
     let userAlreadyCommentOnBook = foundBook.comments.find( comment =>
-      comment.userID == currentUser._id
+      comment.userID == req.currentUser._id
     );
     if (userAlreadyCommentOnBook) {
       return res.end(JSON.stringify(
@@ -241,7 +240,7 @@ module.exports = (app) => {
       ));
     }
 
-    let commentSaved = await addCommentToBook(foundBook, currentUser._id, review);
+    let commentSaved = await addCommentToBook(foundBook, req.currentUser._id, review);
     res.end(JSON.stringify(
       {
         saved: commentSaved

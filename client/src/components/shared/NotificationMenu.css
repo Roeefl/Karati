@@ -1,0 +1,32 @@
+.notifications {
+    width: 30vw;
+    max-height: 50vh;
+    overflow: hidden;
+}
+
+.notifications .items .item {
+    margin-top: 0;
+    padding: 10px;
+}
+
+.notifications .items .item .tiny {
+    width: 64px !important;
+}
+
+.notifications .items .item .content {
+    margin-left: 16px;
+    margin-top: 8px;
+    font-size: 110%;
+}
+
+.notifications .items .item .content .description {
+    margin-top: 8px;
+}
+
+.notifications .items .seen {
+    background: rgba(50, 50, 50, 0.3);
+}
+
+.notifications .items .new {
+    background: rgba(88, 99, 248, 0.5);
+}

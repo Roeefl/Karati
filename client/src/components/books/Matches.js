@@ -24,7 +24,7 @@ class Matches extends React.Component {
         this.props.updateBooks();
     }
 
-    onLikeOrRejectBook = async (liked) => {
+    onSwipeBook = async (liked) => {
         let book = this.props.books[0];
 
         var data = {
@@ -35,7 +35,7 @@ class Matches extends React.Component {
 
         try {
             const apiURL = '/api/swipe/' + (liked ? 'liked' : 'rejected');
-            const res = await Axios.put(apiURL, data);
+            await Axios.put(apiURL, data);
 
             // console.log(res);
 
@@ -80,14 +80,14 @@ class Matches extends React.Component {
             return (
                 <BrowseContainer
                     books={this.props.books}
-                    swipeBook={this.onLikeOrRejectBook} />
+                    swipeBook={this.onSwipeBook} />
             );
         };
 
         return (
             <SwipeContainer
                 books={this.props.books}
-                swipeBook={this.onLikeOrRejectBook} />
+                swipeBook={this.onSwipeBook} />
         );
     }
 

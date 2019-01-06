@@ -1,10 +1,23 @@
 import React from 'react';
 
 import { connect } from 'react-redux';
+import { selectBookFromBrowsing } from '../../actions';
 
 import BookCard from './BookCard/BookCard';
 
 class BrowseContainer extends React.Component {
+    selectBook = (bookId) => {
+        let currBook = this.props.books.find( book => 
+            book.bookID == bookId
+        );
+
+        if (!currBook) {
+            return;
+        }
+
+        this.props.selectBookFromBrowsing(currBook);
+    }
+
     render() {
         const books = this.props.books.map( book => {
             // console.log(book);
@@ -19,7 +32,8 @@ class BrowseContainer extends React.Component {
                         title={book.title}
                         author={book.author}
                         numOfPages={book.numOfPages}
-                        linkTo={'/book/' + book.bookID} />
+                        linkTo={'/book/' + book.bookID}
+                        selectBook={this.selectBook} />
                         
                     <div>
                         Offered for exchange by {book.ownedBy}
@@ -45,11 +59,12 @@ class BrowseContainer extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        userData: state.userData
+        userData: state.userData,
+        books: state.books
     }
 };
 
 export default connect(
     mapStateToProps,
-    {  }
+    { selectBookFromBrowsing }
 )(BrowseContainer);

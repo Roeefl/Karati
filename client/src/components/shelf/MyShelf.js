@@ -7,7 +7,7 @@ import { updateMyShelf, fetchUser, setCurrentComponent } from '../../actions';
 
 import BookCard from '../books/BookCard/BookCard';
 
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router-dom';
 
 import Message from '../shared/Message';
 import Spinner from '../shared/Spinner';
@@ -63,7 +63,7 @@ class MyShelf extends React.Component   {
             );
         };
 
-        const shelfBooks = this.props.myShelf.reverse().map( book => {
+        const shelfBooks = this.props.myShelf.map( book => {
             let trimmedDesc = book.description.substring(0, 200);
 
             return (

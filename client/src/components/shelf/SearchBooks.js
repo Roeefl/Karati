@@ -4,7 +4,7 @@ import './SearchBooks.css';
 
 import React from 'react';
 import { connect } from 'react-redux';
-import { selectBook, updateSearchResults, setCurrentComponent } from '../../actions';
+import { selectBookFromBrowsing, updateSearchResults, setCurrentComponent } from '../../actions';
 
 import SearchBar from '../search/SearchBar';
 import SearchResults from '../search/SearchResults';
@@ -28,7 +28,7 @@ class SearchBooks extends React.Component {
 
     // onBookSelect = (bookId) => {
     //     let bookData = this.props.searchResults.find(book => book.id._ === bookId);
-    //     this.props.selectBook(bookData);
+    //     this.props.selectBookFromBrowsing(bookData);
     // }
 
     onSearchSubmit = async (term) => {
@@ -103,5 +103,5 @@ const mapStateToProps = (state) => {
 
 export default connect(
     mapStateToProps,
-    { selectBook, updateSearchResults, setCurrentComponent }
+    { selectBookFromBrowsing, updateSearchResults, setCurrentComponent }
 )(SearchBooks);

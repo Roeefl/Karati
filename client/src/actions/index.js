@@ -50,7 +50,7 @@ export const submitProfileForm = (formValues, history) =>
     };
 
 // Action Creator
-export const selectBook = (bookData) => {
+export const selectBookFromBrowsing = (bookData) => {
     // Returns an Action
     return {
         type: BOOK_SELECTED,
@@ -142,7 +142,7 @@ export const fetchUser = () =>
 
             dispatch( {
                 type: FETCH_USER,
-                payload: res.data.currentUser || null
+                payload: res.data.currUser || null
             });
         } catch(error) {
             console.log('Failed to fetchUser ' + error);
@@ -161,7 +161,7 @@ export const updateMyShelf = () =>
 
             dispatch( {
                 type: UPDATE_MY_BOOKS,
-                payload: res.data.myShelf || []
+                payload: res.data.myShelf.reverse() || []
             });
         } catch(error) {
             console.log('/api/myShelf failed with error: ' + error);
@@ -250,6 +250,55 @@ export const updateFeeds = () =>
     
             dispatch( {
                 type: UPDATE_FEEDS,
+                payload: false
+            });
+        }
+    };
+    
+export const updateUserSettings = (userSettings) =>
+    async (dispatch) => {
+        try {
+            const res = await Axios.post('/api/mySettings', 
+            {
+                settings: userSettings
+            });
+
+            if (res.data.error) {
+                console.log('Failed to save settings.');
+            }
+
+            dispatch( {
+                type: FETCH_USER,
+                payload: res.data.currUser || null
+            });
+        } catch(error) {
+            console.log('/api/recent failed with error: ' + error);
+
+            dispatch( {
+                type: FETCH_USER,
+                payload: false
+            });
+        }
+    };
+
+export const markNotificationAsSeen = (userId, notificationId) =>
+    async (dispatch) => {
+        try {           
+            const res = await Axios.put(`/api/user/${userId}/notification/${notificationId}/seen`);
+
+            if (res.data.error) {
+                console.log('Failed to save settings.');
+            }
+
+            dispatch( {
+                type: FETCH_USER,
+                payload: res.data.currUser || null
+            });
+        } catch(error) {
+            console.log('/api/recent failed with error: ' + error);
+
+            dispatch( {
+                type: FETCH_USER,
                 payload: false
             });
         }

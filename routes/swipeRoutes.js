@@ -63,6 +63,29 @@ checkForMatch = (currentUser, owner, swipedBookID) => {
     });
 };
 
+addNotificationToUser = (user, matchWith) => {
+    return new Promise((resolve, reject) => {
+        let notification = {
+            content: `You have a new match with ${matchWith.username}`,
+            dateCreated: Date.now(),
+            seen: false,
+            link: `/myMatches/${matchWith._id}`
+        };
+
+        user.notifications.push(notification);
+
+        user.save(function (err, saved) {
+            if (err) {
+                reject(err);
+                return;
+            };
+
+            console.log(`Saved new notification for user ${user.username}`);
+            resolve(true);
+        });
+    });
+};
+
 checkForMatchWrapper = async (user1, user2, lastSwipedBookID) => {
     let match = await checkForMatch(user1, user2, lastSwipedBookID);
 
@@ -75,6 +98,9 @@ checkForMatchWrapper = async (user1, user2, lastSwipedBookID) => {
     mailer.send();
     mailer = new Mailer('New Match in Karati', [user2], newMatchTemplate(match, user1._id));
     mailer.send();
+
+    await addNotificationToUser( user1, user2 );
+    await addNotificationToUser( user2, user1 ); 
 };
 
 addSwipeToUser = (user, bookID, liked) => {
@@ -121,32 +147,51 @@ addLikeToBook = (bookID) => {
                 reject(err);
             });
     });
-}
+};
+
+
+fetchUser = function (userID) {
+    return new Promise((resolve, reject) => {
+        User.findOne(
+            {
+                _id: new ObjectId(userID)
+            },
+            function (err, foundUser) {
+                if (err || !foundUser) {
+                    reject(err);
+                    return;
+                }
+
+                resolve(foundUser);
+            }
+        );
+    });
+};
 
 module.exports = (app) => {
 
     app.put('/api/swipe/liked', middleware.ensureAuthenticated, async (req, res) => {
-        let firstUser = await middleware.getUser( req.body.myUserID );
-        let owner = await middleware.getUser( req.body.ownerID );
+        let firstUser = await fetchUser( req.body.myUserID );
+        let owner = await fetchUser( req.body.ownerID );
 
         let added = await addSwipeToUser( firstUser, req.body.bookID, true );
 
         await addLikeToBook( req.body.bookID );
 
         res.json({
-            added: added
+            swipeAdded: added
         });
 
         checkForMatchWrapper( firstUser, owner, req.body.bookID );
     });
 
     app.put('/api/swipe/rejected', middleware.ensureAuthenticated, async (req, res) => {
-        let firstUser = await middleware.getUser( req.body.myUserID );
+        let firstUser = await fetchUser( req.body.myUserID );
 
         let added = await addSwipeToUser( firstUser, req.body.bookID, false )
 
         res.json({
-            added: added
+            swipeAdded: added
         });
     });
 }

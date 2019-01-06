@@ -11,25 +11,24 @@ module.exports = (app) => {
     app.get('/api/myProfile', middleware.ensureAuthenticated, async (req, res) => {
       const currUser = await User.findById(req.session.passport.user);
 
-      res.end( JSON.stringify( currUser ));
+      res.end( JSON.stringify( middleware.reverseNotifications(currUser) ));
     });
 
-    app.get('/api/mySwipeHistory', middleware.ensureAuthenticated, async (req, res) => {
-      let currentUser = await middleware.getUser(req.session.passport.user);
+    app.get('/api/mySwipeHistory', middleware.ensureAuthenticated, middleware.getUser, async (req, res) => {
 
       let bookData = await Book.find(
         {
             "_id": {
                 "$in": 
-                    currentUser.swipes.map( swipe => swipe.bookID )
+                    req.currentUser.swipes.map( swipe => swipe.bookID )
             }
         }
       );
 
       let mySwipeHistory = [];
 
-      for (let s = currentUser.swipes.length - 1; s >= 0; s--) { 
-        let swipe = currentUser.swipes[s];
+      for (let s = req.currentUser.swipes.length - 1; s >= 0; s--) { 
+        let swipe = req.currentUser.swipes[s];
         
         mySwipeHistory.push(
           {
@@ -54,10 +53,6 @@ module.exports = (app) => {
       let currentUserID = req.session.passport.user;
       let currentUserObjectID = new ObjectId(req.session.passport.user);
       let myMatches = [];
-    
-      let allBooks = await Book.find();
-
-      let allUsers = await User.find();
 
       let userMatches = await Match.find({
         $or: [
@@ -65,14 +60,27 @@ module.exports = (app) => {
           { 'secondUser.userID': currentUserObjectID }
         ]
       });
-      // console.log(userMatches);
+
+      const allBookIDS = userMatches.map( match => match.firstUser.bookID ).concat( userMatches.map( match => match.secondUser.bookID ) );
+
+      // console.log(allBookIDS);
+
+      let allBooks = await Book.find(
+        {
+            "_id": {
+                "$in": 
+                  allBookIDS
+            }
+        }
+      );
+
+      let allUsers = await User.find();
 
       for (let match of userMatches) {
         let owner = (match.firstUser.userID == currentUserID ? match.secondUser : match.firstUser);
         let myself = (match.firstUser.userID == currentUserID ? match.firstUser : match.secondUser);
 
-        // let myInfo = allUsers.find(user => user._id == currentUserID);
-        let ownerInfo = allUsers.find(user =>
+        let ownerInfo = allUsers.find( user => 
           user._id == owner.userID
         );
 
@@ -148,7 +156,48 @@ module.exports = (app) => {
       
       console.log(`Updated user info for user ${currUser.username}`);
       res.json({
-        currUser: currUser
+        currUser: middleware.reverseNotifications(currUser)
+      });
+    });
+
+    app.post('/api/mySettings', middleware.ensureAuthenticated, async (req, res) => {
+      const currUser = await User.findById(req.session.passport.user);
+
+      console.log(req.body);
+
+      currUser.settings = req.body.settings;
+
+      await currUser.save();
+      
+      console.log(`Updated settings for user ${currUser.username}`);
+      
+      res.json({
+        currUser: middleware.reverseNotifications(currUser)
+      });
+    });
+
+    app.put('/api/user/:userId/notification/:id/seen', middleware.ensureAuthenticated, async (req, res) => {
+      const currUser = await User.findById(req.session.passport.user);
+
+      let currentNotification = currUser.notifications.find( notif => 
+        notif._id == req.params.id  
+      );
+
+      if (!currentNotification) {
+        res.json({
+          currUser: middleware.reverseNotifications(currUser)
+        });
+        return;
+      }
+
+      currentNotification.seen = true;
+
+      await currUser.save();
+      
+      console.log(`Updated notification ${req.params.id} for user ${currUser.username}`);
+      
+      res.json({
+        currUser: middleware.reverseNotifications(currUser)
       });
     });
 };

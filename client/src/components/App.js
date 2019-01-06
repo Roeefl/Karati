@@ -16,6 +16,7 @@ import SearchBooks from './shelf/SearchBooks';
 import SearchBookExpanded from './shelf/SearchBookExpanded';
 
 import MyProfile from './profile/MyProfile';
+import MySettings from './profile/MySettings';
 import MySwipes from './swipes/MySwipes';
 
 import MyMatches from './matches/MyMatches';
@@ -66,6 +67,7 @@ class App extends React.Component {
                                 <Route exact path="/myMatches/:userId" component={MatchesWithUser} />
 
                                 <Route path="/myProfile" component={MyProfile} />
+                                <Route path="/mySettings" component={MySettings} />
 
                                 <Route path="/mySwipes" component={MySwipes} />
 
@@ -73,6 +75,7 @@ class App extends React.Component {
 
                                 <Route path="/books/browse" component={Browse} />
                                 <Route path="/books/swipe" component={Swipe} />
+
                                 <Route path="/book/:bookId" component={Book} />
                             </div>
 

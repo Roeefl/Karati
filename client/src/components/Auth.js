@@ -3,6 +3,7 @@ import './Auth.css';
 import React from 'react';
 
 import HeaderMenu from './HeaderMenu';
+import NotificationButton from './shared/NotificationButton';
 
 const methodConfig = {
     google: {
@@ -50,6 +51,9 @@ class Auth extends React.Component {
             <div className="item menu">
                 <div className="item">
                     <HeaderMenu title={this.props.userData.username} links={links}/>
+                </div>
+                <div className="item">
+                    <NotificationButton unread={this.props.userData.notifications.filter( notif => !notif.seen).length} />    
                 </div>
                 <div className="item">
                     <a className="user-data item" href="/api/logout">

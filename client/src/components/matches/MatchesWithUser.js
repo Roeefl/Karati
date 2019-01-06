@@ -15,15 +15,12 @@ class MatchesWithUser extends React.Component {
         this.props.fetchMyMatches();
     }
 
-    renderBookCard = (book) => {
-        let trimmedDesc = book.description.substring(0, 200);
-        
+    renderBookCard = (book) => {     
         return (
             <div className="column" key={book._id}>
                 <BookCard
                     bookId={book._id}
                     src={book.imageURL}
-                    desc={trimmedDesc}
                     title={book.title}
                     author={book.author}
                     numOfPages={book.numOfPages} />
