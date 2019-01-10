@@ -3,6 +3,8 @@ const ObjectId = mongoose.Types.ObjectId;
 const errors = require('../config/errors');
 const middleware = require('../common/middleware');
 
+const genreList = require('../common/genres');
+
 const GoodReadsAPI = require('goodreads-api-node');
 const Goodreads_Credentials = {
   key: process.env.GOODREADS_KEY,
@@ -44,6 +46,14 @@ addCommentToBook = (book, userID, comment) => {
 
 module.exports = (app) => {
 
+  app.get('/api/genres', async (req, res) => {
+    res.json(
+      {
+        genres: genreList.list
+      }
+    )
+  });
+
   /**
    * If a book exists in the OwnedBook collection, it means that some user has declared that he owns that book and put it up for exchange.
    * So basically all books in the OwnedBooks collection are good for display using the "user-next-swipe" post request.
@@ -56,6 +66,7 @@ module.exports = (app) => {
     const MAX_BATCH_SIZE = 20;
 
     let currentUserID = req.session.passport.user;
+    
     let swipes = []; // init empty array for books available for swiping
 
     let allBooks = await Book.find();
@@ -88,13 +99,6 @@ module.exports = (app) => {
               );
             }
 
-            if (isBookSwipedByCurrentUser) {
-              // console.log('Skipping ' + bookInfo.title + ' due to user ' + currentUser.username + ' already swiped it.');
-            };
-            if (isBookOwnedByCurrentUser) {
-              // console.log('Skipping ' + bookInfo.title + ' due to user ' + currentUser.username + ' already owning it.');
-            };
-
             // If not yet swiped by currentUser - push into available swipes
             if (!isBookSwipedByCurrentUser && !isBookOwnedByCurrentUser) {
               // console.log('adding to swipes');
@@ -121,11 +125,11 @@ module.exports = (app) => {
           }
         }
 
-        res.end(JSON.stringify(
+        res.json(
           {
             availableSwipes: swipes
           }
-        ));
+        );
       });
 
     // TODO flatten-aggregation-group make this workz
@@ -283,11 +287,12 @@ module.exports = (app) => {
           { mostPopular: mostPopularBooks }
         );
       });
-    });
+  });
 
-    app.get('/api/mostOwned', async (req, res) => {
-    
-    });
+  app.get('/api/mostOwned', async (req, res) => {
+  
+  });
+
     // const allSwipes = await User.aggregate(
     //   [
     //     {

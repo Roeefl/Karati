@@ -32,6 +32,7 @@ class ProfileForm extends React.Component {
             </div>
         );
     }
+
     render() {
         return (
             <div className="ui container">
@@ -89,6 +90,8 @@ const validate = (formValues) => {
 
  // pull initial values from account reducer
 function mapStateToProps(state) {
+    console.log(state);
+    
     return {
         initialValues: {
             username: state.userData.username,
@@ -101,7 +104,9 @@ function mapStateToProps(state) {
 
 // Decorate with reduxForm(). It will read the initialValues prop provided by connect()
 ProfileForm = reduxForm({
-    form: 'profileForm' // a unique identifier for this form
+    form: 'profileForm', // a unique identifier for this form,
+    validate: validate,
+    destroyOnUnmount: false 
 })(ProfileForm);
   
 // You have to connect() to any reducers that you wish to connect to yourself

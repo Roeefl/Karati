@@ -1,0 +1,7 @@
+.book-card-container {
+    transition: x 1s;
+}
+
+.book-card-container.hidden {
+    display: none !important;
+}

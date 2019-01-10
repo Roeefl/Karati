@@ -71,7 +71,7 @@ class ProfileFormReview extends React.Component {
 }
 
 function mapStateToProps(state) {
-    // console.log(state.form.profileForm);
+    console.log(state);
 
     return {
         formValues: state.form.profileForm.values

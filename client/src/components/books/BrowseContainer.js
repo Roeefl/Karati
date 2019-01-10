@@ -3,9 +3,16 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { selectBookFromBrowsing } from '../../actions';
 
+import BrowseFilter from './BrowseFilter';
 import BookCard from './BookCard/BookCard';
 
+import './BrowseContainer.css';
+
 class BrowseContainer extends React.Component {
+    state = {  
+        filter: false
+    }
+
     selectBook = (bookId) => {
         let currBook = this.props.books.find( book => 
             book.bookID == bookId
@@ -18,13 +25,29 @@ class BrowseContainer extends React.Component {
         this.props.selectBookFromBrowsing(currBook);
     }
 
+    onSelectGenre = (genre) => {
+        console.log(genre);
+
+        this.setState({
+            filter: (genre.length > 1 ? genre : false)
+        })
+    }
+
     render() {
         const books = this.props.books.map( book => {
             // console.log(book);
+
             let trimmedDesc = book.desc.substring(0, 200);
-            // console.log("key: "  + book.bookID);
+
+            let isHidden = (this.state.filter ? 'hidden' : 'shown');
+            if (this.state.filter) {
+                if (book.genres.includes(this.state.filter)) {
+                    isHidden = 'shown';
+                }
+            }
+
             return (
-                <div className="book-card-container three wide column" key={book.bookID}>
+                <div className={`book-card-container three wide column ${isHidden}`} key={book.bookID}>
                     <BookCard
                         bookId={book.bookID}
                         src={book.imageURL}
@@ -43,10 +66,8 @@ class BrowseContainer extends React.Component {
         });
 
         return (
-            <div className="">
-                <div className="ui segment">
-                    Fetched {this.props.books.length} Books
-                </div>
+            <div className="browse-container">
+                <BrowseFilter onSelectGenre={this.onSelectGenre} />
 
                 <div className="ui container grid">
                     {books}    

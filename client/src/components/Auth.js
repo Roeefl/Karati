@@ -47,13 +47,18 @@ class Auth extends React.Component {
             }
         ];
 
+        let notifCount = 0;
+        if (this.props.userData.notifications) {
+            notifCount = this.props.userData.notifications.filter( notif => !notif.seen).length;
+        }
+        
         return (
-            <div className="item menu">
+            <div className="user-data item menu">
                 <div className="item">
                     <HeaderMenu title={this.props.userData.username} links={links}/>
                 </div>
                 <div className="item">
-                    <NotificationButton unread={this.props.userData.notifications.filter( notif => !notif.seen).length} />    
+                    <NotificationButton unread={notifCount} />    
                 </div>
                 <div className="item">
                     <a className="user-data item" href="/api/logout">

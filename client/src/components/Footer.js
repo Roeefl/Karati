@@ -3,7 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 
-import Auth from './Auth';
+import Social from './Social';
 
 import icon64 from '../icons/64.png';
 
@@ -18,7 +18,7 @@ class Footer extends React.Component {
                         </Link>
     
                         <div className="left menu">
-                            <Auth method="google" userData={this.props.userData} />
+                            <Social />
                         </div>
                     </div>
                 </div>
