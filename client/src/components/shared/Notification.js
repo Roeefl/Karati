@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-
 import match64 from '../../icons/match/64.png';
 
 class Notification extends React.Component {

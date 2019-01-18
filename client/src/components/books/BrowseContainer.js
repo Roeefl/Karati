@@ -47,7 +47,7 @@ class BrowseContainer extends React.Component {
             }
 
             return (
-                <div className={`book-card-container three wide column ${isHidden}`} key={book.bookID}>
+                <div className={`book-card-container four wide column ${isHidden}`} key={book.bookID}>
                     <BookCard
                         bookId={book.bookID}
                         src={book.imageURL}

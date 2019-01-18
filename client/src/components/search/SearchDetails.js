@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { updateMyShelf, fetchUser } from '../../actions';
 
-
 class SearchDetails extends React.Component {
     state = {
         addBookComponentType: 1 // Add Button

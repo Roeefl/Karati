@@ -1,4 +1,3 @@
-// Import the React and ReactDOM Libraries
 import React from 'react';
 import ReactDOM from 'react-dom';
 
@@ -9,7 +8,6 @@ import reduxThunk from 'redux-thunk';
 import App from './components/App';
 import reducers from './reducers';
 
-// const store = createStore( () => reducers, {}, applyMiddleware );
 const store = createStore(reducers, {}, applyMiddleware(reduxThunk));
 
 ReactDOM.render(
