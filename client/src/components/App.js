@@ -31,7 +31,7 @@ import CompHeader from './CompHeader';
 
 class App extends React.Component {
     componentDidMount() {
-        // console.log('fetchUser');
+        console.log('fetchUser');
         this.props.fetchUser();
     }
 
