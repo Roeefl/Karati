@@ -4,6 +4,8 @@ const bodyParser= require('body-parser');
 const cookieParser = require('cookie-parser');
 const expressSession = require('express-session');
 
+const MongoDBStore = require('connect-mongodb-session')(expressSession);
+
 const mongoose = require('mongoose');
 require('./models/User');
 require('./models/Book');
@@ -17,7 +19,17 @@ require('./models/Match');
 require('dotenv').config();
 
 const app = express();
+const mongoStore = new MongoDBStore({
+  uri: process.env.ATLAS_CONNECTION,
+  collection: 'userSessions'
+});
 
+// Catch errors
+mongoStore.on('error', function(error) {
+  assert.ifError(error);
+  assert.ok(false);
+});
+ 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 app.use(express.static('public'));
@@ -32,6 +44,7 @@ app.use(
   expressSession(
     {
       secret: 'keyboard cat',
+      store: mongoStore,
       resave: true,
       saveUninitialized: true,
       cookie: {
