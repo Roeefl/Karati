@@ -4,7 +4,7 @@ const bodyParser= require('body-parser');
 const cookieParser = require('cookie-parser');
 const expressSession = require('express-session');
 
-const MongoDBStore = require('connect-mongodb-session')(expressSession);
+const MongoStore = require('connect-mongo')(expressSession);
 
 const mongoose = require('mongoose');
 require('./models/User');
@@ -19,18 +19,6 @@ require('./models/Match');
 require('dotenv').config();
 
 const app = express();
-const mongoStore = new MongoDBStore({
-  uri: 'mongodb+srv://roeefl:53r070nin@karati-5ibl5.gcp.mongodb.net',
-  databaseName: 'karati',
-  collection: 'userSessions'
-});
-
-// Catch errors
-mongoStore.on('error', function(error) {
-  // assert.ifError(error);
-  // assert.ok(false);
-  console.log(error);
-});
  
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
@@ -42,11 +30,19 @@ app.set('view engine', 'ejs');
 // logging, parsing, and session handling.
 app.use(require('morgan')('combined'));
 
+const passportService = require('./services/passport');
+passportService(app);
+
+const PORT = process.env.PORT || 9000;
+
+mongoose.connect(process.env.ATLAS_CONNECTION, { useNewUrlParser: true } );
+let db = mongoose.connection;
+
 app.use(
   expressSession(
     {
       secret: 'keyboard cat',
-      store: mongoStore,
+      store: new MongoStore({ mongooseConnection: mongoose.connection }),
       resave: true,
       saveUninitialized: true,
       cookie: {
@@ -59,17 +55,6 @@ app.use(
 app.use(
   cookieParser()
 );
-
-
-// nothing
-
-const passportService = require('./services/passport');
-passportService(app);
-
-const PORT = process.env.PORT || 9000;
-
-mongoose.connect(process.env.ATLAS_CONNECTION, {useNewUrlParser: true} );
-let db = mongoose.connection;
 
 db.on('error', function () {
   console.log('connection error on mongoose')
