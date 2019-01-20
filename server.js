@@ -26,8 +26,9 @@ const mongoStore = new MongoDBStore({
 
 // Catch errors
 mongoStore.on('error', function(error) {
-  assert.ifError(error);
-  assert.ok(false);
+  // assert.ifError(error);
+  // assert.ok(false);
+  console.log(error);
 });
  
 app.use(bodyParser.urlencoded({extended: true}));
