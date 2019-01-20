@@ -88,6 +88,8 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
+// asddasads
+
 app.get('/', (req, res) => {
   console.log('I AM APP GET / AND I RENDER INDEX WITH EJS');
   res.render('index', { user: req.user });
