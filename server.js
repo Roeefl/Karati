@@ -20,7 +20,8 @@ require('dotenv').config();
 
 const app = express();
 const mongoStore = new MongoDBStore({
-  uri: process.env.ATLAS_CONNECTION,
+  uri: 'mongodb+srv://roeefl:53r070nin@karati-5ibl5.gcp.mongodb.net',
+  databaseName: 'karati',
   collection: 'userSessions'
 });
 
