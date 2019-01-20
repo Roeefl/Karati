@@ -76,6 +76,8 @@ require('./routes/shelfRoutes')(app);
 require('./routes/swipeRoutes')(app);
 require('./routes/matchRoutes')(app);
 
+console.log(path.resolve(__dirname, 'client', 'build', 'index.html'));
+
 if (process.env.NODE_ENV === 'production') {
   // Express will serve production assets like our main.js file, main.css file etc
   app.use(express.static('client/build'));
