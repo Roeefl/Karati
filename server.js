@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser= require('body-parser');
+const path = require('path');
 
 const cookieParser = require('cookie-parser');
 const expressSession = require('express-session');
@@ -22,7 +23,7 @@ const app = express();
  
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
-app.use(express.static('public'));
+// app.use(express.static('public'));
 app.set('view engine', 'ejs');
 // app.use(express.static('client/build'));
 
@@ -74,6 +75,16 @@ require('./routes/userRoutes')(app);
 require('./routes/shelfRoutes')(app);
 require('./routes/swipeRoutes')(app);
 require('./routes/matchRoutes')(app);
+
+if (process.env.NODE_ENV === 'production') {
+  // Express will serve production assets like our main.js file, main.css file etc
+  app.use(express.static('client/build'));
+
+  // Express will serve the index.html file if it does not recognize the route
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
+  });
+}
 
 app.get('/', (req, res) => {
   console.log('I AM APP GET / AND I RENDER INDEX WITH EJS');
