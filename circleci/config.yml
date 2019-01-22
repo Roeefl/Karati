@@ -21,7 +21,6 @@ jobs:
     working_directory: ~/repo
     docker:
       - image: circleci/node:10.11.0
-      # - image: circleci/mongo:3.4.4
     steps:
       - checkout
       - restore_cache:
