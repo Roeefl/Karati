@@ -24,6 +24,8 @@ const PORT = process.env.PORT || 9000;
 mongoose.connect(process.env.ATLAS_CONNECTION, {useNewUrlParser: true} );
 let db = mongoose.connection;
 
+// WHATEVESSSS
+
 db.on('error', function () {
   console.log('connection error on mongoose')
 });
