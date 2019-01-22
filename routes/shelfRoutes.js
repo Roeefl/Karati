@@ -44,11 +44,10 @@ getBookFromMongoByGoodreadsID = goodreadsID => {
  */
 addOwnedBookByUser = (currentUser, userID, bookID, goodreadsID) => {
     return new Promise( (resolve, reject) => {
-        let foundUser = req.currentUser;
-        
+       
         let isBookOwnedByUser = false;
-        if (foundUser.ownedBooks) {
-            isBookOwnedByUser = foundUser.ownedBooks.find(
+        if (currentUser.ownedBooks) {
+            isBookOwnedByUser = currentUser.ownedBooks.find(
                 book => book.bookID === bookID
             );
         }
@@ -66,13 +65,13 @@ addOwnedBookByUser = (currentUser, userID, bookID, goodreadsID) => {
                 dateAdded: Date.now()
             };
 
-            foundUser.ownedBooks.push(newOwnedBook);
+            currentUser.ownedBooks.push(newOwnedBook);
 
-            if (!foundUser.passedIntro && foundUser.ownedBooks.length >= 5) {
-                foundUser.passedIntro = true;
+            if (!currentUser.passedIntro && currentUser.ownedBooks.length >= 5) {
+                currentUser.passedIntro = true;
             }
 
-            foundUser.save(function (err, saved) {
+            currentUser.save(function (err, saved) {
                 if (err) {
                     reject(err);
                     return;
