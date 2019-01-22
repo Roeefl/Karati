@@ -85,6 +85,8 @@ addOwnedBookByUser = (currentUser, userID, bookID, goodreadsID) => {
 };
 
 module.exports = app => {
+
+    
     // List all books on myShelf
     app.get("/api/myShelf", middleware.ensureAuthenticated, middleware.getUser, async (req, res) => {
         let allBooks = await Book.find(
