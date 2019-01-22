@@ -5,7 +5,7 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const expressSession = require('express-session');
 
-const MongoStore = require('connect-mongo')(expressSession);
+// const MongoStore = require('connect-mongo')(expressSession);
 
 const mongoose = require('mongoose');
 require('./models/User');
@@ -43,7 +43,7 @@ app.use(
   expressSession(
     {
       secret: 'keyboard cat',
-      store: new MongoStore({ mongooseConnection: mongoose.connection }),
+      // store: new MongoStore({ mongooseConnection: mongoose.connection }),
       resave: true,
       saveUninitialized: true,
       cookie: {
