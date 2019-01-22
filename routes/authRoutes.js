@@ -11,17 +11,10 @@ module.exports = (app) => {
             }
         )
     );
-
-// app.get('/login/google', (req, res) => {
-//     console.log(req);
-//     res.end(req.user || false);
-//     });
-
+    
     app.get('/login/google/callback',
         passport.authenticate('google', { failureRedirect: '/' }),
         (req, res) => {
-            // console.log('callback');
-            // console.log(req.user);
             res.redirect(process.env.REDIRECT_DOMAIN);
         }
     );

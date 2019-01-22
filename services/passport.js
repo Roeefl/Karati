@@ -25,7 +25,7 @@ passport.use(new GoogleStrategy (
             return done(null, existingUser);
         }
 
-        newUser = new User(
+        let newUser = new User(
             {
                 oauthID: profile.id,
                 username: profile.displayName,

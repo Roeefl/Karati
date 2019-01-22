@@ -35,4 +35,4 @@ jobs:
             - node_modules
       - run:
           name: 'test'
-          command: 'npm test'
+          command: 'npm test' 
