@@ -1,52 +1,26 @@
 const express = require('express');
 const bodyParser= require('body-parser');
-
+const path = require('path');
 const cookieParser = require('cookie-parser');
 const expressSession = require('express-session');
+const MongoStore = require('connect-mongo')(expressSession);
 
 const mongoose = require('mongoose');
 require('./models/User');
 require('./models/Book');
 require('./models/Match');
 
-/* Models */
-// const User = mongoose.model('users');
-// const Book = mongoose.model('books');
-// const Match = mongoose.model('matches');
-
 require('dotenv').config();
 
 const app = express();
 
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(express.static('public'));
-app.set('view engine', 'ejs');
-// app.use(express.static('client/build'));
+// app.set('view engine', 'ejs');
 
 // Use application-level middleware for common functionality, including
 // logging, parsing, and session handling.
 app.use(require('morgan')('combined'));
-
-app.use(
-  expressSession(
-    {
-      secret: 'keyboard cat',
-      resave: true,
-      saveUninitialized: true,
-      cookie: {
-        maxAge: 30 * 24 * 60 * 60 * 1000
-      }
-    }
-  )  
-);
-
-app.use(
-  cookieParser()
-);
-
-const passportService = require('./services/passport');
-passportService(app);
 
 const PORT = process.env.PORT || 9000;
 
@@ -63,6 +37,27 @@ db.once('open', function() {
     console.log('Mongoose connected to MongoDB Atlas');
 });
 
+app.use(
+  expressSession(
+    {
+      secret: 'keyboard cat',
+      resave: true,
+      store: new MongoStore({ mongooseConnection: mongoose.connection }),
+      saveUninitialized: true,
+      cookie: {
+        maxAge: 30 * 24 * 60 * 60 * 1000
+      }
+    }
+  )  
+);
+
+app.use(
+  cookieParser()
+);
+
+const passportService = require('./services/passport');
+passportService(app);
+
 require('./routes/authRoutes')(app);
 require('./routes/bookRoutes')(app);
 require('./routes/userRoutes')(app);
@@ -70,11 +65,12 @@ require('./routes/shelfRoutes')(app);
 require('./routes/swipeRoutes')(app);
 require('./routes/matchRoutes')(app);
 
-app.get('/', (req, res) => {
-  console.log('I AM APP GET / AND I RENDER INDEX WITH EJS');
-  res.render('index', { user: req.user });
-});
+if (process.env.NODE_ENV === 'production') {
+  // Express will serve production assets like our main.js file, main.css file etc
+  app.use(express.static('client/build'));
 
-// app.get('/error-codes', (req, res) => {
-//   res.end( JSON.stringify(errors) );
-// });
+  // Express will serve the index.html file if it does not recognize the route
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
+  });
+}

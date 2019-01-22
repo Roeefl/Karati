@@ -12,6 +12,8 @@ passport.use(new GoogleStrategy (
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     callbackURL: process.env.GOOGLE_CALLBACK_URL,
     passReqToCallback: true
+    // proxy: true
+    
 },
     async function(request, accessToken, refreshToken, profile, done) {
         // console.log(profile);
@@ -24,7 +26,7 @@ passport.use(new GoogleStrategy (
             return done(null, existingUser);
         }
 
-        newUser = new User(
+        let newUser = new User(
             {
                 oauthID: profile.id,
                 username: profile.displayName,
