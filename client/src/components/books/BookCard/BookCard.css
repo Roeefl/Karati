@@ -21,3 +21,24 @@
 .book-card-title-author {
     min-height: 180px !important;
 }
+
+.matches-with-user .book-card {
+    max-height: 400px !important;
+    padding: 8px;
+}
+
+.matches-with-user .book-card .book-card-title-author {
+    min-height: 100px !important;
+    max-height: 100px !important;
+}
+
+.matches-with-user .book-card .swap-picked {
+    background-color: #8E70CD !important;
+}
+.matches-with-user .book-card .swap-picked .meta {
+    color: #fff !important;
+}
+
+.matches-with-user .book-card .image img {
+    height: 200px !important;
+}

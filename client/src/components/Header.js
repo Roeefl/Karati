@@ -41,14 +41,19 @@ class Header extends React.Component {
 
         const links = [
             {
-                to: '/myMatches',
-                text: 'My Matches',
-                icon: 'options'
-            },
-            {
                 to: '/myShelf',
                 text: 'My Shelf',
                 icon: 'zip'
+            },
+            {
+                to: '/myProposals',
+                text: 'My Proposals',
+                icon: 'handshake outline'
+            },
+            {
+                to: '/myMatches',
+                text: 'My Matches',
+                icon: 'options'
             },
             {
                 to: '/mySwipes',

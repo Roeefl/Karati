@@ -38,11 +38,10 @@ getBookFromMongoByGoodreadsID = goodreadsID => {
 
 /**
  * Attaches a current book in the DB to a current user record in the DB in the collection ownedbooks
- * @param {*} userID
  * @param {*} bookID
  * @param {*} goodreadsID
  */
-addOwnedBookByUser = (currentUser, userID, bookID, goodreadsID) => {
+addOwnedBookByUser = (currentUser, bookID, goodreadsID) => {
     return new Promise( (resolve, reject) => {
        
         let isBookOwnedByUser = false;
@@ -54,7 +53,7 @@ addOwnedBookByUser = (currentUser, userID, bookID, goodreadsID) => {
 
         if (isBookOwnedByUser) {
             console.log(
-                "BookID " + bookID + " is already linked to UserID " + userID
+                `BookID ${bookID} is already linked to UserID ${currentUser._id}`
             );
             resolve(false);
             return;
@@ -77,7 +76,7 @@ addOwnedBookByUser = (currentUser, userID, bookID, goodreadsID) => {
                     return;
                 }
 
-                console.log("addBookToUser saved book " + bookID + " to " + userID);
+                console.log(`addBookToUser saved book ${bookID} to  ${currentUser._id}`);
                 resolve(true);
             });
         }
@@ -163,8 +162,6 @@ module.exports = app => {
      */
     // Add a book to myShelf
     app.post("/api/myShelf", middleware.ensureAuthenticated, middleware.getUser, async (req, res) => {
-        let currentUserID = req.session.passport.user;
-
         let existingBook = await getBookFromMongoByGoodreadsID(
             req.body.goodreadsID
         );
@@ -194,16 +191,15 @@ module.exports = app => {
         }
 
         let saved = await addOwnedBookByUser(
-            req.currentUsesr,
-            currentUserID,
+            req.currentUser,
             bookID,
             req.body.goodreadsID
         );
 
-        res.end(
-            JSON.stringify({
+        res.json(
+            {
                 bookAddedToMyShelf: saved
-            })
+            }
         );
     });
 
@@ -217,20 +213,20 @@ module.exports = app => {
     
         if (!result) {
           console.log('ERROR on retrieving book ' + req.params.id + ' from Goodreads');
-          res.end(JSON.stringify(
+          res.json(
               {
                 'error': errors.NO_GOODREADS_RESULT
               }
-          ));
+          );
           return false;
         }
     
         let bookData = middleware.parseBookDataObjFromGoodreads(req.params.id, result);
         // console.log(bookData);
-        res.end(JSON.stringify(
+        res.json(
           {
             book: bookData
           }
-        ));
+        );
       });
 };

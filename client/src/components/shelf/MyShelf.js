@@ -100,7 +100,6 @@ class MyShelf extends React.Component   {
                                     <div className="ui search">
                                         <Link to="/myShelf/search" className="search item">
                                             <div className="ui labeled button green icon">
-                                                {/* <input className="prompt" type="text" placeholder="Search book database..." /> */}
                                                 <i className="search icon"></i>Search
                                             </div>
                                         </Link>

@@ -18,6 +18,7 @@ import SearchBookExpanded from './shelf/SearchBookExpanded';
 import MyProfile from './profile/MyProfile';
 import MySettings from './profile/MySettings';
 import MySwipes from './swipes/MySwipes';
+import MyProposals from './proposals/MyProposals';
 
 import MyMatches from './matches/MyMatches';
 import MatchesWithUser from './matches/MatchesWithUser';
@@ -70,6 +71,7 @@ class App extends React.Component {
                                 <Route path="/mySettings" component={MySettings} />
 
                                 <Route path="/mySwipes" component={MySwipes} />
+                                <Route path="/myProposals" component={MyProposals} />
 
                                 {/* <Route path="/books/edit" component={BookEdit} /> */}
 

@@ -85,6 +85,10 @@ module.exports = (app) => {
               book._id == currBookID
             );
 
+            if (!bookInfo) {
+              continue;
+            }
+
             let isBookSwipedByCurrentUser = false;
             if (req.currentUser.swipes) {
               isBookSwipedByCurrentUser = req.currentUser.swipes.find(swipe =>
@@ -196,17 +200,17 @@ module.exports = (app) => {
             books.push(searchResults[r].best_book);
           }
       }
-      res.end( JSON.stringify(
+      res.json(
         {
           books: books
         }
-      ));
+      );
     } catch(e) {
-        res.end( JSON.stringify(
+        res.json(
           {
             books: books
           }
-        ));
+        );
         return;
     }
   });
@@ -224,11 +228,11 @@ module.exports = (app) => {
     if (!foundBook) {
       console.log('ERROR on retrieving book ' + req.params.id + ' from MongoDB');
 
-      res.end(JSON.stringify(
+      res.json(
           {
             'error': errors.NO_BOOK
           }
-      ));
+      );
 
       return false;
     };
@@ -237,19 +241,19 @@ module.exports = (app) => {
       comment.userID == req.currentUser._id
     );
     if (userAlreadyCommentOnBook) {
-      return res.end(JSON.stringify(
+      return res.json(
         {
           error: errors.ALREADY_COMMENTED
         }
-      ));
+      );
     }
 
     let commentSaved = await addCommentToBook(foundBook, req.currentUser._id, review);
-    res.end(JSON.stringify(
+    res.json(
       {
         saved: commentSaved
       }
-    ));
+    );
   });
 
   const MAX_BOOKS = 10;
@@ -266,9 +270,9 @@ module.exports = (app) => {
     ).
     // select({ name: 1, occupation: 1 }).
     exec(function(err, recentlyAddedBooks) {
-      res.end(JSON.stringify(
+      res.json(
         { recentlyAdded: recentlyAddedBooks }
-      ));
+      );
     });
   });
   

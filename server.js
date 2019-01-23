@@ -14,11 +14,6 @@ require('dotenv').config();
 
 const app = express();
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-
-app.use(require('morgan')('combined'));
-
 const PORT = process.env.PORT || 9000;
 
 mongoose.connect(process.env.ATLAS_CONNECTION, {useNewUrlParser: true} );
@@ -37,11 +32,24 @@ db.once('open', function() {
 });
 
 app.use(
+  bodyParser.urlencoded(
+    { extended: true }
+  )
+);
+app.use(
+  bodyParser.json()
+);
+
+app.use(require('morgan')('combined'));
+
+const mongoStore = new MongoStore({ mongooseConnection: mongoose.connection });
+
+app.use(
   expressSession(
     {
       secret: 'keyboard cat',
       resave: true,
-      store: new MongoStore({ mongooseConnection: mongoose.connection }),
+      store: mongoStore,
       saveUninitialized: true,
       cookie: {
         maxAge: 30 * 24 * 60 * 60 * 1000

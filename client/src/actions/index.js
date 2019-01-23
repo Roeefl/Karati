@@ -6,12 +6,15 @@ import { UPDATE_SEARCH_RESULTS,
     UPDATE_MY_BOOKS,
     UPDATE_BOOKS,
     UPDATE_MY_MATCHES,
+    UPDATE_MY_PROPOSALS,
     UPDATE_FEEDS,
     SELECT_BOOK_FROM_DB,
     RETRIEVE_BOOK_FROM_GOODREADS,
     UPDATE_MY_SWIPE_HISTORY,
     SET_CURRENT_COMP,
-    MATCHES_USER_SELECTED    } from './types';
+    MATCHES_USER_SELECTED,
+    PROPOSE_SWAP
+ } from './types';
 
 export const submitProfileForm = (formValues, history) =>
     async (dispatch) => { 
@@ -192,6 +195,25 @@ export const fetchMyMatches = () =>
         }
     };
 
+export const fetchMyProposals = () =>
+    async (dispatch) => {
+        try {
+            const res = await Axios.get('/api/myProposals');
+
+            dispatch( {
+                type: UPDATE_MY_PROPOSALS,
+                payload: res.data.myProposals || []
+            });
+        } catch(error) {
+            console.log('/api/myProposals failed with error: ' + error);
+
+            dispatch( {
+                type: UPDATE_MY_PROPOSALS,
+                payload: { error: error.response.data.error }
+            });
+        }
+    };
+    
 export const fetchMySwipeHistory = () =>
     async (dispatch) => {
         try {
@@ -299,6 +321,53 @@ export const markNotificationAsSeen = (userId, notificationId) =>
 
             dispatch( {
                 type: FETCH_USER,
+                payload: false
+            });
+        }
+    };
+
+export const proposeSwap = (firstUserId, secondUserId, firstBookId, secondBookId, reset = false) => 
+    async (dispatch) => {
+        if (reset) {
+            dispatch( {
+                type: PROPOSE_SWAP,
+                payload: null
+            });
+
+            dispatch({
+                type: UPDATE_MY_MATCHES,
+                payload: null
+            });
+
+            return;
+        }
+
+        try {           
+            const matchData = {
+                firstUserId,
+                secondUserId,
+                firstBookId,
+                secondBookId
+            };
+
+            console.log(matchData);
+
+            const res = await Axios.put('/api/match/propose', matchData);
+
+            if (res.data.error) {
+                console.log('Failed: propose swap');
+            }
+
+            dispatch( {
+                type: PROPOSE_SWAP,
+                payload: res.data.match || null
+                // payload: null
+            });
+        } catch(error) {
+            console.log('/api/match/propose failed with error: ' + error);
+
+            dispatch( {
+                type: PROPOSE_SWAP,
                 payload: false
             });
         }

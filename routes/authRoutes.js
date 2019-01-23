@@ -36,9 +36,9 @@ module.exports = (app) => {
     );
 
     app.get('/api/currentUser', middleware.ensureAuthenticated, (req, res) => {
-        res.end(JSON.stringify(
+        res.json(
             { currUser: middleware.reverseNotifications(req.user) }
-        ));
+        );
     });
     
     app.get('/api/logout', (req, res) => {

@@ -45,9 +45,7 @@ class MyMatches extends React.Component {
             );
         };
 
-        console.log(this.props.myMatches);
-
-        const matchesWithUsers = this.props.myMatches.map( matchWithUser => {
+        const matchesWithUsers = this.props.myMatches.filter( matchWithUser => matchWithUser.proposalInProgress === false).map( matchWithUser => {
             return (
                 <div className="column" key={matchWithUser.ownerInfo._id} >
                     <MatchesWithUserCard data={matchWithUser} />

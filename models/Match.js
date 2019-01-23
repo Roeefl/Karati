@@ -3,12 +3,11 @@ const Schema = mongoose.Schema;
 
 const chatMsg = require('./ChatMsg');
 
-/* *** Status codes ***
-    3 - Pending
-    4 - Approved by firstUser
-    5 - Approved by secondUser
-    6 - Approved by both users
-*/
+const matchStatus = require('../config/matchStatus');
+
+/**
+ * See matchStatus codes in config/matchStatus.js
+ */
 const matchSchema = new Schema (
     {
         firstUser: {
@@ -19,6 +18,11 @@ const matchSchema = new Schema (
             bookID: {
                 type: String,
                 required: true
+            },
+            proposed: {
+                type: Boolean,
+                required: false,
+                default: false
             }
         },
         secondUser: {
@@ -29,6 +33,11 @@ const matchSchema = new Schema (
             bookID: {
                 type: String,
                 required: true
+            },
+            proposed: {
+                type: Boolean,
+                required: false,
+                default: false
             }
         },
         dateMatched: {
@@ -38,7 +47,11 @@ const matchSchema = new Schema (
         status: {
             type: Number,
             required: true,
-            default: 3
+            default: matchStatus.PENDING
+        },
+        lastStatusDate: {
+            type: Date,
+            required: false
         },
         chat: {
             type: [chatMsg],

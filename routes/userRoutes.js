@@ -1,17 +1,83 @@
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
-const errors = require('../config/errors');
 const middleware = require('../common/middleware');
 
 const User = mongoose.model('users');
 const Book = mongoose.model('books');
 const Match = mongoose.model('matches');
 
+const matchStatus = require('../config/matchStatus');
+const errors = require('../config/errors');
+
 module.exports = (app) => {
     app.get('/api/myProfile', middleware.ensureAuthenticated, async (req, res) => {
       const currUser = await User.findById(req.session.passport.user);
 
-      res.end( JSON.stringify( middleware.reverseNotifications(currUser) ));
+      res.json( middleware.reverseNotifications(currUser) );
+    });
+
+    app.get('/api/myProposals', middleware.ensureAuthenticated, middleware.getUser, async (req, res) => {
+      let currentUserObjectID = new ObjectId(req.currentUser._id);
+
+      let proposals = await Match.find(
+        {
+          "status": 4,
+          "$or": [
+            { 'firstUser.userID': currentUserObjectID },
+            { 'secondUser.userID': currentUserObjectID }
+          ]
+        }
+      );
+
+      if (!proposals) {
+        res.json({ error: errors.NO_PROPOSALS });
+      }
+
+      const allBookIDS = proposals.map( match => match.firstUser.bookID ).concat( proposals.map( match => match.secondUser.bookID ) );
+
+      let allBooks = await Book.find(
+        {
+            "_id": {
+                "$in": 
+                  allBookIDS
+            }
+        }
+      );
+
+      let allUsers = await User.find();
+
+      let myProposals = [];
+
+      for (let proposal of proposals) {
+        let owner = (proposal.firstUser.userID == req.currentUser._id ? proposal.secondUser : proposal.firstUser);
+        let myself = (proposal.firstUser.userID == req.currentUser._id ? proposal.firstUser : proposal.secondUser);
+
+        let ownerInfo = allUsers.find( user => 
+          user._id == owner.userID
+        );
+
+        let myBookInfo = allBooks.find(book =>
+          book._id == owner.bookID
+        );
+        let hisBookInfo = allBooks.find(book =>
+          book._id == myself.bookID
+        );
+
+        myProposals.push(
+          {
+            proposalId: proposal._id,
+            owner: ownerInfo.username,
+            proposedByMe: myself.proposed,
+            myBook: myBookInfo.title,
+            hisBook: hisBookInfo.title,
+            lastStatusDate: proposal.lastStatusDate
+          }
+        )
+      }
+
+      console.log(myProposals);
+
+      res.json({ myProposals });
     });
 
     app.get('/api/mySwipeHistory', middleware.ensureAuthenticated, middleware.getUser, async (req, res) => {
@@ -77,6 +143,7 @@ module.exports = (app) => {
       let allUsers = await User.find();
 
       for (let match of userMatches) {
+        
         let owner = (match.firstUser.userID == currentUserID ? match.secondUser : match.firstUser);
         let myself = (match.firstUser.userID == currentUserID ? match.firstUser : match.secondUser);
 
@@ -92,15 +159,20 @@ module.exports = (app) => {
         );
 
         let existingOwner = myMatches.find( match =>
-          match.ownerInfo._id == ownerInfo. _id
+          match.ownerInfo._id == ownerInfo._id
         );
-        if (!existingOwner) {
+        if (existingOwner) {
+          // existingOwner already found and pushed - only check for proposal in progress prop
+          if (match.status === matchStatus.PROPOSED) {
+            existingOwner.proposalInProgress = true;
+          }
+        } else {
           myMatches.push( {
             ownerInfo: ownerInfo,
             myBooks: [],
-            hisBooks: []
+            hisBooks: [],
+            proposalInProgress: (match.status === matchStatus.PROPOSED)
           });
-
           existingOwner = myMatches[myMatches.length - 1];
         }
 
@@ -111,7 +183,12 @@ module.exports = (app) => {
           existingOwner.myBooks.push(
             myBookInfo
           );
+
+          if (match.status === matchStatus.PROPOSED) {
+            existingOwner.proposalInProgress = true
+          } 
         }
+
 
         let findHisBook = existingOwner.hisBooks.find( book =>
           book._id == hisBookInfo._id
