@@ -12,3 +12,4 @@ export const UPDATE_MY_SWIPE_HISTORY = 'update_my_swipe_history';
 export const MATCHES_USER_SELECTED = 'select_matches_by_user';
 export const SET_CURRENT_COMP = 'set_current_component';
 export const PROPOSE_SWAP = 'propose_swap';
+export const ACCEPT_PROPOSAL = 'accept_proposal';

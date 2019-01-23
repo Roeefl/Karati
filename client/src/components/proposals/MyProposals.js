@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { fetchMyProposals, setCurrentComponent } from '../../actions';
+import { fetchMyProposals, acceptProposal, setCurrentComponent } from '../../actions';
 import * as errors from '../shared/errors';
 import Message from '../shared/Message';
 import Spinner from '../shared/Spinner';
@@ -15,6 +15,10 @@ class MyProposals extends React.Component {
         });
 
         this.props.fetchMyProposals();
+    }
+
+    onAccept = (proposal) => {
+        this.props.acceptProposal(proposal.proposalId);
     }
 
     renderContent() {
@@ -46,7 +50,7 @@ class MyProposals extends React.Component {
 
         const proposals = this.props.myProposals.map( proposal => {
             return (
-                <ProposalCard proposal={proposal} key={proposal.proposalId}/>
+                <ProposalCard proposal={proposal} key={proposal.proposalId} onAccept={this.onAccept} />
             );
         });
 
@@ -85,5 +89,5 @@ function mapStateToProps(state) {
 
 export default connect(
     mapStateToProps,
-    { fetchMyProposals, setCurrentComponent }
+    { fetchMyProposals, acceptProposal, setCurrentComponent }
 )(MyProposals);

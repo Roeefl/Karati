@@ -21,8 +21,12 @@ module.exports = (app) => {
 
       let proposals = await Match.find(
         {
-          "status": 4,
-          "$or": [
+          "status": {
+            $in: [
+              4, 5 
+            ]
+          },
+          $or: [
             { 'firstUser.userID': currentUserObjectID },
             { 'secondUser.userID': currentUserObjectID }
           ]
@@ -66,6 +70,7 @@ module.exports = (app) => {
         myProposals.push(
           {
             proposalId: proposal._id,
+            status: proposal.status,
             owner: ownerInfo.username,
             proposedByMe: myself.proposed,
             myBook: myBookInfo.title,

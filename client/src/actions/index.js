@@ -372,3 +372,27 @@ export const proposeSwap = (firstUserId, secondUserId, firstBookId, secondBookId
             });
         }
     };
+
+    export const acceptProposal = (matchId) => 
+        async (dispatch) => {
+            try {           
+                const matchData = {
+                    matchId
+                };
+
+                const res = await Axios.put('/api/match/accept', matchData);
+
+                if (res.data.error) {
+                    console.log('Failed: /match/accept');
+                }
+
+                const proposals = await Axios.get('/api/myProposals');
+
+                dispatch( {
+                    type: UPDATE_MY_PROPOSALS,
+                    payload: proposals.data.myProposals || []
+                });
+            } catch(error) {
+                console.log('/api/match/accept failed with error: ' + error);
+            }
+        };

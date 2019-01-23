@@ -2,6 +2,23 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 class ProposalCard extends React.Component {
+    onAccept = () => {
+        this.props.onAccept(this.props.proposal);
+    }
+
+    renderAccept() {
+        if (!this.props.proposal.proposedByMe && this.props.proposal.status === 4) {
+            return (
+                <div
+                    className="ui huge orange labeled icon button"
+                    onClick={this.onAccept}>
+                    <i className="icon thumbs up outline white large" />
+                    Accept Proposal
+                </div>
+            );
+        }
+    }
+
     renderTitle() {
         if (this.props.proposal.proposedByMe) {
             return (
@@ -31,8 +48,8 @@ class ProposalCard extends React.Component {
             // <Link to={linkTo} className="swipe-card item">
             <div className="proposal-card item">
 
-                <div className="ui image">
-                    No_Image
+                <div className="ui approve">
+                    {this.renderAccept()}
                 </div>
 
                 <div className="middle aligned content">
@@ -45,7 +62,7 @@ class ProposalCard extends React.Component {
 
                     <div className="extra">
                         <div className={`ui right floated icon`}>
-                            <i className={`icon outline huge thumbs`} />
+                            Status: {this.props.proposal.status}
                         </div>
                         <span>
                             Proposal made on: {this.props.proposal.lastStatusDate || 'NO_DATE'}
