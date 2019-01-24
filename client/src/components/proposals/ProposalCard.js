@@ -1,4 +1,5 @@
 import React from 'react';
+import './ProposalCard.css';
 import { Link } from 'react-router-dom';
 
 class ProposalCard extends React.Component {
@@ -20,59 +21,90 @@ class ProposalCard extends React.Component {
     }
 
     renderTitle() {
-        if (this.props.proposal.proposedByMe) {
-            return (
-                <div>You proposed this swap to {this.props.proposal.owner}</div>
-            );
-        }
-        return (
-            <div>{this.props.proposal.owner} proposed this swap to you</div>
-        )
-    }
-
-    renderDetails() {
-        if (this.props.proposal.proposedByMe) {
-            return (
-                <div>You offered {this.props.proposal.myBook} in exchange for {this.props.proposal.hisBook}</div>
-            );
-        }
-        return (
-            <div>He offered {this.props.proposal.hisBook} in exchange for {this.props.proposal.myBook}</div>
+        // if (this.props.proposal.proposedByMe) {
+        //     return (
+        //         <div>You proposed this swap to {this.props.proposal.owner}</div>
+        //     );
+        // }
+        // return (
+        //     <div>{this.props.proposal.owner} proposed this swap to you</div>
+        // )
+        return(
+            <div>
+                {this.props.proposal.hisBook}
+            </div>
         );
     }
 
-    render() {
-        // let linkTo = ('/book/' + this.props.swipe.book._id);
+    renderDetails() {
+        // if (this.props.proposal.proposedByMe) {
+        //     return (
+        //         <div>You offered {this.props.proposal.myBook} in exchange for {this.props.proposal.hisBook}</div>
+        //     );
+        // }
+        // return (
+        //     <div>He offered {this.props.proposal.hisBook} in exchange for {this.props.proposal.myBook}</div>
+        // );
 
         return (
-            // <Link to={linkTo} className="swipe-card item">
-            <div className="proposal-card item">
+            <div>
+                {this.props.proposal.owner}
+            </div>
+        );
+    }
 
-                <div className="ui approve">
+    renderIcon() {
+        if (this.props.proposal.status === 4) {
+            return (
+                <React.Fragment>
+                    <i className="icon hourglass outline"/> Pending
+                </React.Fragment>
+            );
+        }
+
+        return (
+            <React.Fragment>
+                <i className="icon child"/> Approved
+            </React.Fragment>
+        );
+    }
+
+    onCardClick = () => {
+        this.props.onCardClick(this.props.proposal);
+    }
+
+    render() {
+        return (
+            <div className="proposal-card ui card" onClick={this.onCardClick}>
+
+                {/* <div className="ui approve">
                     {this.renderAccept()}
-                </div>
+                </div> */}
 
-                <div className="middle aligned content">
-                    <div className="header">
+                <div className="content">
+                    <div className="center aligned header">
                         {this.renderTitle()}
                     </div>
-                    <div className="description">
+                    <div className="center aligned description">
                         {this.renderDetails()}
                     </div>
 
-                    <div className="extra">
-                        <div className={`ui right floated icon`}>
+                    {/* <div className="extra"> */}
+                        {/* <div className={`ui right floated icon`}>
                             Status: {this.props.proposal.status}
-                        </div>
-                        <span>
+                        </div> */}
+                        {/* <span>
                             Proposal made on: {this.props.proposal.lastStatusDate || 'NO_DATE'}
-                        </span>
+                        </span> */}
+                    {/* </div> */}
+                </div>
+
+                <div className="extra content">
+                    <div className="center aligned author">
+                        {this.renderIcon()}
                     </div>
-                
                 </div>
             </div>
-
-            // </Link>
         );
     }
 }

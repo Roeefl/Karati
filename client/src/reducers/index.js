@@ -16,6 +16,7 @@ import { swipeHistoryReducer } from './swipeHistory';
 import { matchesWithUserReducer } from './matchesWithUser';
 import { currentComponentReducer } from './currentComponent';
 import { swapJustProposedReducer } from './swapJustProposed';
+import { currentChatReducer } from './currentChatReducer';
 
 export default combineReducers(
     {
@@ -33,6 +34,7 @@ export default combineReducers(
         swipeHistory: swipeHistoryReducer,
         matchesWithUser: matchesWithUserReducer,
         currentComponent: currentComponentReducer,
-        proposedSwap: swapJustProposedReducer
+        proposedSwap: swapJustProposedReducer,
+        currentChat: currentChatReducer
     }
 );

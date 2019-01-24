@@ -1,12 +1,18 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { fetchMyProposals, acceptProposal, setCurrentComponent } from '../../actions';
+import { fetchMyProposals, acceptProposal, loadChat, setCurrentComponent } from '../../actions';
 import * as errors from '../shared/errors';
 import Message from '../shared/Message';
 import Spinner from '../shared/Spinner';
 import ProposalCard from './ProposalCard';
+import ProposalFilter from './ProposalFilter';
+import ProposalChat from './ProposalChat';
 
 class MyProposals extends React.Component {
+    state = {
+        selectedProposal: null
+    };
+
     componentDidMount() {
         this.props.setCurrentComponent({
             primary: 'My Proposals',
@@ -19,6 +25,11 @@ class MyProposals extends React.Component {
 
     onAccept = (proposal) => {
         this.props.acceptProposal(proposal.proposalId);
+    }
+
+    onCardClick = (proposal) => {
+        this.setState({ selectedProposal: proposal });
+        this.props.loadChat(proposal);
     }
 
     renderContent() {
@@ -48,15 +59,28 @@ class MyProposals extends React.Component {
             );
         };
 
-        const proposals = this.props.myProposals.map( proposal => {
+        const proposalCards = this.props.myProposals.map( proposal => {
             return (
-                <ProposalCard proposal={proposal} key={proposal.proposalId} onAccept={this.onAccept} />
+                <ProposalCard proposal={proposal} key={proposal.proposalId} onAccept={this.onAccept} onCardClick={this.onCardClick} />
             );
         });
 
         return (
-            <div className="proposal-grid ui divided items">
-                {proposals}
+            <div className="ui grid proposal-grid">
+                <div className="six wide column filter-col">
+                    <ProposalFilter />
+                    <ProposalFilter />
+
+                    <div className="proposal-cards">
+                        {proposalCards}
+                    </div>
+                </div>
+                
+                <div className="ten wide column chat-col">
+                    <ProposalChat
+                        proposal={this.state.selectedProposal}
+                    />
+                </div>
             </div>
         );
     }
@@ -64,17 +88,7 @@ class MyProposals extends React.Component {
     render() {
         return (
             <div className="my-proposals ui raised container">
-                <Message
-                    color='violet'
-                    lines={[
-                        `You have ${this.props.myProposals.length || 0} proposals`
-                    ]} />
-
-                <div className="ui centered grid">
-                    <div className="ui ten wide column">
-                        {this.renderContent()}
-                    </div>
-                </div>
+                {this.renderContent()}
             </div>
         );
     }
@@ -89,5 +103,5 @@ function mapStateToProps(state) {
 
 export default connect(
     mapStateToProps,
-    { fetchMyProposals, acceptProposal, setCurrentComponent }
+    { fetchMyProposals, acceptProposal, loadChat, setCurrentComponent }
 )(MyProposals);

@@ -1,0 +1,15 @@
+.proposal-chat {
+    height: 70vh;
+}
+
+.proposal-chat .chat-header {
+    height: 20%;
+}
+
+.proposal-chat .chat-messages {
+    height: 70%;
+}
+
+.proposal-chat .chat-new-message {
+    height: 10%;
+}

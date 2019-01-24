@@ -13,7 +13,8 @@ import { UPDATE_SEARCH_RESULTS,
     UPDATE_MY_SWIPE_HISTORY,
     SET_CURRENT_COMP,
     MATCHES_USER_SELECTED,
-    PROPOSE_SWAP
+    PROPOSE_SWAP,
+    UPDATE_CURRENT_CHAT
  } from './types';
 
 export const submitProfileForm = (formValues, history) =>
@@ -136,6 +137,13 @@ export const updateSearchResults = (searchResults) => {
         type: UPDATE_SEARCH_RESULTS,
         payload: searchResults || []
     };
+};
+
+export const loadChat = (proposal) => {
+    return {
+        type: UPDATE_CURRENT_CHAT,
+        payload: proposal.chat || []
+    }
 };
 
 export const fetchUser = () => 
@@ -373,26 +381,50 @@ export const proposeSwap = (firstUserId, secondUserId, firstBookId, secondBookId
         }
     };
 
-    export const acceptProposal = (matchId) => 
-        async (dispatch) => {
-            try {           
-                const matchData = {
-                    matchId
-                };
+export const acceptProposal = (matchId) =>
+    async (dispatch) => {
+        try {
+            const matchData = {
+                matchId
+            };
 
-                const res = await Axios.put('/api/match/accept', matchData);
+            const res = await Axios.put('/api/match/accept', matchData);
 
-                if (res.data.error) {
-                    console.log('Failed: /match/accept');
-                }
-
-                const proposals = await Axios.get('/api/myProposals');
-
-                dispatch( {
-                    type: UPDATE_MY_PROPOSALS,
-                    payload: proposals.data.myProposals || []
-                });
-            } catch(error) {
-                console.log('/api/match/accept failed with error: ' + error);
+            if (res.data.error) {
+                console.log('Failed: /match/accept');
             }
-        };
+
+            const proposals = await Axios.get('/api/myProposals');
+
+            dispatch({
+                type: UPDATE_MY_PROPOSALS,
+                payload: proposals.data.myProposals || []
+            });
+        } catch (error) {
+            console.log('/api/match/accept failed with error: ' + error);
+        }
+    };
+
+export const sendChatMessage = (matchId, senderId, message) => 
+    async (dispatch) => {
+        try {
+            const chatData = {
+                matchId,
+                senderId,
+                message
+            };
+
+            const res = await Axios.post('/api/match/chat', chatData);
+
+            if (res.data.error) {
+                console.log('Failed: POST /api/match/chat');
+            }
+
+            dispatch({
+                type: UPDATE_CURRENT_CHAT,
+                payload: res.data.match.chat || []
+            });
+        } catch (error) {
+            console.log('/api/match/accept failed with error: ' + error);
+        }
+    };

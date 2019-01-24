@@ -67,10 +67,16 @@ module.exports = (app) => {
           book._id == myself.bookID
         );
 
+        for (let msg of proposal.chat) {
+          let userInfo = allUsers.find( user => user._id == msg.sender );
+          msg.senderName = userInfo.username;
+        }
+
         myProposals.push(
           {
             proposalId: proposal._id,
             status: proposal.status,
+            chat: proposal.chat, 
             owner: ownerInfo.username,
             proposedByMe: myself.proposed,
             myBook: myBookInfo.title,
@@ -79,8 +85,6 @@ module.exports = (app) => {
           }
         )
       }
-
-      console.log(myProposals);
 
       res.json({ myProposals });
     });

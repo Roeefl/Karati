@@ -7,6 +7,11 @@ const chatMsg = new Schema (
             type: String,
             required: true
         },
+        senderName: {
+            type: String,
+            required: false,
+            default: 'John Doe'
+        },
         message: {
             type: String,
             required: true

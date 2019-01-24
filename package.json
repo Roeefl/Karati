@@ -42,12 +42,14 @@
     "passport-google-oauth": "^1.0.0",
     "passport-google-oauth2": "^0.1.6",
     "passport-local": "^1.0.0",
+    "pusher": "^2.2.0",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
     "react-scripts": "2.1.1",
     "redux-form": "^8.0.4",
     "request": "^2.88.0",
     "sendgrid": "^5.2.3",
+    "socket.io": "^2.2.0",
     "sse": "0.0.8"
   },
   "devDependencies": {
