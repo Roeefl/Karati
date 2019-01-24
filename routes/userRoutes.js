@@ -12,91 +12,17 @@ const errors = require('../config/errors');
 module.exports = (app) => {
     app.get('/api/myProfile', middleware.ensureAuthenticated, async (req, res) => {
       const currUser = await User.findById(req.session.passport.user);
-
       res.json( middleware.reverseNotifications(currUser) );
-    });
-
-    app.get('/api/myProposals', middleware.ensureAuthenticated, middleware.getUser, async (req, res) => {
-      let currentUserObjectID = new ObjectId(req.currentUser._id);
-
-      let proposals = await Match.find(
-        {
-          "status": {
-            $in: [
-              4, 5 
-            ]
-          },
-          $or: [
-            { 'firstUser.userID': currentUserObjectID },
-            { 'secondUser.userID': currentUserObjectID }
-          ]
-        }
-      );
-
-      if (!proposals) {
-        res.json({ error: errors.NO_PROPOSALS });
-      }
-
-      const allBookIDS = proposals.map( match => match.firstUser.bookID ).concat( proposals.map( match => match.secondUser.bookID ) );
-
-      let allBooks = await Book.find(
-        {
-            "_id": {
-                "$in": 
-                  allBookIDS
-            }
-        }
-      );
-
-      let allUsers = await User.find();
-
-      let myProposals = [];
-
-      for (let proposal of proposals) {
-        let owner = (proposal.firstUser.userID == req.currentUser._id ? proposal.secondUser : proposal.firstUser);
-        let myself = (proposal.firstUser.userID == req.currentUser._id ? proposal.firstUser : proposal.secondUser);
-
-        let ownerInfo = allUsers.find( user => 
-          user._id == owner.userID
-        );
-
-        let myBookInfo = allBooks.find(book =>
-          book._id == owner.bookID
-        );
-        let hisBookInfo = allBooks.find(book =>
-          book._id == myself.bookID
-        );
-
-        for (let msg of proposal.chat) {
-          let userInfo = allUsers.find( user => user._id == msg.sender );
-          msg.senderName = userInfo.username;
-        }
-
-        myProposals.push(
-          {
-            proposalId: proposal._id,
-            status: proposal.status,
-            chat: proposal.chat, 
-            owner: ownerInfo.username,
-            proposedByMe: myself.proposed,
-            myBook: myBookInfo.title,
-            hisBook: hisBookInfo.title,
-            lastStatusDate: proposal.lastStatusDate
-          }
-        )
-      }
-
-      res.json({ myProposals });
     });
 
     app.get('/api/mySwipeHistory', middleware.ensureAuthenticated, middleware.getUser, async (req, res) => {
 
       let bookData = await Book.find(
         {
-            "_id": {
-                "$in": 
-                    req.currentUser.swipes.map( swipe => swipe.bookID )
-            }
+          "_id": {
+            "$in":
+              req.currentUser.swipes.map(swipe => swipe.bookID)
+          }
         }
       );
 
@@ -123,38 +49,26 @@ module.exports = (app) => {
       });
     });
 
-    app.get('/api/myMatches', middleware.ensureAuthenticated, async (req, res) => {
-      const MAX_DESC_LEN = 100;
-      let currentUserID = req.session.passport.user;
-      let currentUserObjectID = new ObjectId(req.session.passport.user);
+    findMatchesForUser = async (currUserId, active) => {
+      let currentUserObjectID = new ObjectId(currUserId);
+      let allUsers = await User.find();
       let myMatches = [];
 
-      let userMatches = await Match.find({
-        $or: [
-          { 'firstUser.userID': currentUserObjectID },
-          { 'secondUser.userID': currentUserObjectID }
-        ]
-      });
+      let userMatches = null;
+      if (active)
+        userMatches = await Match.findActiveByUserID(currentUserObjectID);
+      else
+        userMatches = await Match.findByUserID(currentUserObjectID);
+
+      if (!userMatches)
+        res.json({ error: (active ? errors.NO_PROPOSALS : errors.NO_MATCHES) });
 
       const allBookIDS = userMatches.map( match => match.firstUser.bookID ).concat( userMatches.map( match => match.secondUser.bookID ) );
-
-      // console.log(allBookIDS);
-
-      let allBooks = await Book.find(
-        {
-            "_id": {
-                "$in": 
-                  allBookIDS
-            }
-        }
-      );
-
-      let allUsers = await User.find();
+      const allBooks = await Book.findInIdArray(allBookIDS);
 
       for (let match of userMatches) {
-        
-        let owner = (match.firstUser.userID == currentUserID ? match.secondUser : match.firstUser);
-        let myself = (match.firstUser.userID == currentUserID ? match.firstUser : match.secondUser);
+        let owner = (match.firstUser.userID == currUserId ? match.secondUser : match.firstUser);
+        let myself = (match.firstUser.userID == currUserId ? match.firstUser : match.secondUser);
 
         let ownerInfo = allUsers.find( user => 
           user._id == owner.userID
@@ -167,51 +81,84 @@ module.exports = (app) => {
           book._id == myself.bookID
         );
 
-        let existingOwner = myMatches.find( match =>
-          match.ownerInfo._id == ownerInfo._id
-        );
-        if (existingOwner) {
-          // existingOwner already found and pushed - only check for proposal in progress prop
-          if (match.status === matchStatus.PROPOSED) {
-            existingOwner.proposalInProgress = true;
+        if (active) {
+          for (let msg of match.chat) {
+            let userInfo = allUsers.find( user => user._id == msg.sender );
+            msg.senderName = userInfo.username;
           }
-        } else {
-          myMatches.push( {
-            ownerInfo: ownerInfo,
-            myBooks: [],
-            hisBooks: [],
-            proposalInProgress: (match.status === matchStatus.PROPOSED)
-          });
-          existingOwner = myMatches[myMatches.length - 1];
         }
 
-        let findMyBook = existingOwner.myBooks.find( book =>
-          book._id == myBookInfo._id
-        );
-        if (!findMyBook) {
-          existingOwner.myBooks.push(
-            myBookInfo
-          );
-
-          if (match.status === matchStatus.PROPOSED) {
-            existingOwner.proposalInProgress = true
-          } 
+        if (active) {
+          myMatches.push(
+            {
+              proposalId: match._id,
+              status: match.status,
+              chat: match.chat, 
+              owner: ownerInfo.username,
+              proposedByMe: myself.proposed,
+              myBook: myBookInfo.title,
+              hisBook: hisBookInfo.title,
+              lastStatusDate: match.lastStatusDate
+            }
+          )
         }
 
-
-        let findHisBook = existingOwner.hisBooks.find( book =>
-          book._id == hisBookInfo._id
-        );
-        if (!findHisBook) {
-          existingOwner.hisBooks.push(
-            hisBookInfo
+        if (!active) {
+          let existingOwner = myMatches.find( match =>
+            match.ownerInfo._id == ownerInfo._id
           );
+
+          if (existingOwner) {
+            // existingOwner already found and pushed - only check for proposal in progress prop
+            if (match.status === matchStatus.PROPOSED) {
+              existingOwner.proposalInProgress = true;
+            }
+          } else {
+            myMatches.push( {
+              ownerInfo: ownerInfo,
+              myBooks: [],
+              hisBooks: [],
+              proposalInProgress: (match.status === matchStatus.PROPOSED)
+            });
+            existingOwner = myMatches[myMatches.length - 1];
+          }
+
+          let findMyBook = existingOwner.myBooks.find( book =>
+            book._id == myBookInfo._id
+          );
+          if (!findMyBook) {
+            existingOwner.myBooks.push(
+              myBookInfo
+            );
+
+            if (match.status === matchStatus.PROPOSED) {
+              existingOwner.proposalInProgress = true
+            } 
+          }
+
+          let findHisBook = existingOwner.hisBooks.find( book =>
+            book._id == hisBookInfo._id
+          );
+          if (!findHisBook) {
+            existingOwner.hisBooks.push(
+              hisBookInfo
+            );
+          }
         }
       }
 
-      res.json({
-        myMatches: myMatches
-      });
+      return myMatches;
+    }
+
+    app.get('/api/myProposals', middleware.ensureAuthenticated, middleware.getUser, async (req, res) => {
+      let myProposals = await findMatchesForUser(req.currentUser._id, true);
+      res.json({ myProposals });
+    });
+
+    app.get('/api/myMatches', middleware.ensureAuthenticated, middleware.getUser, async (req, res) => {
+      let myMatches = await findMatchesForUser(req.currentUser._id, false);
+      console.log(myMatches);
+      res.json({ myMatches });
     });
 
     app.post('/api/myProfile', middleware.ensureAuthenticated, async (req, res) => {
@@ -230,7 +177,6 @@ module.exports = (app) => {
         return;
       }
 
-      console.log(req.body);
       currUser.username = req.body.username;
       currUser.bio = req.body.bio;
       currUser.fullName = {
@@ -248,8 +194,6 @@ module.exports = (app) => {
 
     app.post('/api/mySettings', middleware.ensureAuthenticated, async (req, res) => {
       const currUser = await User.findById(req.session.passport.user);
-
-      console.log(req.body);
 
       currUser.settings = req.body.settings;
 

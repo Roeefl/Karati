@@ -66,4 +66,12 @@ const bookSchema = new Schema(
     }
 );
 
+bookSchema.statics.findInIdArray = function (idArray, cb) {
+    return this.find( {
+        "_id": {
+            "$in": idArray
+        }
+    }, cb);
+};
+
 mongoose.model('books', bookSchema);
