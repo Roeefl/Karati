@@ -1,21 +1,23 @@
-import './SearchResults.css';
-
 import React from 'react';
-
+import './SearchResults.css';
 import BookCard from '../books/BookCard/BookCard';
+import Spinner from '../shared/Spinner';
 
 class SearchResults extends React.Component {
     renderContent() {
         console.log(this.props);
 
         if (!this.props.ready) {
+            // return (
+            //     <div className="ui segment retrieving-books">
+            //         <div className="ui huge indeterminate text active loader">
+            //             Retrieving Books...
+            //         </div> 
+            //     </div>
+            // );
             return (
-                <div className="ui segment retrieving-books">
-                    <div className="ui huge indeterminate text active loader">
-                        Retrieving Books...
-                    </div> 
-                </div>
-            );
+                <Spinner message='Retrieving Search Results' />
+            )
         };
 
         const results = this.props.results.map( result => {
