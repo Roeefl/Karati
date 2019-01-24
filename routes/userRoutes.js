@@ -84,7 +84,7 @@ module.exports = (app) => {
         if (active) {
           for (let msg of match.chat) {
             let userInfo = allUsers.find( user => user._id == msg.sender );
-            msg.senderName = userInfo.username;
+            msg.senderName = await msg.senderName;
           }
         }
 
@@ -110,7 +110,7 @@ module.exports = (app) => {
 
           if (existingOwner) {
             // existingOwner already found and pushed - only check for proposal in progress prop
-            if (match.status === matchStatus.PROPOSED) {
+            if (match.status === matchStatus.PROPOSED || match.status === matchStatus.ACCEPTED) {
               existingOwner.proposalInProgress = true;
             }
           } else {
@@ -118,7 +118,7 @@ module.exports = (app) => {
               ownerInfo: ownerInfo,
               myBooks: [],
               hisBooks: [],
-              proposalInProgress: (match.status === matchStatus.PROPOSED)
+              proposalInProgress: (match.status === matchStatus.PROPOSED || match.status === matchStatus.ACCEPTED)
             });
             existingOwner = myMatches[myMatches.length - 1];
           }
@@ -131,7 +131,7 @@ module.exports = (app) => {
               myBookInfo
             );
 
-            if (match.status === matchStatus.PROPOSED) {
+            if ( match.status === matchStatus.PROPOSED || match.status === matchStatus.ACCEPTED ) {
               existingOwner.proposalInProgress = true
             } 
           }
