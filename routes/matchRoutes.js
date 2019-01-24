@@ -32,14 +32,9 @@ module.exports = (app) => {
             _id: new ObjectId(matchId)
         });
 
-        let findUser = await User.findOne({
-            _id: new ObjectId(senderId)
-        })
-
         if (findMatch) {
             const pushChatMsg = {
                 sender: senderId,
-                senderName: findUser.username || 'Error',
                 message: message,
                 whenSent: Date.now()
             };
