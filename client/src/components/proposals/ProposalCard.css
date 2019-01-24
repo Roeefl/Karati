@@ -1,3 +1,5 @@
 .proposal-card {
     cursor: pointer !important;
+    border-bottom: 1px solid rgb(179, 179, 179) !important;
+    padding: 10px;
 }

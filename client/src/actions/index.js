@@ -94,7 +94,7 @@ export const setCurrentComponent = (compInfo) => {
 export const selectBookFromDB = (bookID) => 
     async (dispatch) => { 
         try {
-            const res = await Axios.get('/api/books/' + bookID);
+            const res = await Axios.get(`/api/books/${bookID}`);
             console.log(res.data.book);
 
             dispatch( {
@@ -145,6 +145,25 @@ export const loadChat = (proposal) => {
         payload: proposal.chat || []
     }
 };
+
+export const refreshChat = (matchId) =>
+    async (dispatch) => { 
+        try {
+            const res = await Axios.get(`/api/match/chat/${matchId}`);
+
+            dispatch( {
+                type: UPDATE_CURRENT_CHAT,
+                payload: res.data.chat || null
+            });
+        } catch(error) {
+            console.log(`Failed to refreshChat with error ${error}`);
+
+            dispatch( {
+                type: UPDATE_CURRENT_CHAT,
+                payload: { error: error.response.data.error }
+            });
+        }
+    };
 
 export const fetchUser = () => 
     async (dispatch) => { 

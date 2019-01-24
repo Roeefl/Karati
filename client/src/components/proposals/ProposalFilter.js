@@ -9,10 +9,10 @@ class ProposalFilter extends React.Component {
         return (
             <div className="proposal-filter">
 
-                <h2 className="ui centered header">
-                    <i className="red envelope outline icon"></i>
+                <h4 className="ui header">
+                    <i className="orange filter tiny icon"></i>
                     Proposal Type
-                </h2>
+                </h4>
                 
                 <div className="ui raised segment">
                     <div className="ui blue button">

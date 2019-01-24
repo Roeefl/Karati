@@ -1,5 +1,6 @@
 import React from 'react';
 import './ProposalCard.css';
+import ProposalIcon from './ProposalIcon';
 import { Link } from 'react-router-dom';
 
 class ProposalCard extends React.Component {
@@ -53,22 +54,6 @@ class ProposalCard extends React.Component {
         );
     }
 
-    renderIcon() {
-        if (this.props.proposal.status === 4) {
-            return (
-                <React.Fragment>
-                    <i className="icon hourglass outline"/> Pending
-                </React.Fragment>
-            );
-        }
-
-        return (
-            <React.Fragment>
-                <i className="icon child"/> Approved
-            </React.Fragment>
-        );
-    }
-
     onCardClick = () => {
         this.props.onCardClick(this.props.proposal);
     }
@@ -101,7 +86,7 @@ class ProposalCard extends React.Component {
 
                 <div className="extra content">
                     <div className="center aligned author">
-                        {this.renderIcon()}
+                        <ProposalIcon status={this.props.proposal.status} />
                     </div>
                 </div>
             </div>
