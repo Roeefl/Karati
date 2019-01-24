@@ -1,0 +1,40 @@
+.proposals-grid {
+    border-right: 1px solid gray;
+    border-left: 1px solid gray;
+    height: 100vh;
+}
+
+.proposals-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    flex: 1 1 auto;
+    height: 100%;
+}
+
+.proposal-filters {
+    background-color: lightblue;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.proposal-cards {
+    display: flex;
+    flex-direction: column;
+    height: 0px;
+    overflow-y: scroll;
+    flex: 1 1 auto;
+    background: linear-gradient(90deg, rgb(219, 225, 232) 0%, rgb(234, 240, 244) 100%);
+    padding: 20px;
+}
+
+.proposal-filters .proposal-filter {
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+}
+
+.proposal-filters .proposal-filter .header {
+    color: black !important;
+}

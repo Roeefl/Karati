@@ -81,6 +81,7 @@ module.exports = (app) => {
             proposedByMe: myself.proposed,
             myBook: myBookInfo.title,
             hisBook: hisBookInfo.title,
+            hisBookImageURL: hisBookInfo.imageURL,
             lastStatusDate: proposal.lastStatusDate
           }
         )

@@ -25,6 +25,27 @@ module.exports = (app) => {
         res.send({});
     });
 
+    app.get('/api/match/chat/:matchId', middleware.ensureAuthenticated, middleware.getUser, async (req, res) => {
+        const { matchId } = req.params;
+
+        console.log(req.params);
+
+        let findMatch = await Match.findOne({
+            _id: new ObjectId(matchId)
+        });
+
+        // const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        // const formatDate = props.whenSent.toLocaleDateString("en-US", options);
+
+        if (findMatch) {           
+            res.json({
+                chat: findMatch.chat
+            });
+        } else {
+            res.status(500).json({ error: errors.MATCH_NOT_FOUND });
+        }
+    });
+
     app.post('/api/match/chat', middleware.ensureAuthenticated, middleware.getUser, async(req, res) => {
         const { matchId, senderId, message } = req.body;
 
@@ -48,11 +69,10 @@ module.exports = (app) => {
 
             const matchUpdated = await findMatch.save();
 
-            console.log(`${matchId}`);
-
-            // pusher.trigger(`${matchId}`, 'newChatMessage', {
-            //     msg: message
-            // });
+            // console.log(`channel name: ${matchId}`);
+            pusher.trigger(`${matchId}`, 'newChatMessage', {
+                msg: message
+            });
             
             res.json({
                 match: matchUpdated
@@ -63,8 +83,10 @@ module.exports = (app) => {
     });
 
     app.put('/api/match/accept', middleware.ensureAuthenticated, middleware.getUser, async(req, res) => {
+        const { matchId } = req.body;
+
         let findMatch = await Match.findOne({
-            _id: new ObjectId(req.body.matchId)
+            _id: new ObjectId(matchId)
         });
 
         if (findMatch) {
@@ -78,26 +100,27 @@ module.exports = (app) => {
             });
         } else {
             // Still not found - bizzare. should not happen.
-            console.log(`Super horrible error on /api/match/accept with matchId ${req.body.matchId}`);
+            console.log(`Super horrible error on /api/match/accept with matchId ${matchId}`);
             res.status(500).json({ error: errors.MATCH_NOT_FOUND });
         }
     });
 
     app.put('/api/match/propose', middleware.ensureAuthenticated, middleware.getUser, async (req, res) => {
+        const { firstUserId, secondUserId, firstBookId, secondBookId } = req.body;
         
         let findMatch = await Match.findOne({
-          "firstUser.userID": req.body.firstUserId,
-          "secondUser.userID": req.body.secondUserId,
-          "firstUser.bookID": req.body.firstBookId,
-          "secondUser.bookID": req.body.secondBookId
+          "firstUser.userID": firstUserId,
+          "secondUser.userID": secondUserId,
+          "firstUser.bookID": firstBookId,
+          "secondUser.bookID": secondBookId
         });
 
         if (!findMatch) {
             findMatch = await Match.findOne({
-                "firstUser.userID": req.body.secondUserId,
-                "secondUser.userID": req.body.firstUserId,
-                "firstUser.bookID": req.body.secondBookId,
-                "secondUser.bookID": req.body.firstBookId
+                "firstUser.userID": secondUserId,
+                "secondUser.userID": firstUserId,
+                "firstUser.bookID": secondBookId,
+                "secondUser.bookID": firstBookId
               });
         }
 
@@ -115,7 +138,7 @@ module.exports = (app) => {
 
         } else {
             // Still not found - bizzare. should not happen.
-            console.log(`Super horrible error on /api/match/propose with users ${req.body.firstUserId} and ${req.body.secondUserId}`);
+            console.log(`Super horrible error on /api/match/propose with users ${firstUserId} and ${secondUserId}`);
 
             res.status(500).json(
                 {

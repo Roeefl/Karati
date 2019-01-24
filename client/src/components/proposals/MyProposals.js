@@ -7,6 +7,7 @@ import Spinner from '../shared/Spinner';
 import ProposalCard from './ProposalCard';
 import ProposalFilter from './ProposalFilter';
 import ProposalChat from './ProposalChat';
+import './MyProposals.css';
 
 class MyProposals extends React.Component {
     state = {
@@ -66,17 +67,23 @@ class MyProposals extends React.Component {
         });
 
         return (
-            <div className="ui grid proposal-grid">
-                <div className="six wide column filter-col">
-                    <ProposalFilter />
-                    <ProposalFilter />
+            <div className="ui grid proposals-grid">
+                <div className="five wide column filter-col">
 
-                    <div className="proposal-cards">
-                        {proposalCards}
+                    <div className="proposals-container">
+                        <div className="proposal-filters">
+                            <ProposalFilter />
+                            <ProposalFilter />
+                        </div>
+
+                        <div className="proposal-cards">
+                            {proposalCards}
+                        </div>
                     </div>
+                    
                 </div>
                 
-                <div className="ten wide column chat-col">
+                <div className="eleven wide column chat-col">
                     <ProposalChat
                         proposal={this.state.selectedProposal}
                     />
