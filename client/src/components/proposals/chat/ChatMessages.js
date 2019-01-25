@@ -10,6 +10,8 @@ class ChatMessages extends React.Component {
         }
 
         const chatContent = this.props.chat.map( chatMsg => {
+            // console.log(chatMsg);
+            
             return (
                 <ChatMessage
                     key={chatMsg.whenSent}

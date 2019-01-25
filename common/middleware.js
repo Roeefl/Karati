@@ -95,5 +95,28 @@ module.exports = {
     
     user.notifications.reverse();
     return user;
+  },
+
+  createProposalObj: function(match, owner, proposedByMe, myBook, hisBook) {
+    return {
+      proposalId: match._id,
+      status: match.status,
+      chat: match.chat,
+      lastStatusDate: match.lastStatusDate,
+      owner,
+      proposedByMe,
+      myBook,
+      hisBook
+    };
+  },
+
+  convertMatchToProposal: async function(match, currUserId) {
+    const owner = (match.firstUser.userID == currUserId ? match.secondUser : match.firstUser);
+    const ownerInfo = await User.findById(owner.userID);
+    const myself = (match.firstUser.userID == currUserId ? match.firstUser : match.secondUser);
+    const myBookInfo = await Book.findById(owner.bookID);
+    const hisBookInfo = await Book.findById(myself.bookID);
+
+    return this.createProposalObj( match, ownerInfo.username, myself.proposed, myBookInfo.title, hisBookInfo.title );
   }
 };

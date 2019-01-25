@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { sendChatMessage, refreshChat, setCurrentComponent } from '../../actions';
+import { sendChatMessage, reloadProposal, setCurrentComponent } from '../../actions';
 import './ProposalChat.css';
 import ChatHeader from './chat/ChatHeader';
 import ChatMessages from './chat/ChatMessages';
@@ -8,7 +8,7 @@ import ChatNewMessage from './chat/ChatNewMessage';
 
 import Pusher from 'pusher-js';
 // Enable pusher logging - don't include this in production
-Pusher.logToConsole = true; 
+// Pusher.logToConsole = true; 
 
 const pusher = new Pusher('300a43dcc40b1a52fa00', {
     cluster: 'eu',
@@ -21,9 +21,9 @@ class ProposalChat extends React.Component {
             // console.log(`channel name: ${nextProps.proposal.proposalId}`);
             const channel = pusher.subscribe(`${nextProps.proposal.proposalId}`);
 
-            channel.bind('newChatMessage', (data) => {
-                console.log(`new msg from Pusher: ${data.msg}`);
-                nextProps.refreshChat(nextProps.proposal.proposalId);
+            channel.bind('newChatMsg', (data) => {
+                console.log(`new msg from Pusher: ${data.message}`);
+                nextProps.reloadProposal(nextProps.proposal.proposalId);
             });
         }
     }
@@ -52,7 +52,7 @@ class ProposalChat extends React.Component {
                     src={this.props.proposal.hisBookImageURL}
                 />
 
-                <ChatMessages chat={this.props.currentChat} />
+                <ChatMessages chat={this.props.proposal.chat} />
                 <ChatNewMessage sendMsg={this.sendMessage} />
             </div>
         )
@@ -70,11 +70,11 @@ class ProposalChat extends React.Component {
 function mapStateToProps(state) {
     return {
         currUserId: state.userData._id,
-        currentChat: state.currentChat
+        proposal: state.currentProposal
     }
 };
 
 export default connect(
     mapStateToProps,
-    { sendChatMessage, refreshChat, setCurrentComponent }
+    { sendChatMessage, reloadProposal, setCurrentComponent }
 )(ProposalChat);

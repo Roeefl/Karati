@@ -168,11 +168,7 @@ module.exports = (app) => {
     };
 
     for (let comment of foundBook.comments) {
-      let userInfo = await User.findOne(
-        {
-          _id: new ObjectId(comment.userID)
-        }
-      );
+      let userInfo = await User.findById( comment.userID );
 
       comment.username = (userInfo ? userInfo.username : 'User Not Found');
     }

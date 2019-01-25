@@ -11,7 +11,7 @@ class Notification extends React.Component {
         return (
             <div className={`item ${this.props.data.seen ? 'seen' : 'new'}`}>
                 <div className="ui tiny image">
-                    <img src={match64} />
+                    <img src={match64} alt='match-icon-64' />
                 </div>
                     <Link to={this.props.data.link} className="enforce-black">
                         <div className="content">

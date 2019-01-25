@@ -1,7 +1,7 @@
 .notifications {
     width: 30vw;
     max-height: 50vh;
-    overflow: hidden;
+    overflow-y: scroll;
 }
 
 .notifications .items .item {

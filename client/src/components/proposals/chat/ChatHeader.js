@@ -12,7 +12,7 @@ class ChatHeader extends React.Component {
                     <i className="user icon" /> {this.props.owner}
                 </div>
                 <div className="center aligned image">
-                    <img src={this.props.src} className="book-cover" />
+                    <img src={this.props.src} className="book-cover" alt={`this.props.owner-match-book-cover`} />
                 </div>
                 <div className="content">
                     <span className="right floated">

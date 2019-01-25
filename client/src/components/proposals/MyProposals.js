@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { fetchMyProposals, acceptProposal, loadChat, setCurrentComponent } from '../../actions';
+import { fetchMyProposals, acceptProposal, setCurrentProposal, setCurrentComponent } from '../../actions';
 import * as errors from '../shared/errors';
 import Message from '../shared/Message';
 import Spinner from '../shared/Spinner';
@@ -10,10 +10,6 @@ import ProposalChat from './ProposalChat';
 import './MyProposals.css';
 
 class MyProposals extends React.Component {
-    state = {
-        selectedProposal: null
-    };
-
     componentDidMount() {
         this.props.setCurrentComponent({
             primary: 'My Proposals',
@@ -29,8 +25,7 @@ class MyProposals extends React.Component {
     }
 
     onCardClick = (proposal) => {
-        this.setState({ selectedProposal: proposal });
-        this.props.loadChat(proposal);
+        this.props.setCurrentProposal(proposal);
     }
 
     renderContent() {
@@ -85,7 +80,7 @@ class MyProposals extends React.Component {
                 
                 <div className="eleven wide column chat-col">
                     <ProposalChat
-                        proposal={this.state.selectedProposal}
+                        proposal={this.props.currentProposa}
                     />
                 </div>
             </div>
@@ -104,11 +99,12 @@ class MyProposals extends React.Component {
 function mapStateToProps(state) {
     return {
         userData: state.userData, 
-        myProposals: state.myProposals
+        myProposals: state.myProposals,
+        currentProposal: state.currentProposal
     }
 };
 
 export default connect(
     mapStateToProps,
-    { fetchMyProposals, acceptProposal, loadChat, setCurrentComponent }
+    { fetchMyProposals, acceptProposal, setCurrentProposal, setCurrentComponent }
 )(MyProposals);

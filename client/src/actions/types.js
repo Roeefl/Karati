@@ -14,4 +14,4 @@ export const SET_CURRENT_COMP = 'set_current_component';
 export const PROPOSE_SWAP = 'propose_swap';
 export const ACCEPT_PROPOSAL = 'accept_proposal';
 export const SEND_CHAT_MSG = 'send_chat_messasge';
-export const UPDATE_CURRENT_CHAT = 'update_current_chat';
+export const UPDATE_CURRENT_PROPOSAL = 'update_current_proposal';

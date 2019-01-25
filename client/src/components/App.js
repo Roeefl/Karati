@@ -46,8 +46,7 @@ class App extends React.Component {
                         <main>
                             <Route exact path="/" component={ () => (
                                 (this.props.userData && !this.props.userData.error && !this.props.userData.passedIntro) ? (
-                                        // <Redirect to="/intro" />
-                                        <FrontPage />
+                                        <Redirect to="/intro" />
                                     ) : (
                                         <FrontPage />
                                     )

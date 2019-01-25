@@ -14,7 +14,7 @@ import { UPDATE_SEARCH_RESULTS,
     SET_CURRENT_COMP,
     MATCHES_USER_SELECTED,
     PROPOSE_SWAP,
-    UPDATE_CURRENT_CHAT
+    UPDATE_CURRENT_PROPOSAL
  } from './types';
 
 export const submitProfileForm = (formValues, history) =>
@@ -139,29 +139,56 @@ export const updateSearchResults = (searchResults) => {
     };
 };
 
-export const loadChat = (proposal) => {
+export const setCurrentProposal = (proposal) => {
     return {
-        type: UPDATE_CURRENT_CHAT,
-        payload: proposal.chat || []
+        type: UPDATE_CURRENT_PROPOSAL,
+        payload: proposal || null
     }
 };
 
-export const refreshChat = (matchId) =>
+export const reloadProposal = (proposalId) =>
     async (dispatch) => { 
         try {
-            const res = await Axios.get(`/api/match/chat/${matchId}`);
+            const res = await Axios.get(`/api/proposal/${proposalId}`);
 
             dispatch( {
-                type: UPDATE_CURRENT_CHAT,
-                payload: res.data.chat || null
+                type: UPDATE_CURRENT_PROPOSAL,
+                payload: res.data.proposal || null
             });
         } catch(error) {
             console.log(`Failed to refreshChat with error ${error}`);
 
             dispatch( {
-                type: UPDATE_CURRENT_CHAT,
+                type: UPDATE_CURRENT_PROPOSAL,
                 payload: { error: error.response.data.error }
             });
+        }
+    };
+
+export const sendChatMessage = (matchId, senderId, message) => 
+    async (dispatch) => {
+        try {
+            const chatData = {
+                matchId,
+                senderId,
+                message
+            };
+
+            const res = await Axios.post('/api/proposal/chat', chatData);
+
+            if (res.data.error) {
+                console.log('Failed: POST /api/proposal/chat');
+            }
+
+            // console.log('dispatching UPDATE_CURRENT_PROPOSAL with chat:');
+            // console.log(res.data.proposal);
+
+            dispatch({
+                type: UPDATE_CURRENT_PROPOSAL,
+                payload: res.data.proposal || null
+            });
+        } catch (error) {
+            console.log('POST /api/proposal/chat failed with error: ' + error);
         }
     };
 
@@ -418,30 +445,6 @@ export const acceptProposal = (matchId) =>
             dispatch({
                 type: UPDATE_MY_PROPOSALS,
                 payload: proposals.data.myProposals || []
-            });
-        } catch (error) {
-            console.log('/api/match/accept failed with error: ' + error);
-        }
-    };
-
-export const sendChatMessage = (matchId, senderId, message) => 
-    async (dispatch) => {
-        try {
-            const chatData = {
-                matchId,
-                senderId,
-                message
-            };
-
-            const res = await Axios.post('/api/match/chat', chatData);
-
-            if (res.data.error) {
-                console.log('Failed: POST /api/match/chat');
-            }
-
-            dispatch({
-                type: UPDATE_CURRENT_CHAT,
-                payload: res.data.match.chat || []
             });
         } catch (error) {
             console.log('/api/match/accept failed with error: ' + error);

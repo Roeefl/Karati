@@ -21,10 +21,7 @@ const chatMsg = new Schema (
 
 chatMsg.virtual('senderName')
     .get(async function () {
-        let findUser = await User.findOne({
-            _id: new mongoose.Types.ObjectId(this.sender)
-        });
-        
+        const findUser = await User.findById(this.sender);
         return findUser.username;
     });
 

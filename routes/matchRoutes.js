@@ -2,8 +2,6 @@ const mongoose = require('mongoose');
 const middleware = require('../common/middleware');
 const ObjectId = mongoose.Types.ObjectId;
 
-const User = mongoose.model('users');
-const Book = mongoose.model('books');
 const Match = mongoose.model('matches');
 
 const matchStatus = require('../config/matchStatus');
@@ -11,67 +9,58 @@ const errors = require('../config/errors');
 
 const Pusher = require('pusher');
 const pusher = new Pusher({
-  appId: '698267',
-  key: '300a43dcc40b1a52fa00',
-  secret: 'e433a406238958f921c2',
+  appId: process.env.PUSHER_APP_ID,
+  key: process.env.PUSHER_KEY,
+  secret: process.env.PUSHER_SECRET,
   cluster: 'eu',
   forceTLS: true
 });
 
 module.exports = (app) => {
 
-    app.post('/api/match/webhooks', middleware.ensureAuthenticated, async (req, res) => {
-        console.log(req.body);
-        res.send({});
-    });
+    // app.post('/api/match/webhooks', middleware.ensureAuthenticated, async (req, res) => {
+    //     res.send({});
+    // });
 
-    app.get('/api/match/chat/:matchId', middleware.ensureAuthenticated, middleware.getUser, async (req, res) => {
-        const { matchId } = req.params;
-
-        console.log(req.params);
-
-        let findMatch = await Match.findOne({
-            _id: new ObjectId(matchId)
-        });
-
-        // const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    app.get('/api/proposal/:proposalId', middleware.ensureAuthenticated, middleware.getUser, async (req, res) => {
+                // const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         // const formatDate = props.whenSent.toLocaleDateString("en-US", options);
 
-        if (findMatch) {           
-            res.json({
-                chat: findMatch.chat
-            });
+        const { proposalId } = req.params;
+        const proposal = await Match.findById( proposalId );
+
+        if (proposal) {
+            const proposalData = await middleware.convertMatchToProposal(proposal, req.currentUser._id);
+            res.json({ proposal: proposalData });
         } else {
             res.status(500).json({ error: errors.MATCH_NOT_FOUND });
         }
     });
 
-    app.post('/api/match/chat', middleware.ensureAuthenticated, middleware.getUser, async(req, res) => {
+    app.post('/api/proposal/chat', middleware.ensureAuthenticated, middleware.getUser, async(req, res) => {
         const { matchId, senderId, message } = req.body;
 
-        let findMatch = await Match.findOne({
-            _id: new ObjectId(matchId)
-        });
+        let proposal = await Match.findById( matchId );
 
-        if (findMatch) {
-            const pushChatMsg = {
+        if (proposal) {
+            const newChatMsg = {
                 sender: senderId,
                 message: message,
                 whenSent: Date.now()
             };
 
-            findMatch.chat.push(pushChatMsg);
+            proposal.chat.push(newChatMsg);
 
-            const matchUpdated = await findMatch.save();
+            await proposal.save();
 
-            // console.log(`channel name: ${matchId}`);
-            pusher.trigger(`${matchId}`, 'newChatMessage', {
-                msg: message
-            });
+            console.log(`channel name: ${matchId}`);
+            pusher.trigger(`${matchId}`, 'newChatMsg', { message });
             
-            res.json({
-                match: matchUpdated
-            });
+            const proposalData = await middleware.convertMatchToProposal(proposal, req.currentUser._id);
+            // console.log('proposalData:');
+            // console.log(proposalData);
+            
+            res.json({ proposal: proposalData });
         } else {
             res.status(500).json({ error: errors.MATCH_NOT_FOUND });
         }
