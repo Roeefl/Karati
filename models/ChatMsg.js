@@ -24,7 +24,7 @@ chatMsg.virtual('senderName')
         let findUser = await User.findOne({
             _id: new mongoose.Types.ObjectId(this.sender)
         });
-
+        
         return findUser.username;
     });
 

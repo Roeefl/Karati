@@ -85,6 +85,7 @@ module.exports = (app) => {
           for (let msg of match.chat) {
             let userInfo = allUsers.find( user => user._id == msg.sender );
             msg.senderName = await msg.senderName;
+            console.log(msg.senderName);
           }
         }
 
