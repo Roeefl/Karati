@@ -143,20 +143,23 @@ module.exports = (app) => {
       const currUser = await User.findById(req.currentUser._id);
       const { username, bio, first, last } = req.body;
 
-      const checkForExistingUsername = await User.findOne({ username });
+      if (username != currUser.username) {
+        // User is asking to change his username
+        const checkForExistingUsername = await User.findOne({ username });
 
-      if (checkForExistingUsername && checkForExistingUsername._id != currUser._id) {
-        res.json({
-          error: errors.USERNAME_TAKEN
-        });
-        return;
+        if (checkForExistingUsername) {
+          res.json({
+            error: errors.USERNAME_TAKEN
+          });
+          return;
+        }
       }
 
       currUser.username = username;
       currUser.bio = bio;
       currUser.fullName = {
-        first: first,
-        last: last
+        first,
+        last
       };
 
       await currUser.save();
