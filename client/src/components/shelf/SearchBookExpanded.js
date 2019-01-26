@@ -26,8 +26,8 @@ class SearchBookExpanded extends React.Component {
 }
 
 function mapStateToProps(state, ownProps) {
-    console.log(ownProps.match.params.bookId);
-    console.log(state);
+    // console.log(ownProps.match.params.bookId);
+    // console.log(state);
 
     return {
         goodreadsID: ownProps.match.params.bookId,

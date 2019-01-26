@@ -11,6 +11,7 @@ import SearchResults from '../search/SearchResults';
 
 import Message from '../shared/Message';
 
+const INTRO_SEARCH_LIMIT = 5;
 const DEFAULT_SEARCH_LIMIT = 10;
 
 class SearchBooks extends React.Component {
@@ -37,7 +38,7 @@ class SearchBooks extends React.Component {
 
             const res = await Axios.post('/api/books/search', {
                 query: term,
-                limit: this.props.limit || DEFAULT_SEARCH_LIMIT
+                limit: ( this.props.intro ? INTRO_SEARCH_LIMIT : DEFAULT_SEARCH_LIMIT )
             } );
 
             console.log(res);
@@ -50,9 +51,12 @@ class SearchBooks extends React.Component {
     }
 
     renderContent() {
-        console.log(this.props);
+        // console.log(this.props);
 
         if (!this.props.searchResults && this.state.ready) {
+            if (this.props.intro)
+                return;
+                
             return (
                 <Message 
                     color='violet'
@@ -76,6 +80,7 @@ class SearchBooks extends React.Component {
             <div>
                 <div className="search-container ui container">
                         <SearchResults
+                            intro={this.props.intro}
                             results={this.props.searchResults}
                             ready={ (this.state.ready) } />
                 </div>

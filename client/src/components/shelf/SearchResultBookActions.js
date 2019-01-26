@@ -10,7 +10,6 @@ import Message from '../shared/Message';
 
 import { updateMyShelf, fetchUser } from '../../actions';
 
-
 class SearchResultBookActions extends React.Component {
     state = {
         saved: false,
@@ -21,7 +20,7 @@ class SearchResultBookActions extends React.Component {
         try {
             this.setState({ saving: true } );
 
-            const res = await Axios.post('/api/myShelf', { goodreadsID: this.props.selectedBookFromSearch.goodreadsID } );
+            const res = await Axios.post('/api/myShelf', { goodreadsID: this.props.goodreadsID } );
             console.log(res);
 
             if (res.data.error) {
@@ -40,6 +39,9 @@ class SearchResultBookActions extends React.Component {
     }
 
     renderMyShelfLink() {
+        if (this.props.quickAdd)
+            return;
+
         return (
             <Link to="/myShelf" className="enforce-green">
                 <i className="icon list alternate outline" />
@@ -54,6 +56,9 @@ class SearchResultBookActions extends React.Component {
         }
 
         if (this.state.saved) {
+            if (this.props.quickAdd)
+                return;
+            
             return (
                 <div className="ui positive message">
                     <div className="header">
@@ -72,17 +77,26 @@ class SearchResultBookActions extends React.Component {
 
         if (    !this.props.userData.ownedBooks ||
                 !this.props.userData.ownedBooks.find(book =>
-                    book.goodreadsID == this.props.selectedBookFromSearch.goodreadsID 
+                    book.goodreadsID == this.props.goodreadsID 
                 )) {
+            const btnText = this.props.quickAdd ? '' : 'Add to My Shelf';
+            
             return (
-                <button
+                <div
                     className="add-to-my-shelf ui large button green"
                     onClick={this.addToMyShelf}>
                     <i className="icon add" />
-                    Add to My Shelf
-                </button>
+                        {btnText}
+                </div>
             );
         }
+
+        if (this.props.quickAdd)
+            return (
+                <div className="add-to-my-shelf ui large violet disabled button">
+                    <i className="check circle outline icon" />
+                </div>
+            )
 
         return (
             <Message 
@@ -106,10 +120,19 @@ class SearchResultBookActions extends React.Component {
     }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, ownProps) => {
+    if (ownProps.quickAddGoodreadsID) {
+        return {
+            quickAdd: true,
+            userData: state.userData,
+            goodreadsID: ownProps.quickAddGoodreadsID,
+        };
+    }
+    
     return {
+        quickAdd: false,
         userData: state.userData,
-        selectedBookFromSearch: state.selectedBookFromSearch
+        goodreadsID: state.selectedBookFromSearch.goodreadsID,
     };
 }
 

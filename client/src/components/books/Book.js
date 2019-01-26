@@ -94,7 +94,7 @@ class Book extends React.Component {
             return;
         }
 
-        console.log(this.props);
+        // console.log(this.props);
 
         let onShelf = this.props.userData.ownedBooks.find(book =>
             book.bookID == this.props.selectedBookFromDB._id

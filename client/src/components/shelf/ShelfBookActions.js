@@ -3,7 +3,6 @@ import React from 'react';
 import { Redirect } from 'react-router-dom';
 
 import Spinner from '../shared/Spinner';
-import Modal from './Modal';
 
 class ShelfBookActions extends React.Component {
     state = {

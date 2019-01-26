@@ -1,11 +1,21 @@
 import React from 'react';
+import SearchResultBookActions from '../shelf/SearchResultBookActions';
 import './SearchResults.css';
 import BookCard from '../books/BookCard/BookCard';
 import Spinner from '../shared/Spinner';
 
 class SearchResults extends React.Component {
+    renderQuickAdd(goodreadsID) {
+        if (!this.props.intro)
+            return;
+
+        return (
+            <SearchResultBookActions quickAddGoodreadsID={goodreadsID}/>
+        );
+    }
+
     renderContent() {
-        console.log(this.props);
+        // console.log(this.props);
 
         if (!this.props.ready) {
             // return (
@@ -21,8 +31,14 @@ class SearchResults extends React.Component {
         };
 
         const results = this.props.results.map( result => {
+            const linkTo = (this.props.intro ? '' : ('/myShelf/search/book/' + result.id._));
+
             return (
                 <div className="book-card-container column" key={result.id._}>
+                    {this.renderQuickAdd(result.id._)}
+
+                    <div className="ui divider"></div>
+
                     <BookCard
                         bookId={result.id._}
                         src={result.image_url}
@@ -30,7 +46,7 @@ class SearchResults extends React.Component {
                         title={result.title}
                         author={result.author.name}
                         numOfPages={null}
-                        linkTo={'/myShelf/search/book/' + result.id._} />
+                        linkTo={linkTo} />
                 </div>
             );
         });

@@ -202,5 +202,27 @@ module.exports = (app) => {
         currUser: middleware.reverseNotifications(currUser)
       });
     });
+
+    app.put('/api/user/:userId/notification/clear', middleware.ensureAuthenticated, middleware.getUser, async (req, res) => {
+      const currUser = await User.findById(req.currentUser._id);
+
+      if (!currUser.notifications) {
+        res.json({
+          currUser: middleware.reverseNotifications(currUser)
+        });
+        return;
+      }
+
+      for (let notif of currUser.notifications) {
+        notif.seen = true;
+      }
+
+      await currUser.save();
+      console.log(`Updated notification ${req.params.id} for user ${currUser.username}`);
+      
+      res.json({
+        currUser: middleware.reverseNotifications(currUser)
+      });
+    });
     
 };

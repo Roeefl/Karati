@@ -380,6 +380,29 @@ export const markNotificationAsSeen = (userId, notificationId) =>
         }
     };
 
+export const clearNotifications = (userId) =>
+    async (dispatch) => {
+        try {           
+            const res = await Axios.put(`/api/user/${userId}/notification/clear`);
+
+            if (res.data.error) {
+                console.log('Failed to save settings.');
+            }
+
+            dispatch( {
+                type: FETCH_USER,
+                payload: res.data.currUser || null
+            });
+        } catch(error) {
+            console.log('clearNotifications failed with error: ' + error);
+
+            dispatch( {
+                type: FETCH_USER,
+                payload: false
+            });
+        }
+    };
+
 export const proposeSwap = (firstUserId, secondUserId, firstBookId, secondBookId, reset = false) => 
     async (dispatch) => {
         if (reset) {
