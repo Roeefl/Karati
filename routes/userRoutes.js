@@ -141,17 +141,16 @@ module.exports = (app) => {
 
     app.post('/api/myProfile', middleware.ensureAuthenticated, middleware.getUser, async (req, res) => {
       const currUser = await User.findById(req.currentUser._id);
+      const { username, bio, first, last } = req.body;
 
-      const checkForExistingUsername = await User.findOne({ username: req.body.username });
+      const checkForExistingUsername = await User.findOne({ username });
 
-      if (checkForExistingUsername) {
+      if (checkForExistingUsername && checkForExistingUsername._id != currUser._id) {
         res.json({
           error: errors.USERNAME_TAKEN
         });
         return;
       }
-
-      const { username, bio, first, last } = req.body;
 
       currUser.username = username;
       currUser.bio = bio;
