@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema; 
 
 const ownedBookSchema = require('./OwnedBook');
+const wishSchema = require('./Wish');
 const swipeSchema = require('./Swipe');
 const notificationSchema = require('./Notification');
 
@@ -44,6 +45,11 @@ const userSchema = new Schema (
         ownedBooks: {
             type: [ownedBookSchema],
             required: false
+        },
+        wishlist: {
+            type: [wishSchema],
+            required: false,
+            default: []
         },
         swipes: {
             type: [swipeSchema],

@@ -1,23 +1,19 @@
 import './MyShelf.css';
-
 import React from 'react';
-
 import { connect } from 'react-redux';
 import { updateMyShelf, fetchUser, setCurrentComponent } from '../../actions';
-
 import BookCard from '../books/BookCard/BookCard';
-
 import { Link } from 'react-router-dom';
-
 import Message from '../shared/Message';
 import Spinner from '../shared/Spinner';
+import * as iconNames from '../../config/iconNames';
 
 class MyShelf extends React.Component   {
     componentDidMount() {
         this.props.setCurrentComponent({
             primary: 'Your Book Shelf',
             secondary: 'View and update the books that you offer for swap',
-            icon: 'zip'
+            icon: iconNames.MY_SHELF
         });
 
         this.props.updateMyShelf();
@@ -93,14 +89,14 @@ class MyShelf extends React.Component   {
                         <div className="middle aligned row">
                             <div className="column">
                                 <div className="ui icon header">
-                                    <i className="book icon"></i>
+                                    <i className={`${iconNames.BOOK} icon`} />
                                     Have more books you wanna add?
                                 </div>
                                 <div className="field">
                                     <div className="ui search">
                                         <Link to="/myShelf/search" className="search item">
                                             <div className="ui labeled button green icon">
-                                                <i className="search icon"></i>Search
+                                                <i className={`${iconNames.SEARCH} icon`} /> Search
                                             </div>
                                         </Link>
                                         <div className="results"></div>
@@ -109,11 +105,11 @@ class MyShelf extends React.Component   {
                             </div>
                             <div className="column">
                                 <div className="ui icon header">
-                                    <i className="plus icon"></i>
+                                    <i className={`${iconNames.ADD} icon`} />
                                     Add a book to our database
                                 </div>
                                 <div className="ui labeled blue icon button disabled">
-                                <i className="plus icon"></i>Create custom book
+                                <i className={`${iconNames.ADD} icon`} /> Create custom book
                                 </div>
                             </div>
                         </div>

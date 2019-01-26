@@ -164,7 +164,6 @@ module.exports = (app) => {
 
       await currUser.save();
       console.log(`Updated user info for user ${currUser.username}`);
-
       res.json({
         currUser: middleware.reverseNotifications(currUser)
       });

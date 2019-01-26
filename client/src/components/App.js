@@ -16,6 +16,9 @@ import SearchBooks from './shelf/SearchBooks';
 import SearchBookExpanded from './shelf/SearchBookExpanded';
 
 import MyProfile from './profile/MyProfile';
+
+import MyWishlist from './wishlist/MyWishlist';
+
 import MySettings from './profile/MySettings';
 import MySwipes from './swipes/MySwipes';
 import MyProposals from './proposals/MyProposals';
@@ -71,6 +74,7 @@ class App extends React.Component {
 
                                 <Route path="/mySwipes" component={MySwipes} />
                                 <Route path="/myProposals" component={MyProposals} />
+                                <Route path="/myWishlist" component={MyWishlist} />
 
                                 {/* <Route path="/books/edit" component={BookEdit} /> */}
 

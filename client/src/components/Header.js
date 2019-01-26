@@ -9,6 +9,7 @@ import Auth from './Auth';
 import HeaderMenu from './HeaderMenu';
 
 import icon64 from '../icons/64.png';
+import * as iconNames from '../config/iconNames';
 
 class Header extends React.Component {  
     renderExplore() {
@@ -20,12 +21,12 @@ class Header extends React.Component {
             {
                 to: '/books/browse',
                 text: 'Browse Books',
-                icon: 'delicious'
+                icon: iconNames.BROWSE
             },
             {
                 to: '/books/swipe',
                 text: 'Swipe',
-                icon: 'nintendo switch'
+                icon: iconNames.SWIPE
             }
         ];
 
@@ -43,22 +44,27 @@ class Header extends React.Component {
             {
                 to: '/myShelf',
                 text: 'My Shelf',
-                icon: 'zip'
+                icon: iconNames.MY_SHELF
+            },
+            {
+                to: '/myWishlist',
+                text: 'My Wishlist',
+                icon: iconNames.WISHLIST
             },
             {
                 to: '/myProposals',
                 text: 'My Proposals',
-                icon: 'handshake outline'
+                icon: iconNames.MY_PROPOSALS
             },
             {
                 to: '/myMatches',
                 text: 'My Matches',
-                icon: 'options'
+                icon: iconNames.MY_MATCHES
             },
             {
                 to: '/mySwipes',
                 text: 'My Swipes',
-                icon: 'thumbs up outline'
+                icon: iconNames.MY_SWIPES
             }
         ];
 

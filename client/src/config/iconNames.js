@@ -1,0 +1,10 @@
+export const MY_SHELF = 'zip';
+export const WISHLIST = 'hand peace outline';
+export const MY_PROPOSALS = 'handshake outline';
+export const MY_MATCHES = 'options';
+export const MY_SWIPES = 'thumbs up outline';
+export const BROWSE = 'delicious';
+export const SWIPE = 'nintendo switch';
+export const BOOK = 'book';
+export const SEARCH = 'search';
+export const ADD = 'plus';

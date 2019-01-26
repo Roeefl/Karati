@@ -12,6 +12,7 @@ import ShelfBookActions from '../shelf/ShelfBookActions';
 import BookActions from './BookActions';
 
 import Message from '../shared/Message';
+import * as iconNames from '../../config/iconNames';
 
 class Book extends React.Component {
     state = {
@@ -121,7 +122,7 @@ class Book extends React.Component {
                             ]} />
                         <Link to="/books/browse">
                             <div className="ui large violet button">
-                                <i className="icon delicious" />
+                                <i className={`${iconNames.BROWSE} icon`} />
                                 Back to Browsing
                             </div>
                         </Link>  
