@@ -3,7 +3,7 @@ module.exports = ( match, matchUserIdLink ) => {
         <html>
             <body>
                 <div style="text-align: center;">
-                    <h3>You have a new match in Karati app.</h3>
+                    <h3>You have new matches in Karati app.</h3>
                     <div>Open the app to view the book you matched with.</div>
                     <div>Matched on: ${match.dateMatched}</div>
                     <div>

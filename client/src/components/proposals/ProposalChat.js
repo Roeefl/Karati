@@ -16,20 +16,26 @@ const pusher = new Pusher('300a43dcc40b1a52fa00', {
 });
 
 class ProposalChat extends React.Component {
-    componentWillReceiveProps(nextProps) {
-        if (nextProps.proposal) {
-            // console.log(`channel name: ${nextProps.proposal.proposalId}`);
-            const channel = pusher.subscribe(`${nextProps.proposal.proposalId}`);
-
-            channel.bind('newChatMsg', (data) => {
-                console.log(`new msg from Pusher: ${data.message}`);
-                nextProps.reloadProposal(nextProps.proposal.proposalId);
-            });
-        }
-    }
+    constructor(props) {
+        super(props);
+        this.channel = null;
+     }
 
     sendMessage = (message) => {
         this.props.sendChatMessage(this.props.proposal.proposalId, this.props.currUserId, message);
+    }
+
+    connectToPusher = () => {
+        if (this.channel)
+            return;
+
+        // console.log(`channel name: ${nextProps.proposal.proposalId}`);
+        this.channel = pusher.subscribe(`${this.props.proposal.proposalId}`);
+
+        this.channel.bind('newChatMsg', (data) => {
+            console.log(`new msg from Pusher: ${data.message}`);
+            this.props.reloadProposal(this.props.proposal.proposalId);
+        });
     }
 
     renderChat() {
@@ -40,6 +46,8 @@ class ProposalChat extends React.Component {
                 </div>
             );
         }
+
+        this.connectToPusher();
 
         return (
             <div className="proposal-chat">

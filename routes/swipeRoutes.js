@@ -68,7 +68,7 @@ checkForMatch = (currentUser, owner, swipedBookID) => {
 addNotificationToUser = (user, matchWith) => {
     return new Promise((resolve, reject) => {
         let notification = {
-            content: `You have a new match with ${matchWith.username}`,
+            content: `You have new matches with ${matchWith.username}`,
             dateCreated: Date.now(),
             seen: false,
             link: `/myMatches/${matchWith._id}`

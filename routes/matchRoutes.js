@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const middleware = require('../common/middleware');
-const ObjectId = mongoose.Types.ObjectId;
 
 const Match = mongoose.model('matches');
 
@@ -23,7 +22,7 @@ module.exports = (app) => {
     // });
 
     app.get('/api/proposal/:proposalId', middleware.ensureAuthenticated, middleware.getUser, async (req, res) => {
-                // const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        // const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         // const formatDate = props.whenSent.toLocaleDateString("en-US", options);
 
         const { proposalId } = req.params;
@@ -69,9 +68,7 @@ module.exports = (app) => {
     app.put('/api/match/accept', middleware.ensureAuthenticated, middleware.getUser, async(req, res) => {
         const { matchId } = req.body;
 
-        let findMatch = await Match.findOne({
-            _id: new ObjectId(matchId)
-        });
+        let findMatch = await Match.findById(matchId);
 
         if (findMatch) {
             findMatch.status = matchStatus.ACCEPTED;
@@ -91,44 +88,20 @@ module.exports = (app) => {
 
     app.put('/api/match/propose', middleware.ensureAuthenticated, middleware.getUser, async (req, res) => {
         const { firstUserId, secondUserId, firstBookId, secondBookId } = req.body;
-        
-        let findMatch = await Match.findOne({
-          "firstUser.userID": firstUserId,
-          "secondUser.userID": secondUserId,
-          "firstUser.bookID": firstBookId,
-          "secondUser.bookID": secondBookId
-        });
 
-        if (!findMatch) {
-            findMatch = await Match.findOne({
-                "firstUser.userID": secondUserId,
-                "secondUser.userID": firstUserId,
-                "firstUser.bookID": secondBookId,
-                "secondUser.bookID": firstBookId
-              });
-        }
+        const findMatch = await Match.findMatchOfEitherUser({ firstUserId, secondUserId, firstBookId, secondBookId });
 
         if (findMatch) {
-
             findMatch.status = matchStatus.PROPOSED;
             findMatch.lastStatusDate = Date.now();
             findMatch.firstUser.proposed = true;
 
-            const matchUpdated = await findMatch.save();
-                        // Found wanted match
-            res.json({
-                match: matchUpdated
-            });
-
+            const match = await findMatch.save();
+            res.json({ match });
         } else {
             // Still not found - bizzare. should not happen.
             console.log(`Super horrible error on /api/match/propose with users ${firstUserId} and ${secondUserId}`);
-
-            res.status(500).json(
-                {
-                    error: errors.MATCH_NOT_FOUND
-                }
-            );
+            res.status(500).json({ error: errors.MATCH_NOT_FOUND });
         }
     });
 

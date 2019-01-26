@@ -83,4 +83,27 @@ matchSchema.statics.findActiveByUserID = function(userID, cb) {
     }, cb);
 };
 
+matchSchema.statics.findMatchOfEitherUser = function({ firstUserId, secondUserId, firstBookId, secondBookId }, cb) {
+    return this.findOne({
+        $or: [
+            {
+                $and: [
+                    { 'firstUser.userID': firstUserId },
+                    { 'firstUser.bookID': firstBookId },
+                    { 'secondUser.userID': secondUserId },
+                    { 'secondUser.bookID': secondBookId }
+                ]
+            },
+            {
+                $and: [
+                    { 'firstUser.userID': secondUserId },
+                    { 'firstUser.bookID': secondBookId },
+                    { 'secondUser.userID': firstUserId },
+                    { 'secondUser.bookID': firstBookId }
+                ]
+            }
+        ]
+    }, cb);
+};
+
 mongoose.model("matches", matchSchema);

@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 const User = mongoose.model("users");
 const Book = mongoose.model('books');
-const ObjectId = mongoose.Types.ObjectId;
 
 const errors = require("../config/errors");
 
@@ -24,9 +23,7 @@ module.exports = {
 
   getUser: async function(req, res, next) {
     if (req && req.session && req.session.passport && req.session.passport.user) {
-      req.currentUser = await User.findOne( 
-        { _id: new ObjectId(req.session.passport.user) } 
-      );
+      req.currentUser = await User.findById( req.session.passport.user );
 
       return next();
     }
@@ -36,10 +33,8 @@ module.exports = {
   },
 
   ensureUserOwnsBook: async function(req, res, next) {
-    User.findOne(
-      {
-        _id: new ObjectId(req.session.passport.user)
-      },
+    User.findById(
+        _req.session.passport.user,
       function(err, currentUser) {
         if (err || !currentUser) {
           console.log('SUPER ERROR');
@@ -97,11 +92,28 @@ module.exports = {
     return user;
   },
 
-  createProposalObj: function(match, owner, proposedByMe, myBook, hisBook) {
+  createProposalObj: async function(match, owner, proposedByMe, myBook, hisBook) {
+    let chatWithUsernames = [];
+    
+    for (let msg of match.chat) {
+      const fetchSenderName = await msg.senderName;
+      
+      let cloneMsg = {
+        sender: msg.sender,
+        message: msg.message,
+        whenSent: msg.whenSent,
+        senderName: fetchSenderName
+      }
+
+      chatWithUsernames.push(cloneMsg);
+    }
+
+    // console.log(chatWithUsernames);
+
     return {
       proposalId: match._id,
       status: match.status,
-      chat: match.chat,
+      chat: chatWithUsernames,
       lastStatusDate: match.lastStatusDate,
       owner,
       proposedByMe,
@@ -117,6 +129,20 @@ module.exports = {
     const myBookInfo = await Book.findById(owner.bookID);
     const hisBookInfo = await Book.findById(myself.bookID);
 
-    return this.createProposalObj( match, ownerInfo.username, myself.proposed, myBookInfo.title, hisBookInfo.title );
+    const proposal = await this.createProposalObj( match, ownerInfo.username, myself.proposed, myBookInfo.title, hisBookInfo.title );
+    return proposal;
+  },
+
+  /**
+   * Shuffles array in place. ES6 version
+   * @param {Array} a items An array containing the items.
+   */
+  shuffleArray: function(a) {
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    
+    return a;
   }
 };

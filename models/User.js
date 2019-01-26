@@ -65,4 +65,10 @@ const userSchema = new Schema (
     }
 );
 
+userSchema.statics.fetchRandom = async function (cb) {
+    const userCount = await this.count();
+    const rndSkip = Math.floor(Math.random() * userCount);
+    return this.findOne().skip(rndSkip).exec(cb);
+};
+
 mongoose.model('users', userSchema);

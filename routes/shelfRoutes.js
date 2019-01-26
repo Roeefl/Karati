@@ -1,10 +1,7 @@
 const mongoose = require("mongoose");
 const errors = require("../config/errors");
 const middleware = require("../common/middleware");
-
-const User = mongoose.model("users");
 const Book = mongoose.model("books");
-const Match = mongoose.model("matches");
 
 const GoodReadsAPI = require('goodreads-api-node');
 const Goodreads_Credentials = {
@@ -15,10 +12,7 @@ const goodreads = GoodReadsAPI(Goodreads_Credentials);
 
 getBookFromMongoByGoodreadsID = goodreadsID => {
     return new Promise((resolve, reject) => {
-        Book.findOne(
-            {
-                goodreadsID: goodreadsID
-            },
+        Book.findOne({ goodreadsID },
             function (err, existingBook) {
                 if (err) {
                     reject(err);
@@ -52,15 +46,13 @@ addOwnedBookByUser = (currentUser, bookID, goodreadsID) => {
         }
 
         if (isBookOwnedByUser) {
-            console.log(
-                `BookID ${bookID} is already linked to UserID ${currentUser._id}`
-            );
+            console.log(`BookID ${bookID} is already linked to UserID ${currentUser._id}`);
             resolve(false);
             return;
         } else {
-            let newOwnedBook = {
-                bookID: bookID,
-                goodreadsID: goodreadsID,
+            const newOwnedBook = {
+                bookID,
+                goodreadsID,
                 dateAdded: Date.now()
             };
 
@@ -85,37 +77,27 @@ addOwnedBookByUser = (currentUser, bookID, goodreadsID) => {
 
 module.exports = app => {
 
-    
     // List all books on myShelf
     app.get("/api/myShelf", middleware.ensureAuthenticated, middleware.getUser, async (req, res) => {
-        let allBooks = await Book.find(
-            {
-                "_id": {
-                    "$in": 
-                        req.currentUser.ownedBooks.map( book => book.bookID )
-                }
-            }
-        );
+        const allBooks = await Book.findInIdArray( req.currentUser.ownedBooks.map( book => book.bookID ) );
 
-        let myShelf = req.currentUser.ownedBooks.map(myBook => {
+        const myShelf = req.currentUser.ownedBooks.map(myBook => {
             return allBooks.find(book =>
                 book._id == myBook.bookID
             );
         });
 
-        res.json({
-            myShelf: myShelf
-        });
+        res.json({ myShelf });
     });
 
-    // Get one particular book on myShelf
-    app.get("/api/myShelf/:id", middleware.ensureAuthenticated, middleware.getUser, (req, res) => {
-        res.json({
-            book: allBooks.find(book =>
-                book._id == req.params.id
-            )
-        });
-    });
+    // // Get one particular book on myShelf
+    // app.get("/api/myShelf/:id", middleware.ensureAuthenticated, middleware.getUser, (req, res) => {
+    //     res.json({
+    //         book: allBooks.find(book =>
+    //             book._id == req.params.id
+    //         )
+    //     });
+    // });
 
     // Update availability for a book on myShelf
     app.put("/api/myShelf/:id", middleware.ensureAuthenticated, middleware.getUser, (req, res) => {
@@ -132,9 +114,7 @@ module.exports = app => {
                 return;
             }
             
-            res.json({
-                updated: true
-            });
+            res.json({ updated: true });
         });
     });
 
@@ -150,9 +130,7 @@ module.exports = app => {
                 return;
             }
             
-            res.json({
-                removed: true
-            });
+            res.json({ removed: true });
         });
     });
 
@@ -162,71 +140,63 @@ module.exports = app => {
      */
     // Add a book to myShelf
     app.post("/api/myShelf", middleware.ensureAuthenticated, middleware.getUser, async (req, res) => {
-        let existingBook = await getBookFromMongoByGoodreadsID(
-            req.body.goodreadsID
-        );
+        const { goodreadsID } = req.body;
 
-        console.log(existingBook);
+        let existingBook = await getBookFromMongoByGoodreadsID(goodreadsID);
 
-        let bookID;
-        if (!existingBook) {
-            console.log("Adding book to MongoDB /books: " + req.body.goodreadsID);
+        // console.log(existingBook);
 
-            const result = await goodreads.showBook(req.body.goodreadsID);
+        let bookID = null;
+        if (existingBook) {
+            bookID = existingBook._id;
+
+            console.log(`updating timeStamp for book ${bookID}`);
+            existingBook.lastMarkedAsOwned = Date.now();
+
+            await existingBook.save();
+        } else {
+            console.log("Adding book to MongoDB /books: " + goodreadsID);
+
+            const result = await goodreads.showBook(goodreadsID);
 
             let newBook = middleware.parseBookDataObjFromGoodreads(
-                req.body.goodreadsID,
+                goodreadsID,
                 result
             );
             const saved = await newBook.save();
 
             bookID = saved._id;
             console.log("Book added succesfully to MongoDB /books: " + bookID);
-        } else {
-            bookID = existingBook._id;
-
-            console.log("updating timeStamp for book: " + bookID);
-            existingBook.lastMarkedAsOwned = Date.now();
-            await existingBook.save();
         }
 
-        let saved = await addOwnedBookByUser(
+        let bookAddedToMyShelf = await addOwnedBookByUser(
             req.currentUser,
             bookID,
-            req.body.goodreadsID
+            goodreadsID
         );
 
-        res.json(
-            {
-                bookAddedToMyShelf: saved
-            }
-        );
+        res.json({ bookAddedToMyShelf });
     });
 
-    app.post('/api/myShelf/search/book/:id', async (req, res) => {
-        console.log(req.params.id);
-    
-        const result = await goodreads.showBook(req.params.id);
-    
-        // console.log(result.book);
-        // console.log(result.book.popular_shelves.shelf);
-    
-        if (!result) {
-          console.log('ERROR on retrieving book ' + req.params.id + ' from Goodreads');
-          res.json(
-              {
-                'error': errors.NO_GOODREADS_RESULT
-              }
-          );
-          return false;
+    app.post('/api/myShelf/search/book/:id', async (req, res) => { 
+        const { id } = req.params;
+
+        try {
+            const result = await goodreads.showBook(id);
+
+            // console.log(result.book);
+            // console.log(result.book.popular_shelves.shelf);
+
+            if (!result) {
+                console.log(`ERROR on retrieving book ${id} from Goodreads`);
+                res.json({ 'error': errors.NO_GOODREADS_RESULT });
+                return false;
+            }
+
+            let book = middleware.parseBookDataObjFromGoodreads(id, result);
+            res.json({ book });
+        } catch (e) {
+            res.status(500).json({ error: errors.NO_GOODREADS_RESULT });
         }
-    
-        let bookData = middleware.parseBookDataObjFromGoodreads(req.params.id, result);
-        // console.log(bookData);
-        res.json(
-          {
-            book: bookData
-          }
-        );
       });
 };
