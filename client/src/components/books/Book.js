@@ -95,9 +95,7 @@ class Book extends React.Component {
             return;
         }
 
-        // console.log(this.props);
-
-        let onShelf = this.props.userData.ownedBooks.find(book =>
+        const onShelf = this.props.userData.ownedBooks.find(book =>
             book.bookID == this.props.selectedBookFromDB._id
         );
 
@@ -138,6 +136,14 @@ class Book extends React.Component {
         }
     }
 
+    renderAllReviews() {
+        // if (this.props.showReviews) {
+            return (
+                <BookReviews book={this.props.selectedBookFromDB} />
+            );
+        // }
+    }
+
     render() {
         return (
             <div className="book-container ui container">
@@ -145,9 +151,9 @@ class Book extends React.Component {
 
                 {this.renderReview()}
                 
-                <BookContent book={this.props.selectedBookFromDB} />
+                <BookContent book={this.props.selectedBookFromDB} showReviews={false} />
 
-                <BookReviews book={this.props.selectedBookFromDB} />
+                {this.renderAllReviews()}
             </div>
         );
     }

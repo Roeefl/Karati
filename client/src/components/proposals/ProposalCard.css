@@ -1,5 +1,6 @@
-.proposal-card {
-    cursor: pointer !important;
-    border-bottom: 1px solid rgb(179, 179, 179) !important;
+/* Semantic-UI Card extended to a ProposalCard */
+.ui.card.proposal-card {
+    cursor: pointer;
+    border-bottom: 1px solid rgb(179, 179, 179);
     padding: 10px;
 }

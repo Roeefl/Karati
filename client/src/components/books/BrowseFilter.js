@@ -65,7 +65,7 @@ class BrowseFilter extends React.Component {
                 <div className="ui eight wide column">
 
                     <h2 className="ui centered header">
-                        <i className="red envelope outline icon"></i>
+                        <i className="red filter icon"/>
                         Filter Results
                     </h2>
                     
