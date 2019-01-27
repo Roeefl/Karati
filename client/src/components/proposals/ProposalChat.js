@@ -6,15 +6,6 @@ import ChatHeader from './chat/ChatHeader';
 import ChatMessages from './chat/ChatMessages';
 import ChatNewMessage from './chat/ChatNewMessage';
 
-import Pusher from 'pusher-js';
-// Enable pusher logging - don't include this in production
-// Pusher.logToConsole = true; 
-
-const pusher = new Pusher('300a43dcc40b1a52fa00', {
-    cluster: 'eu',
-    forceTLS: true
-});
-
 class ProposalChat extends React.Component {
     constructor(props) {
         super(props);
@@ -29,8 +20,11 @@ class ProposalChat extends React.Component {
         if (this.channel)
             return;
 
+        if (!this.props.pusher)
+            return;
+
         // console.log(`channel name: ${nextProps.proposal.proposalId}`);
-        this.channel = pusher.subscribe(`${this.props.proposal.proposalId}`);
+        this.channel = this.props.pusher.subscribe(`${this.props.proposal.proposalId}`);
 
         this.channel.bind('newChatMsg', (data) => {
             console.log(`new msg from Pusher: ${data.message}`);
@@ -77,6 +71,7 @@ class ProposalChat extends React.Component {
 
 function mapStateToProps(state) {
     return {
+        pusher: state.pusher,
         currUserId: state.userData._id,
         proposal: state.currentProposal
     }

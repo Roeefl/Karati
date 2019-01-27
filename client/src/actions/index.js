@@ -14,8 +14,16 @@ import { UPDATE_SEARCH_RESULTS,
     SET_CURRENT_COMP,
     MATCHES_USER_SELECTED,
     PROPOSE_SWAP,
-    UPDATE_CURRENT_PROPOSAL
+    UPDATE_CURRENT_PROPOSAL,
+    SETUP_PUSHER
  } from './types';
+
+export const setupPusher = () => {
+    return {
+        type: SETUP_PUSHER,
+        payload: true
+    }
+}
 
 export const submitProfileForm = (formValues, history) =>
     async (dispatch) => { 

@@ -18,3 +18,10 @@ main {
 .front-page + .route-container {
     display: none;
 }
+
+.enforce-green {
+    color: green !important;
+}
+.enforce-black {
+    color: black !important;
+}

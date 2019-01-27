@@ -15,3 +15,4 @@ export const PROPOSE_SWAP = 'propose_swap';
 export const ACCEPT_PROPOSAL = 'accept_proposal';
 export const SEND_CHAT_MSG = 'send_chat_messasge';
 export const UPDATE_CURRENT_PROPOSAL = 'update_current_proposal';
+export const SETUP_PUSHER = 'setup_pusher';

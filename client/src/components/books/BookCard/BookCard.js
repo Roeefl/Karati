@@ -10,6 +10,12 @@ import { Link } from 'react-router-dom';
  * @extends {React.Component}
  */
 class BookCard extends React.Component {
+    selectBook = () => {
+        if (this.props.selectBook) {
+            this.props.selectBook(this.props.bookId, this.props.myBook || null);
+        }
+    }
+
     renderNumOfPages() {
         if (this.props.numOfPages) {
             return  (
@@ -19,41 +25,63 @@ class BookCard extends React.Component {
                 </span>
             );
         }
-
-        return;
     }
 
-    selectBook = () => {
-        if (this.props.selectBook) {
-            this.props.selectBook(this.props.bookId, this.props.myBook || null);
-        }
-    }
-
-    renderCard() {
-        return (
-            <div 
-                className={`book-card ui card ${this.props.cardColor || ''}`}
-                onClick={this.selectBook}>
-                <div className="ui image">
-                    <img
-                        src={this.props.src}
-                        alt={this.props.desc} />
-                </div>
-                <div className={`content book-card-title-author ${this.props.pickedClass}`}>
-                    <div className="header">{this.props.title}</div>
-                    <div className="meta">
-                        {this.props.author}
-                    </div>
-                    <div className="description">
-                        <div dangerouslySetInnerHTML={{ __html: this.props.desc }} />
-                    </div>
-                </div>
+    renderExtraContent() {
+        if (this.props.ranking) {
+            return (
                 <div className="extra content">
                     <span className="right floated">
                         {this.props.ranking}
                     </span>
                     {this.renderNumOfPages()}
                 </div>
+            );
+        }
+    }
+
+    renderMeta() {
+        if (this.props.author) {
+            return (
+                <div className="meta">
+                    {this.props.author}
+                </div>
+            );
+        }
+    }
+
+    renderDesc() {
+        if (this.props.desc) {
+            return (
+                <div className="description">
+                    <div dangerouslySetInnerHTML={{ __html: this.props.desc }} />
+                </div>
+            );
+        }
+    }
+
+    renderCard() {
+        const withDesc = (this.props.desc ? 'with-desc' : '');
+
+        return (
+            <div 
+                className={`book-card ui card ${withDesc} ${this.props.cardColor || ''}`}
+                onClick={this.selectBook}>
+                <div className="ui centered image">
+                    <img
+                        src={this.props.src}
+                        alt={this.props.desc} />
+                </div>
+                <div className={`content book-card-data ${this.props.pickedClass}`}>
+
+                    <div className="header">
+                        {this.props.title}
+                    </div>
+
+                    {this.renderMeta()}
+                    {this.renderDesc()}
+                </div>
+                {this.renderExtraContent()}
             </div>
         );
     }

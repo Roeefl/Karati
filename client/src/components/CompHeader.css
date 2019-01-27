@@ -1,9 +1,9 @@
-.comp-header {
+.ui.header.comp-header {
     min-height: 10vh;
-    padding: 2vh !important;
+    padding: 4vh;
     background: rgba(139, 175, 200, 0.73);
 }
 
-.comp-header .content {
+.ui.header.comp-header .content {
     font-size: 130%;
 }

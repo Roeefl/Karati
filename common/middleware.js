@@ -92,7 +92,7 @@ module.exports = {
     return user;
   },
 
-  createProposalObj: async function(match, owner, proposedByMe, myBook, hisBook) {
+  createProposalObj: async function(match, owner, proposedByMe, myBook, hisBook, hisBookImageURL) {
     let chatWithUsernames = [];
     
     for (let msg of match.chat) {
@@ -118,7 +118,8 @@ module.exports = {
       owner,
       proposedByMe,
       myBook,
-      hisBook
+      hisBook,
+      hisBookImageURL
     };
   },
 
@@ -129,7 +130,7 @@ module.exports = {
     const myBookInfo = await Book.findById(owner.bookID);
     const hisBookInfo = await Book.findById(myself.bookID);
 
-    const proposal = await this.createProposalObj( match, ownerInfo.username, myself.proposed, myBookInfo.title, hisBookInfo.title );
+    const proposal = await this.createProposalObj( match, ownerInfo.username, myself.proposed, myBookInfo.title, hisBookInfo.title, hisBookInfo.imageURL );
     return proposal;
   },
 

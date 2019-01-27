@@ -6,16 +6,7 @@ const Match = mongoose.model('matches');
 const matchStatus = require('../config/matchStatus');
 const errors = require('../config/errors');
 
-const Pusher = require('pusher');
-const pusher = new Pusher({
-  appId: process.env.PUSHER_APP_ID,
-  key: process.env.PUSHER_KEY,
-  secret: process.env.PUSHER_SECRET,
-  cluster: 'eu',
-  forceTLS: true
-});
-
-module.exports = (app) => {
+module.exports = (app, pusher) => {
 
     // app.post('/api/match/webhooks', middleware.ensureAuthenticated, async (req, res) => {
     //     res.send({});

@@ -26,7 +26,6 @@ class SwipeContainer extends React.Component {
                         <BookCard
                             bookId={book.bookID}
                             src={book.imageURL}
-                            desc={trimmedDesc}
                             title={book.title}
                             author={book.author}
                             numOfPages={book.numOfPages}

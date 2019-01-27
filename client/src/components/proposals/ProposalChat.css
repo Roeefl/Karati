@@ -14,9 +14,9 @@
     padding: 20px;
 }
 
-.proposal-chat .chat-header .book-cover {
-    height: 64px !important;
-    width: 64px !important;
+.proposal-chat .chat-header .image img {
+    height: 64px;
+    width: 64px;
 }
 
 .proposal-chat .chat-messages {

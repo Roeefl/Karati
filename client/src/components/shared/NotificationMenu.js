@@ -1,13 +1,37 @@
 import React from 'react';
 
 import { connect } from 'react-redux';
-import { markNotificationAsSeen, clearNotifications } from '../../actions';
+import { fetchUser, markNotificationAsSeen, clearNotifications } from '../../actions';
 
 import Notification from './Notification';
 
 import './NotificationMenu.css';
 
 class NotificationMenu extends React.Component {
+    constructor(props) {
+        super(props);
+        this.channel = null;
+     }
+
+    connectToPusher = () => {
+        if (this.channel)
+            return;
+
+        if (!this.props.pusher)
+            return;
+
+        if (!this.props.userData)
+            return;
+
+        console.log(`channel name: ${this.props.userData._id}`);
+        this.channel = this.props.pusher.subscribe(`${this.props.userData._id}`);
+
+        this.channel.bind('newNotification', (data) => {
+            console.log(`new msg from Pusher: ${data.content}`);
+            this.props.fetchUser();
+        });
+    }
+
     markNotificationAsSeen = (userId, notificationId) => {
         this.props.markNotificationAsSeen(userId, notificationId);
     }
@@ -32,6 +56,8 @@ class NotificationMenu extends React.Component {
     }
 
     render() {
+        this.connectToPusher();
+        
         const notifications = this.props.userData.notifications.filter( notif => !notif.seen).map( notif => {
             return (   
                 <Notification key={notif._id} data={notif} userId={this.props.userData._id} markNotificationAsSeen={this.markNotificationAsSeen}/>
@@ -59,11 +85,12 @@ class NotificationMenu extends React.Component {
 
 function mapStateToProps(state) {
     return {
+        pusher: state.pusher,
         userData: state.userData
     }
 };
 
 export default connect(
     mapStateToProps,
-    { markNotificationAsSeen, clearNotifications}
+    { fetchUser, markNotificationAsSeen, clearNotifications}
 )(NotificationMenu);

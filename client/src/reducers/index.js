@@ -17,9 +17,11 @@ import { matchesWithUserReducer } from './matchesWithUser';
 import { currentComponentReducer } from './currentComponent';
 import { swapJustProposedReducer } from './swapJustProposed';
 import { currentProposalReducer } from './currentProposalReducer';
+import { pusherReducer } from './pusherReducer';
 
 export default combineReducers(
     {
+        pusher: pusherReducer,
         form: reduxForm,
         userData: userDataReducer,
         searchResults: bookSearchReducer,

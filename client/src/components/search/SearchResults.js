@@ -1,6 +1,5 @@
 import React from 'react';
 import SearchResultBookActions from '../shelf/SearchResultBookActions';
-import './SearchResults.css';
 import BookCard from '../books/BookCard/BookCard';
 import Spinner from '../shared/Spinner';
 

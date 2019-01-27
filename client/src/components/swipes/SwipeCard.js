@@ -14,7 +14,6 @@ class SwipeCard extends React.Component {
             <Link to={linkTo} className="swipe-card item">
                     <div className="ui image">
                         <img
-                            className="swipe-img"
                             src={this.props.swipe.book.imageURL}
                             alt={this.props.swipe.book.desc} />
                     </div>

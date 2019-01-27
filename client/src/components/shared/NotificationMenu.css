@@ -9,8 +9,8 @@
     padding: 10px;
 }
 
-.notifications .items .item .tiny {
-    width: 64px !important;
+.notifications .items .ui.image.tiny {
+    width: 64px;
 }
 
 .notifications .items .item .content {

@@ -10,6 +10,8 @@ const Mailer = require('../services/Mailer');
 const matchStatus = require('../config/matchStatus');
 const newMatchTemplate = require('../services/emailTemplates/newMatch');
 
+let appPusher = null;
+
 /**
  * Check for ANY book match between two users
  * @param {*} currentUser 
@@ -67,7 +69,7 @@ checkForMatch = (currentUser, owner, swipedBookID) => {
 
 addNotificationToUser = (user, matchWith) => {
     return new Promise((resolve, reject) => {
-        let notification = {
+        const notification = {
             content: `You have new matches with ${matchWith.username}`,
             dateCreated: Date.now(),
             seen: false,
@@ -75,6 +77,9 @@ addNotificationToUser = (user, matchWith) => {
         };
 
         user.notifications.push(notification);
+
+        console.log(`channel name: ${user._id}`);
+        appPusher.trigger(`${user._id}`, 'newNotification', { notification });
 
         user.save(function (err, saved) {
             if (err) {
@@ -150,7 +155,9 @@ addLikeToBook = (bookID) => {
     });
 };
 
-module.exports = (app) => {
+module.exports = (app, pusher) => {
+
+    appPusher = pusher;
 
     app.put('/api/swipe/liked', middleware.ensureAuthenticated, async (req, res) => {
         const { myUserID, ownerID, bookID } = req.body;

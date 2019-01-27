@@ -37,6 +37,7 @@ class App extends React.Component {
     componentDidMount() {
         console.log('fetchUser');
         this.props.fetchUser();
+        this.props.setupPusher();
     }
 
     render() {

@@ -39,8 +39,8 @@ module.exports = (app) => {
       res.json({ mySwipeHistory });
     });
 
-    pushProposal = async (proposals, proposal, owner, proposedByMe, myBook, hisBook) => {
-      const proposalObj = await middleware.createProposalObj(proposal, owner, proposedByMe, myBook, hisBook);
+    pushProposal = async (proposals, proposal, owner, proposedByMe, myBook, hisBook, hisBookImageURL) => {
+      const proposalObj = await middleware.createProposalObj(proposal, owner, proposedByMe, myBook, hisBook, hisBookImageURL);
       proposals.push(proposalObj);
     };
 
@@ -120,7 +120,7 @@ module.exports = (app) => {
         );
 
         if (activeProposalsOnly) {
-          await pushProposal(myMatches, match, ownerInfo.username, myself.proposed, myBookInfo.title, hisBookInfo.title);
+          await pushProposal(myMatches, match, ownerInfo.username, myself.proposed, myBookInfo.title, hisBookInfo.title, hisBookInfo.imageURL);
         } else {
           pushToMatchesObj(myMatches, match, ownerInfo, myBookInfo, hisBookInfo);
         }

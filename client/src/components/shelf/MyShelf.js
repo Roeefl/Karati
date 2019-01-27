@@ -63,7 +63,7 @@ class MyShelf extends React.Component   {
             let trimmedDesc = book.description.substring(0, 200);
 
             return (
-                <div className="book-card-container three wide column" key={book._id}>
+                <div className="book-card-container four wide column" key={book._id}>
                     <BookCard
                         bookId={book._id}
                         src={book.imageURL}

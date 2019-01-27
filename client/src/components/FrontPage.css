@@ -1,32 +1,29 @@
-.first-gradient {
+.ui.stripe.first-gradient {
     height: 100vh;
     width: 100%;
-    box-shadow: rgba(35, 4, 35, 0.1) 0px 3.7px 23.53px !important;
-    background: linear-gradient(135deg, rgb(230, 230, 230) 45%, rgba(30, 30, 30, 0.7) 0%, rgb(73, 118, 150) 100%) !important;
+    box-shadow: rgba(35, 4, 35, 0.1) 0px 3.7px 23.53px;
+    background: linear-gradient(135deg, rgb(230, 230, 230) 45%, rgba(30, 30, 30, 0.7) 0%, rgb(73, 118, 150) 100%);
     padding-top: 60px;
 }
 
-.text-white {
-    color: rgb(230, 230, 230) !important;
-}
-
-.text-black {
-    color: rgb(30, 30, 30);
-}
-
-.bg-black {
-    background-color: rgb(30, 30, 30);
-}
-
-.bg-white {
-    background-color: rgb(230, 230, 230);
-}
-
-.books-feed {
+.ui.stripe.books-feed {
     padding: 50px;
     min-height: 30vh;
 }
+.ui.stripe.books-feed .header {
+    padding-bottom: 30px;
+}
 
-.books-feed .header {
-    padding-bottom: 30px !important;
+.ui.stripe.bg-black {
+    background-color: rgb(30, 30, 30);
+}
+.ui.header.text-white {
+    color: rgb(230, 230, 230);
+}
+
+.ui.stripe.bg-white {
+    background-color: rgb(230, 230, 230);
+}
+.ui.header.text-black {
+    color: rgb(30, 30, 30);
 }

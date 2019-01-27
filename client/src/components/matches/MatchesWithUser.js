@@ -79,7 +79,7 @@ class MatchesWithUser extends React.Component {
                 <BookCard
                     bookId={book._id}
                     src={book.imageURL}
-                    author={book.title}
+                    title={book.title}
                     myBook={myBook}
                     pickedClass={currentlyPicked ? 'swap-picked' : ''}
                     selectBook={this.selectBook} />
@@ -128,7 +128,7 @@ class MatchesWithUser extends React.Component {
                     <i className="icon green book"/>
                     {this.props.matchesWithUser.ownerInfo.username}'s books that you marked as interested in:
                 </h2>
-                <div className="ui link cards six column grid">
+                <div className="ui link cards four column grid">
                     {hisBooks}
                 </div>
 
@@ -138,7 +138,7 @@ class MatchesWithUser extends React.Component {
                     <i className="icon green book"/>
                     Your books that {this.props.matchesWithUser.ownerInfo.username} is interested in:
                 </h2>
-                <div className="ui link cards six column grid">
+                <div className="ui link cards four column grid">
                     {myBooks}
                 </div>
             </div>

@@ -5,6 +5,8 @@ const cookieParser = require('cookie-parser');
 const expressSession = require('express-session');
 const MongoStore = require('connect-mongo')(expressSession);
 
+const Pusher = require('pusher');
+
 const mongoose = require('mongoose');
 require('./models/User');
 require('./models/Book');
@@ -65,12 +67,20 @@ app.use(
 const passportService = require('./services/passport');
 passportService(app);
 
+const pusher = new Pusher({
+  appId: process.env.PUSHER_APP_ID,
+  key: process.env.PUSHER_KEY,
+  secret: process.env.PUSHER_SECRET,
+  cluster: 'eu',
+  forceTLS: true
+});
+
 require('./routes/authRoutes')(app);
 require('./routes/bookRoutes')(app);
 require('./routes/userRoutes')(app);
 require('./routes/shelfRoutes')(app);
-require('./routes/swipeRoutes')(app);
-require('./routes/matchRoutes')(app);
+require('./routes/swipeRoutes')(app, pusher);
+require('./routes/matchRoutes')(app, pusher);
 
 if (process.env.NODE_ENV === 'production') {
   // Express will serve production assets like our main.js file, main.css file etc

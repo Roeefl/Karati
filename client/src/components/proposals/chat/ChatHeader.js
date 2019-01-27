@@ -11,8 +11,8 @@ class ChatHeader extends React.Component {
                     </div>
                     <i className="user icon" /> {this.props.owner}
                 </div>
-                <div className="center aligned image">
-                    <img src={this.props.src} className="book-cover" alt={`this.props.owner-match-book-cover`} />
+                <div className="ui centered image">
+                    <img src={this.props.src} alt={`${this.props.owner}-match-book-cover`} />
                 </div>
                 <div className="content">
                     <span className="right floated">
