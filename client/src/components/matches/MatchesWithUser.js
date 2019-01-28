@@ -37,15 +37,15 @@ class MatchesWithUser extends React.Component {
         if (myBook) {
             this.setState(
                 {
-                    myPickedBook: this.props.matchesWithUser.myBooks.find( book => book._id == bookId )
+                    myPickedBook: this.props.matchesWithUser.myBooks.find( book => book._id === bookId )
                 }
-            )
+            );
         } else {
             this.setState(
                 {
-                    hisPickedBook: this.props.matchesWithUser.hisBooks.find( book => book._id == bookId )
+                    hisPickedBook: this.props.matchesWithUser.hisBooks.find( book => book._id === bookId )
                 }
-            )
+            );
         }
     }
 
@@ -70,8 +70,8 @@ class MatchesWithUser extends React.Component {
     renderBookCard = (book, myBook) => {
         // if this book is the one picked from either myBooks or hisBooks - mark it as so so it can be colored
         let currentlyPicked = ( 
-            (myBook && this.state.myPickedBook && this.state.myPickedBook._id == book._id) ||
-            (!myBook && this.state.hisPickedBook && this.state.hisPickedBook._id == book._id)  
+            (myBook && this.state.myPickedBook && this.state.myPickedBook._id === book._id) ||
+            (!myBook && this.state.hisPickedBook && this.state.hisPickedBook._id === book._id)  
         );
 
         return (
@@ -118,14 +118,14 @@ class MatchesWithUser extends React.Component {
                 <div className="ui divider"></div>
                 
                 <h2 className="ui centered header red">
-                    <i className="icon green user"/>
+                    <i className={`${iconNames.USER} icon green`}/>
                     Here are your swap options with {this.props.matchesWithUser.ownerInfo.username}
                 </h2>
 
                 <div className="ui divider"></div>
                 
                 <h2 className="ui centered header red">
-                    <i className="icon green book"/>
+                    <i className={`${iconNames.BOOK} icon green`}/>
                     {this.props.matchesWithUser.ownerInfo.username}'s books that you marked as interested in:
                 </h2>
                 <div className="ui link cards four column grid">
@@ -135,7 +135,7 @@ class MatchesWithUser extends React.Component {
                 <div className="ui divider"></div>
 
                 <h2 className="ui centered header red">
-                    <i className="icon green book"/>
+                    <i className={`${iconNames.BOOK} icon green`}/>
                     Your books that {this.props.matchesWithUser.ownerInfo.username} is interested in:
                 </h2>
                 <div className="ui link cards four column grid">

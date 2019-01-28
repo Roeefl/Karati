@@ -67,6 +67,18 @@ const userSchema = new Schema (
         settings: {
             type: Object,
             required: false
+        },
+        location: {
+            lat: {
+                type: Number,
+                required: false,
+                default: 32.82206
+            },
+            lng: {
+                type: Number,
+                required: false,
+                default: 35.00032
+            }
         }
     }
 );

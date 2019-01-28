@@ -1,6 +1,7 @@
 import Axios from 'axios';
 import React from 'react';
 import Message from '../shared/Message';
+import * as iconNames from '../../config/iconNames';
 
 class BookReviewByCurrentUser extends React.Component {
     state = {
@@ -74,7 +75,7 @@ class BookReviewByCurrentUser extends React.Component {
                         <button 
                             className="ui green right labeled icon button"
                             onClick={this.postReview} >
-                            <i className="send icon"></i>
+                            <i className={`${iconNames.SEND} icon`} />
                             Done
                         </button>
                 </div>  

@@ -18,13 +18,15 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@google/maps": "^0.5.5",
     "@sendgrid/mail": "^6.3.1",
+    "axios": "^0.18.0",
     "body-parser": "^1.18.3",
     "bulma": "^0.7.2",
     "concurrently": "^4.1.0",
     "connect-ensure-login": "^0.1.1",
     "connect-mongo": "^2.0.3",
-    "connect-mongodb-session": "^2.0.6",
+    "connect-mongodb-session": "^2.0.7",
     "cookie-parser": "^1.4.3",
     "cookie-session": "^2.0.0-beta.3",
     "dotenv": "^6.1.0",
@@ -32,9 +34,9 @@
     "event-stream": "^3.3.4",
     "express": "^4.16.4",
     "express-session": "^1.15.6",
-    "goodreads-api-node": "0.0.9",
-    "mongodb": "^3.1.9",
-    "mongoose": "^5.3.13",
+    "goodreads-api-node": "0.0.10",
+    "mongodb": "^3.1.13",
+    "mongoose": "^5.4.7",
     "morgan": "^1.9.1",
     "nodemailer": "^4.7.0",
     "passport": "^0.4.0",
@@ -45,16 +47,16 @@
     "pusher": "^2.2.0",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
-    "react-scripts": "2.1.1",
     "redux-form": "^8.0.4",
     "request": "^2.88.0",
     "sendgrid": "^5.2.3",
     "socket.io": "^2.2.0",
-    "sse": "0.0.8"
+    "sse": "0.0.8",
+    "webpack-dev-server": "^3.1.9"
   },
   "devDependencies": {
     "jest": "^23.6.0",
     "nodemon": "^1.18.6",
-    "react-scripts": "^2.1.1"
+    "react-scripts": "^2.1.3"
   }
 }

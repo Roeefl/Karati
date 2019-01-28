@@ -69,12 +69,15 @@ class MyProfile extends React.Component {
                                 </div>
                             </div>
                             <div className="extra content">
-                                <i className="user icon"></i>
+                                <i className="user icon"/>
                                 {currentUser.ownedBooks.length || 0} Books on Shelf
                             </div>
                             <div className="extra content">
-                                <i className="calendar check outline icon"></i>
+                                <i className="calendar check outline icon"/>
                                 Joined in {currentUser.joinedAt}
+                            </div>
+                            <div className="extra content">
+                                <i className="thumbtack icon"/> My Location: {currentUser.location.lat}, {currentUser.location.lng}
                             </div>
                         </div>
                     </div>

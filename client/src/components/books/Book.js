@@ -35,7 +35,7 @@ class Book extends React.Component {
 
     componentWillUnmount() {
         // SAFETY
-        if (this.props.selectedBookFromBrowse && this.props.selectedBookFromBrowse.bookID == this.props.selectedBookFromDB._id) { 
+        if (this.props.selectedBookFromBrowse && this.props.selectedBookFromBrowse.bookID === this.props.selectedBookFromDB._id) { 
             this.props.selectBookFromBrowsing(null); // reset selected book from swiping in case it's set to something
         }
     }
@@ -96,7 +96,7 @@ class Book extends React.Component {
         }
 
         const onShelf = this.props.userData.ownedBooks.find(book =>
-            book.bookID == this.props.selectedBookFromDB._id
+            book.bookID === this.props.selectedBookFromDB._id
         );
 
         if (onShelf) {
@@ -109,7 +109,7 @@ class Book extends React.Component {
             return;
         }
 
-        if (this.props.selectedBookFromBrowse.bookID == this.props.selectedBookFromDB._id) {
+        if (this.props.selectedBookFromBrowse.bookID === this.props.selectedBookFromDB._id) {
             if (this.state.swiped) {
                 return (
                     <div className="ui container">

@@ -4,13 +4,6 @@ const middleware = require('../common/middleware');
 
 const genreList = require('../common/genres');
 
-const GoodReadsAPI = require('goodreads-api-node');
-const Goodreads_Credentials = {
-  key: process.env.GOODREADS_KEY,
-  secret: process.env.GOODREADS_SECRET
-};
-const goodreads = GoodReadsAPI(Goodreads_Credentials);
-
 const User = mongoose.model('users');
 const Book = mongoose.model('books');
 // const Match = mongoose.model('matches');
@@ -45,7 +38,7 @@ addCommentToBook = (book, userID, comment) => {
   });
 };
 
-module.exports = (app) => {
+module.exports = (app, goodreads) => {
 
   app.get('/api/genres', async (req, res) => {
     res.json({ genres: genreList.list });
@@ -148,7 +141,7 @@ module.exports = (app) => {
 
   // Get one particular book that a user can swipe on
   app.get('/api/books/:id', async (req, res) => {
-    console.log(req.params.id);
+    // console.log(req.params.id);
 
     const foundBook = await Book.findById(req.params.id);
 

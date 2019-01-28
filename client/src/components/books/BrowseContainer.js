@@ -15,8 +15,10 @@ class BrowseContainer extends React.Component {
 
     selectBook = (bookId) => {
         let currBook = this.props.books.find( book => 
-            book.bookID == bookId
+            book.bookID === bookId
         );
+
+        console.log(currBook);
 
         if (!currBook) {
             return;
@@ -37,7 +39,7 @@ class BrowseContainer extends React.Component {
         const books = this.props.books.map( book => {
             // console.log(book);
 
-            let trimmedDesc = book.desc.substring(0, 200);
+            // let trimmedDesc = book.desc.substring(0, 200);
 
             let isHidden = (this.state.filter ? 'hidden' : 'shown');
             if (this.state.filter) {
@@ -46,8 +48,9 @@ class BrowseContainer extends React.Component {
                 }
             }
 
+            // console.log(`key: ${book.ownerID}_${book.bookID}`);
             return (
-                <div className={`book-card-container four wide column ${isHidden}`} key={book.bookID}>
+                <div className={`book-card-container four wide column ${isHidden}`} key={`${book.ownerID}_${book.bookID}`}>
                     <BookCard
                         bookId={book.bookID}
                         src={book.imageURL}

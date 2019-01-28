@@ -64,6 +64,13 @@ app.use(
   cookieParser()
 );
 
+const GR_API_NODE = require('goodreads-api-node');
+const GR_CREDENTIALS = {
+  key: process.env.GOODREADS_KEY,
+  secret: process.env.GOODREADS_SECRET
+};
+const goodreads = GR_API_NODE(GR_CREDENTIALS);
+
 const passportService = require('./services/passport');
 passportService(app);
 
@@ -76,9 +83,9 @@ const pusher = new Pusher({
 });
 
 require('./routes/authRoutes')(app);
-require('./routes/bookRoutes')(app);
+require('./routes/bookRoutes')(app, goodreads);
 require('./routes/userRoutes')(app);
-require('./routes/shelfRoutes')(app);
+require('./routes/shelfRoutes')(app, goodreads);
 require('./routes/swipeRoutes')(app, pusher);
 require('./routes/matchRoutes')(app, pusher);
 

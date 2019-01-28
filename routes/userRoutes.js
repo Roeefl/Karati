@@ -1,3 +1,5 @@
+const Axios = require('axios');
+
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
 const middleware = require('../common/middleware');
@@ -9,11 +11,30 @@ const Match = mongoose.model('matches');
 const matchStatus = require('../config/matchStatus');
 const errors = require('../config/errors');
 
+// const googleMapsClient = require('@google/maps').createClient({
+//   key: 'AIzaSyCShyhesDrKhi3cEdLxQmjJOn2hNy'
+// });
+
 module.exports = (app) => {
   
     app.get('/api/myProfile', middleware.ensureAuthenticated, middleware.getUser, async (req, res) => {
       const currUser = await User.findById(req.currentUser._id);
-      res.json( middleware.reverseNotifications(currUser) );
+      res.json( { currUser: middleware.reverseNotifications(currUser) } );
+    });
+
+    app.put('/api/myLocation', middleware.ensureAuthenticated, middleware.getUser, async (req, res) => {
+      const { lat, lng } = req.body;
+
+      const currUser = await User.findById(req.currentUser._id);
+
+      currUser.location = {
+        lat,
+        lng
+      };
+
+      await currUser.save();
+
+      res.json( { currUser: middleware.reverseNotifications(currUser) } );
     });
 
     app.get('/api/mySwipeHistory', middleware.ensureAuthenticated, middleware.getUser, async (req, res) => {

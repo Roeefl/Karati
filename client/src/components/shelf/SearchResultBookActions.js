@@ -10,6 +10,8 @@ import Message from '../shared/Message';
 
 import { updateMyShelf, fetchUser } from '../../actions';
 
+import * as iconNames from '../../config/iconNames';
+
 class SearchResultBookActions extends React.Component {
     state = {
         saved: false,
@@ -44,7 +46,7 @@ class SearchResultBookActions extends React.Component {
 
         return (
             <Link to="/myShelf" className="enforce-green">
-                <i className="icon list alternate outline" />
+                <i className={`${iconNames.MY_SHELF} icon`} />
                 My Shelf
             </Link>
         );
@@ -77,7 +79,7 @@ class SearchResultBookActions extends React.Component {
 
         if (    !this.props.userData.ownedBooks ||
                 !this.props.userData.ownedBooks.find(book =>
-                    book.goodreadsID == this.props.goodreadsID 
+                    book.goodreadsID === this.props.goodreadsID 
                 )) {
             const btnText = this.props.quickAdd ? '' : 'Add to My Shelf';
             
@@ -85,7 +87,7 @@ class SearchResultBookActions extends React.Component {
                 <div
                     className="add-to-my-shelf ui large button green"
                     onClick={this.addToMyShelf}>
-                    <i className="icon add" />
+                    <i className={`${iconNames.ADD} icon`} />
                         {btnText}
                 </div>
             );
@@ -94,7 +96,7 @@ class SearchResultBookActions extends React.Component {
         if (this.props.quickAdd)
             return (
                 <div className="add-to-my-shelf ui large violet disabled button">
-                    <i className="check circle outline icon" />
+                    <i className={`${iconNames.QUICK_ADD} icon`} />
                 </div>
             )
 

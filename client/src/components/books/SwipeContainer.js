@@ -11,7 +11,7 @@ class SwipeContainer extends React.Component {
     
     render() {
         let book = this.props.books[0];
-        let trimmedDesc = book.desc.substring(0, 140);
+        // let trimmedDesc = book.desc.substring(0, 140);
 
         return (
             <div className="ui container">

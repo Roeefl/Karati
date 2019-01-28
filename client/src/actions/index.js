@@ -200,6 +200,63 @@ export const sendChatMessage = (matchId, senderId, message) =>
         }
     };
 
+      
+
+
+function getGeolocation(options) {
+    return new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, options);
+    });
+}
+
+export const setupUserGeolocation = () =>
+    async (dispatch) => {
+        try {
+            const options = {
+                enableHighAccuracy: true,
+                timeout: 5000,
+                maximumAge: 0
+            };
+
+            const { coords } = await getGeolocation(options);
+            console.log(coords);
+
+            const { latitude, longitude } = coords;
+
+            const locData = {
+                lat: latitude,
+                lng: longitude
+            };
+            
+            const res = await Axios.put('/api/myLocation', locData);
+
+            // const res = await Axios.get('/api/location', {
+            //     params: {
+            //         latitude,
+            //         longitude
+            //     }
+            // });
+
+            if (res.data.error) {
+                console.log('Failed: GET /api/location');
+            }
+
+            dispatch({
+                type: FETCH_USER,
+                payload: res.data.currUser || null
+            });
+        } catch (error) {
+            console.log('setupUserGeolocation failed with error: ' + error);
+        }
+    };
+    
+    // (position => getPlaces(position.coords))
+    //     .then(places => getWeather(places[0]))
+    //     .catch(err => {
+    //     alert(`Can't get your position [code=${err.code}]`);
+    //     });
+
+
 export const fetchUser = () => 
     async (dispatch) => { 
         try {

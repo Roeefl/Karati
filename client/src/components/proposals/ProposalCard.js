@@ -1,7 +1,6 @@
 import React from 'react';
 import './ProposalCard.css';
 import ProposalIcon from './ProposalIcon';
-import { Link } from 'react-router-dom';
 
 class ProposalCard extends React.Component {
     onAccept = () => {

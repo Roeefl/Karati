@@ -3,13 +3,6 @@ const errors = require("../config/errors");
 const middleware = require("../common/middleware");
 const Book = mongoose.model("books");
 
-const GoodReadsAPI = require('goodreads-api-node');
-const Goodreads_Credentials = {
-  key: process.env.GOODREADS_KEY,
-  secret: process.env.GOODREADS_SECRET
-};
-const goodreads = GoodReadsAPI(Goodreads_Credentials);
-
 getBookFromMongoByGoodreadsID = goodreadsID => {
     return new Promise((resolve, reject) => {
         Book.findOne({ goodreadsID },
@@ -75,7 +68,7 @@ addOwnedBookByUser = (currentUser, bookID, goodreadsID) => {
     });
 };
 
-module.exports = app => {
+module.exports = (app, goodreads) => {
 
     // List all books on myShelf
     app.get("/api/myShelf", middleware.ensureAuthenticated, middleware.getUser, async (req, res) => {
