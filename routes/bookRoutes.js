@@ -12,6 +12,9 @@ const FILTER_ALL = 'all';
 const FEED_MAX_BOOKS = 10;
 const SWIPE_MAX_BOOKS = 30;
 
+const geolib = require('geolib');
+const distance = require('../config/distance');
+
 addCommentToBook = (book, userID, comment) => {
   return new Promise( (resolve, reject) => {
 
@@ -61,9 +64,24 @@ module.exports = (app, goodreads) => {
     User.
       find().
       where('_id').ne(req.currentUser._id).
-      select('username ownedBooks').
+      select('username location ownedBooks').
       exec(function (err, usersWithPossibleBooksForSwiping) {
         for (let possibility of usersWithPossibleBooksForSwiping) {
+
+          const myLocation = { latitude: req.currentUser.location.lat , longitude: req.currentUser.location.lng };
+          // const hisLocation = {	latitude: 32.109333, longitude: 34.855499 }; // Tel Aviv
+          const hisLocation = { latitude: possibility.location.lat , longitude: possibility.location.lng };
+          // console.log(myLocation);
+          // console.log(hisLocation);
+
+          const dist = geolib.getDistance(
+            myLocation, hisLocation
+          );   
+          console.log(`distance: ${dist}, max distance: ${distance.MAX_DISTANCE}`);
+
+          if (dist > distance.MAX_DISTANCE)
+            continue;
+
           for (let ownedBook of possibility.ownedBooks) {
 
             if (!ownedBook.available)
