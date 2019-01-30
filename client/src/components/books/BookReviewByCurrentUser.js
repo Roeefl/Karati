@@ -1,4 +1,6 @@
-import Axios from 'axios';
+import { connect } from 'react-redux';
+import { postReview } from '../../actions';
+
 import React from 'react';
 import Message from '../shared/Message';
 import * as iconNames from '../../config/iconNames';
@@ -8,19 +10,8 @@ class BookReviewByCurrentUser extends React.Component {
         myReview: '',
     };
 
-    closeSelf = () => {
-        this.props.refetchBook();
-    }
-
-    postReview = async () => {
-        const res = await Axios.post('/api/review', {
-            bookID: this.props.book._id,
-            review: this.state.myReview
-        } );
-
-        if (res.data.saved) {
-            this.closeSelf();
-        }
+    postReview = () => {
+        this.props.postReview(this.props.book._id, this.state.myReview);
     }
 
     updateMyReview = (event) => {
@@ -92,4 +83,7 @@ class BookReviewByCurrentUser extends React.Component {
     }
 }
 
-export default BookReviewByCurrentUser;
+export default connect(
+    null,
+    { postReview }
+)(BookReviewByCurrentUser);

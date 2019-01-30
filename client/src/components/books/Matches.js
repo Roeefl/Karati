@@ -1,10 +1,8 @@
-import Axios from 'axios';
-
 import './Matches.css';
 
 import React from 'react';
 import { connect } from 'react-redux'   ;
-import { updateBooks, fetchUser, setCurrentComponent } from '../../actions';
+import { swipeBook, updateAvailableSwipes, fetchUser, setCurrentComponent } from '../../actions';
 
 import SwipeContainer from './SwipeContainer';
 import BrowseContainer from './BrowseContainer';
@@ -21,30 +19,12 @@ class Matches extends React.Component {
             icon: 'delicious'
         });
 
-        this.props.updateBooks();
+        this.props.updateAvailableSwipes();
     }
 
     onSwipeBook = async (liked) => {
-        let book = this.props.books[0];
-
-        var data = {
-            bookID: book.bookID,
-            ownerID: book.ownerID,
-            myUserID: this.props.userData._id
-        };
-
-        try {
-            const apiURL = '/api/swipe/' + (liked ? 'liked' : 'rejected');
-            await Axios.put(apiURL, data);
-
-            // console.log(res);
-
-            this.props.updateBooks();
-
-            this.props.fetchUser();
-        } catch(error) {
-            console.log('onLikeOrRejectBook Axios post - failed with error: ' + error);
-        }
+        const book = this.props.books[0];
+        this.props.swipeBook(liked, book.bookID, book.ownerID, this.props.userData._id);
     }
 
     renderContent() {
@@ -101,8 +81,6 @@ class Matches extends React.Component {
 }
 
 const mapStateToProps = (state) => {
-    // console.log(state);
-
     return {
         userData: state.userData,
         books: state.books
@@ -111,5 +89,5 @@ const mapStateToProps = (state) => {
 
 export default connect(
     mapStateToProps,
-    { updateBooks, fetchUser, setCurrentComponent}
+    { swipeBook, updateAvailableSwipes, fetchUser, setCurrentComponent}
 )(Matches);

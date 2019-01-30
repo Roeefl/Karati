@@ -34,7 +34,7 @@ module.exports = {
 
   ensureUserOwnsBook: async function(req, res, next) {
     User.findById(
-        _req.session.passport.user,
+        req.session.passport.user,
       function(err, currentUser) {
         if (err || !currentUser) {
           console.log('SUPER ERROR');

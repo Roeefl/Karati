@@ -1,31 +1,11 @@
 import React from 'react';
 import { Dropdown } from 'semantic-ui-react';
 import { connect } from 'react-redux';
-import Axios from 'axios';
+import { loadGenres } from '../../actions';
 
 class BrowseFilter extends React.Component {
-    state = {
-        genres: false
-    };
-
-    loadGenres = async () => {
-        try {
-            let res = await Axios.get('/api/genres');
-
-            if (!res.data.genres) {
-                return;
-            }
-
-            this.setState( {
-                genres: res.data.genres
-            });
-        } catch(error) {
-            console.log('genres Axios .put failed with error: ' + error);
-        }
-    }
-
     componentDidMount() {
-        this.loadGenres();
+        this.props.loadGenres();
     }
 
     onSelectGenre = (event, data) => {
@@ -33,11 +13,11 @@ class BrowseFilter extends React.Component {
     }
 
     renderDropdown() {
-        if (!this.state.genres) {
+        if (!this.props.genres) {
             return;
         }
 
-        let genreOptions = this.state.genres.map( genre => {
+        let genreOptions = this.props.genres.map( genre => {
             return (
                 {
                     text: genre,
@@ -81,11 +61,12 @@ class BrowseFilter extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        books: state.books
+        books: state.books,
+        genres: state.genres
     }
 };
 
 export default connect(
     mapStateToProps,
-    {  }
+    { loadGenres }
 )(BrowseFilter);

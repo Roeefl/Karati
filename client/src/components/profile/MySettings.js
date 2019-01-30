@@ -9,10 +9,24 @@ import './MySettings.css';
 import Message from '../shared/Message';
 import Spinner from '../shared/Spinner';
 
+import * as Sentry from '@sentry/browser';
+
 class mySettings extends React.Component {
-    state = {
-        
-    };
+    constructor(props) {
+        super(props);
+        this.state = { error: null };
+    }
+
+    componentDidCatch(error, errorInfo) {
+        this.setState({ error });
+       
+        Sentry.withScope(scope => {
+          Object.keys(errorInfo).forEach(key => {
+            scope.setExtra(key, errorInfo[key]);
+          });
+          Sentry.captureException(error);
+        });
+      }
 
     componentDidMount() {
         this.props.setCurrentComponent({
@@ -53,6 +67,13 @@ class mySettings extends React.Component {
     }
 
     renderContent() {
+        if (this.state.error) {
+            // render fallback UI
+            return (
+              <a onClick={() => Sentry.showReportDialog()}>Report feedback</a>
+            );
+        }   
+
         if (!this.props.userData) {
             return (
                 <Spinner message="Fetching your settings..."/>

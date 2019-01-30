@@ -14,16 +14,7 @@ class SearchResults extends React.Component {
     }
 
     renderContent() {
-        // console.log(this.props);
-
-        if (!this.props.ready) {
-            // return (
-            //     <div className="ui segment retrieving-books">
-            //         <div className="ui huge indeterminate text active loader">
-            //             Retrieving Books...
-            //         </div> 
-            //     </div>
-            // );
+        if (!this.props.results) {
             return (
                 <Spinner message='Retrieving Search Results' />
             )
@@ -58,7 +49,6 @@ class SearchResults extends React.Component {
     }
 
     render() {
-        // console.log(this.props.results);
         return (
             <div className="search-results">
                 {this.renderContent()}

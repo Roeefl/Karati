@@ -39,6 +39,7 @@ class App extends React.Component {
         this.props.fetchUser();
         this.props.setupUserGeolocation();
         this.props.setupPusher();
+        this.props.setupSentry();
     }
 
     render() {

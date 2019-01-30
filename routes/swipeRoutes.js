@@ -162,25 +162,30 @@ module.exports = (app, pusher) => {
     app.put('/api/swipe/liked', middleware.ensureAuthenticated, async (req, res) => {
         const { myUserID, ownerID, bookID } = req.body;
 
-        let firstUser = await User.findById( myUserID );
+        let me = await User.findById( myUserID );
         let owner = await User.findById( ownerID );
 
-        let added = await addSwipeToUser( firstUser, bookID, true );
+        let swipeAdded = await addSwipeToUser( me, bookID, true );
+        
         await addLikeToBook( bookID );
 
-        res.json({ swipeAdded: added });
+        res.json({
+            currUser: middleware.reverseNotifications(me)
+        });
 
-        checkForMatchWrapper( firstUser, owner, bookID );
+        checkForMatchWrapper( me, owner, bookID );
     });
 
     app.put('/api/swipe/rejected', middleware.ensureAuthenticated, async (req, res) => {
         const { myUserID, bookID } = req.body;
 
-        let firstUser = await User.findById( myUserID );
+        let me = await User.findById( myUserID );
 
-        let added = await addSwipeToUser( firstUser, bookID, false );
+        const swipeAdded = await addSwipeToUser( me, bookID, false );
 
-        res.json({ swipeAdded: added });
+        res.json({
+            currUser: middleware.reverseNotifications(me)
+        });
     });
 
 }

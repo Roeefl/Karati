@@ -1,24 +1,15 @@
-import Axios from 'axios';
-
 import './SearchBooks.css';
 
 import React from 'react';
 import { connect } from 'react-redux';
-import { selectBookFromBrowsing, updateSearchResults, setCurrentComponent } from '../../actions';
+import { searchGoodreads, setCurrentComponent } from '../../actions';
 
 import SearchBar from '../search/SearchBar';
 import SearchResults from '../search/SearchResults';
 
 import Message from '../shared/Message';
 
-const INTRO_SEARCH_LIMIT = 5;
-const DEFAULT_SEARCH_LIMIT = 10;
-
 class SearchBooks extends React.Component {
-    state = {
-        ready: true
-    };
-
     componentDidMount() {
         this.props.setCurrentComponent({
             primary: 'Search Books',
@@ -27,33 +18,12 @@ class SearchBooks extends React.Component {
         });
     }
 
-    // onBookSelect = (bookId) => {
-    //     let bookData = this.props.searchResults.find(book => book.id._ === bookId);
-    //     this.props.selectBookFromBrowsing(bookData);
-    // }
-
-    onSearchSubmit = async (term) => {
-        try {
-            this.setState( { ready: false } );
-
-            const res = await Axios.post('/api/books/search', {
-                query: term,
-                limit: ( this.props.intro ? INTRO_SEARCH_LIMIT : DEFAULT_SEARCH_LIMIT )
-            } );
-
-            console.log(res);
-
-            this.props.updateSearchResults(res.data.books);
-            this.setState( { ready: true } );
-        } catch(error) {
-            console.log('/api/books/search failed with error: ' + error);
-        }
+    onSearchSubmit = (term) => {
+        this.props.searchGoodreads(term, this.props.intro);
     }
 
     renderContent() {
-        // console.log(this.props);
-
-        if (!this.props.searchResults && this.state.ready) {
+        if (this.props.searchResults === false) {
             if (this.props.intro)
                 return;
                 
@@ -66,7 +36,7 @@ class SearchBooks extends React.Component {
             );
         }
 
-        if (this.props.searchResults.length <= 0 ) {
+        if (this.props.searchResults && this.props.searchResults.length <= 0 ) {
             return (
                 <Message 
                     color='red'
@@ -81,8 +51,7 @@ class SearchBooks extends React.Component {
                 <div className="search-container ui container">
                         <SearchResults
                             intro={this.props.intro}
-                            results={this.props.searchResults}
-                            ready={ (this.state.ready) } />
+                            results={this.props.searchResults} />
                 </div>
             </div>
         );
@@ -108,5 +77,5 @@ const mapStateToProps = (state) => {
 
 export default connect(
     mapStateToProps,
-    { selectBookFromBrowsing, updateSearchResults, setCurrentComponent }
+    { searchGoodreads, setCurrentComponent }
 )(SearchBooks);

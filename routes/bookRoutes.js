@@ -18,7 +18,7 @@ const distance = require('../config/distance');
 addCommentToBook = (book, userID, comment) => {
   return new Promise( (resolve, reject) => {
 
-    let newComment = {
+    const newComment = {
       userID,
       content: comment,
       dateAdded: Date.now()
@@ -77,7 +77,7 @@ module.exports = (app, goodreads) => {
           const dist = geolib.getDistance(
             myLocation, hisLocation
           );   
-          console.log(`distance: ${dist}, max distance: ${distance.MAX_DISTANCE}`);
+          // console.log(`distance: ${dist}, max distance: ${distance.MAX_DISTANCE}`);
 
           if (dist > distance.MAX_DISTANCE)
             continue;
@@ -216,7 +216,7 @@ module.exports = (app, goodreads) => {
     if (userAlreadyCommentOnBook)
       return res.json({ error: errors.ALREADY_COMMENTED });
 
-    let saved = await addCommentToBook(foundBook, req.currentUser._id, review);
+    const saved = await addCommentToBook(foundBook, req.currentUser._id, review);
 
     res.json({ saved });
   });

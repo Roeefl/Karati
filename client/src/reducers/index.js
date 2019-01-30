@@ -18,10 +18,14 @@ import { currentComponentReducer } from './currentComponent';
 import { swapJustProposedReducer } from './swapJustProposed';
 import { currentProposalReducer } from './currentProposalReducer';
 import { pusherReducer } from './pusherReducer';
+import { sentryReducer } from './sentryReducer';
+import { genresReducer } from './genresReducer';
 
 export default combineReducers(
     {
         pusher: pusherReducer,
+        sentry: sentryReducer,
+        genres: genresReducer,
         form: reduxForm,
         userData: userDataReducer,
         searchResults: bookSearchReducer,
