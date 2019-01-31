@@ -4,14 +4,14 @@ import { fetchUser, setCurrentComponent } from '../../actions';
 import Spinner from '../shared/Spinner';
 import Message from '../shared/Message';
 import BookCard from '../books/BookCard/BookCard';
-import * as iconNames from '../../config/iconNames';
+import * as icons from '../../config/icons';
 
 class MyWishlist extends Component {
     componentDidMount() {
         this.props.setCurrentComponent({
             primary: 'Your Wishlist',
             secondary: 'View your wishlist and stuff',
-            icon: iconNames.WISHLIST
+            icon: icons.WISHLIST
         });
 
         this.props.fetchUser();

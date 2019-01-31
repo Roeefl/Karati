@@ -19,10 +19,8 @@ class BrowseContainer extends React.Component {
         );
 
         console.log(currBook);
-
-        if (!currBook) {
+        if (!currBook)
             return;
-        }
 
         this.props.selectBookFromBrowsing(currBook);
     }

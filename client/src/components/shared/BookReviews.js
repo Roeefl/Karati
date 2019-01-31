@@ -1,6 +1,6 @@
 import React from 'react';
-
 import Message from '../shared/Message';
+import { formatDate } from '../../common';
 
 class BookReviews extends React.Component {
     render() {
@@ -20,22 +20,18 @@ class BookReviews extends React.Component {
             );
         };
 
-        const imageURL = 'https://semantic-ui.com/images/avatar/large/elliot.jpg';
-
-        const comments = this.props.book.comments.map( comment => {
-            console.log(comment);
-            
+        const comments = this.props.book.comments.map( comment => {           
             return (
                 <div className="book-comment comment" key={ Math.random().toFixed(8) * 100000000 }>
 
                     <div className="avatar">
-                        <img src={imageURL} alt="avatar" />
+                        <img src={comment.portrait} alt="avatar" />
                     </div>
 
                     <div className="content">
                         <div className="author">{comment.username}</div>
                         <div className="metadata">
-                            <span className="date">{comment.dateAdded}</span>
+                            <span className="date">{ formatDate(comment.dateAdded) }</span>
                         </div>
                         <div className="text">
                             {comment.content}

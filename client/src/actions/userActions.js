@@ -3,7 +3,7 @@ import Axios from 'axios';
 
 import {
     FETCH_USER,
-
+    OWNER_INFO
  } from './types';
 
  export const fetchUser = () => 
@@ -20,6 +20,25 @@ import {
 
             dispatch( {
                 type: FETCH_USER,
+                payload: { error: error.response.data.error }
+            });
+        }
+    };
+
+export const getUserDataById = (userId) => 
+    async (dispatch) => { 
+        try {
+            const res = await Axios.get(`/api/users/${userId}`);
+
+            dispatch( {
+                type: OWNER_INFO,
+                payload: res.data.user || null
+            });
+        } catch(error) {
+            console.log('Failed to fetchUser ' + error);
+
+            dispatch( {
+                type: OWNER_INFO,
                 payload: { error: error.response.data.error }
             });
         }

@@ -16,7 +16,18 @@ const errors = require('../config/errors');
 // });
 
 module.exports = (app) => {
-  
+
+    app.get('/api/users/:userId', async (req, res) => {
+      const { userId } = req.params;
+      const user = await User.findById( userId );
+
+      if (user) {
+          res.json({ user });
+      } else {
+          res.status(500).json({ error: errors.USER_NOT_FOUND });
+      }
+    });
+
     app.get('/api/myProfile', middleware.ensureAuthenticated, middleware.getUser, async (req, res) => {
       const currUser = await User.findById(req.currentUser._id);
       res.json( { currUser: middleware.reverseNotifications(currUser) } );

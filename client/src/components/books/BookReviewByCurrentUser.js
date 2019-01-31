@@ -3,7 +3,7 @@ import { postReview } from '../../actions';
 
 import React from 'react';
 import Message from '../shared/Message';
-import * as iconNames from '../../config/iconNames';
+import * as icons from '../../config/icons';
 
 class BookReviewByCurrentUser extends React.Component {
     state = {
@@ -66,7 +66,7 @@ class BookReviewByCurrentUser extends React.Component {
                         <button 
                             className="ui green right labeled icon button"
                             onClick={this.postReview} >
-                            <i className={`${iconNames.SEND} icon`} />
+                            <i className={`${icons.SEND} icon`} />
                             Done
                         </button>
                 </div>  

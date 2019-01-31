@@ -4,7 +4,7 @@ import { fetchMyMatches, setCurrentComponent, proposeSwap } from '../../actions'
 import BookCard from '../books/BookCard/BookCard';
 import Spinner from '../shared/Spinner';
 import SwapProposed from './SwapProposed'
-import * as iconNames from '../../config/iconNames';
+import * as icons from '../../config/icons';
 
 /**
  * Shows all matches with a specific user from the URL param userId
@@ -60,7 +60,7 @@ class MatchesWithUser extends React.Component {
                 <div
                     className='ui labeled button violet icon'
                     onClick={this.proposeSwap} >
-                    <i className={`${iconNames.MY_PROPOSALS} icon`} />
+                    <i className={`${icons.MY_PROPOSALS} icon`} />
                     Propose Swap!
                 </div>
             )
@@ -118,14 +118,14 @@ class MatchesWithUser extends React.Component {
                 <div className="ui divider"></div>
                 
                 <h2 className="ui centered header red">
-                    <i className={`${iconNames.USER} icon green`}/>
+                    <i className={`${icons.USER} icon green`}/>
                     Here are your swap options with {this.props.matchesWithUser.ownerInfo.username}
                 </h2>
 
                 <div className="ui divider"></div>
                 
                 <h2 className="ui centered header red">
-                    <i className={`${iconNames.BOOK} icon green`}/>
+                    <i className={`${icons.BOOK} icon green`}/>
                     {this.props.matchesWithUser.ownerInfo.username}'s books that you marked as interested in:
                 </h2>
                 <div className="ui link cards four column grid">
@@ -135,7 +135,7 @@ class MatchesWithUser extends React.Component {
                 <div className="ui divider"></div>
 
                 <h2 className="ui centered header red">
-                    <i className={`${iconNames.BOOK} icon green`}/>
+                    <i className={`${icons.BOOK} icon green`}/>
                     Your books that {this.props.matchesWithUser.ownerInfo.username} is interested in:
                 </h2>
                 <div className="ui link cards four column grid">

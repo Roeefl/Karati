@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import * as iconNames from '../../config/iconNames';
+import * as icons from '../../config/icons';
 
 class SwapProposed extends React.Component {
     render() {
@@ -17,7 +17,7 @@ class SwapProposed extends React.Component {
                 </div>
     
                 <h2 className="ui centered header">
-                    <i className={`${iconNames.MY_SWIPES} violet icon`}/>
+                    <i className={`${icons.MY_SWIPES} violet icon`}/>
                     Congrats {this.props.myUsername}! Awesome job. You proposed {this.props.hisUsername} to swap books with each other. Give him some time to think about it!
                 </h2>
     

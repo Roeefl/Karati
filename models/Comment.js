@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema; 
 
+const portraits = require('../config/portraits');
+
 const commentSchema = new Schema(
     {
         userID: {
@@ -11,6 +13,11 @@ const commentSchema = new Schema(
             type: String,
             required: false,
             default: 'John Doe'
+        },
+        portrait: {
+            type: String,
+            required: false,
+            default: portraits.ELYSE
         },
         content: {
             type: String,

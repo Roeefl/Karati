@@ -5,6 +5,7 @@ import { setCurrentComponent } from '../../actions';
 import ProfileFormContainer from './ProfileFormContainer';
 import Message from '../shared/Message';
 import Spinner from '../shared/Spinner';
+import UserCard from '../shared/UserCard';
 
 class MyProfile extends React.Component {
     componentDidMount() {
@@ -16,77 +17,41 @@ class MyProfile extends React.Component {
     }
 
     renderContent() {
-        // console.log(this.props);
-        
-        if (!this.props.userData) {
+        if (!this.props.currentUser) {
             return (
                 <Spinner message="Fetching Your User Profile..."/>
             );
         }
 
-        if (this.props.userData.error) {
+        if (this.props.currentUser.error) {
             return (
                 <Message 
                     color='red'
                     lines={[
-                        this.props.userData.error
+                        this.props.currentUser.error
                     ]} />
             );
         };
-
-        let currentUser = this.props.userData;
-
-        currentUser.joinedAt = new Date(currentUser.createdAt).toLocaleString("en-us", {
-            month: 'long',
-            year: 'numeric',
-            day: 'numeric'
-        });
-        currentUser.imageURL = 'https://semantic-ui.com/images/avatar/large/elliot.jpg';
 
         return (
             <div className="ui container">
                 <Message
                     color='violet'
                     lines={[
-                        `You have ${currentUser.ownedBooks.length || 0} Books on your shelf`
+                        `You have ${this.props.currentUser.ownedBooks.length || 0} Books on your shelf`
                     ]} />
 
                 <div className="ui centered grid">
+
                     <div className="ui four wide column">
-                        <div className="ui card">
-                            <div className="image">
-                                <img
-                                    src={currentUser.imageURL}
-                                    alt="Profile Placeholder" />
-                            </div>
-                            <div className="content">
-                                <div className="header">{currentUser.username}</div>
-                                <div className="meta full-name">
-                                    {currentUser.fullName.first} {currentUser.fullName.last}
-                                </div>
-                                <div className="bio">
-                                    Bio: {currentUser.bio}
-                                </div>
-                            </div>
-                            <div className="extra content">
-                                <i className="user icon"/>
-                                {currentUser.ownedBooks.length || 0} Books on Shelf
-                            </div>
-                            <div className="extra content">
-                                <i className="calendar check outline icon"/>
-                                Joined in {currentUser.joinedAt}
-                            </div>
-                            <div className="extra content">
-                                <i className="thumbtack icon"/> My Location: {currentUser.location.lat}, {currentUser.location.lng}
-                            </div>
-                        </div>
+                        <UserCard user={this.props.currentUser} />
                     </div>
 
                     <div className="ui ten wide column">
                         <ProfileFormContainer />
                     </div>
-                </div>
 
+                </div>
             </div>
         );
     }
@@ -102,7 +67,7 @@ class MyProfile extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        userData: state.userData
+        currentUser: state.userData
     }
 };
 

@@ -6,14 +6,14 @@ import MatchesWithUserCard from './MatchesWithUserCard';
 import Message from '../shared/Message';
 import Spinner from '../shared/Spinner';
 import * as errors from '../shared/errors';
-import * as iconNames from '../../config/iconNames';
+import * as icons from '../../config/icons';
 
 class MyMatches extends React.Component {
     componentDidMount() {
         this.props.setCurrentComponent({
             primary: 'My Matches',
             secondary: 'View matches with users',
-            icon: iconNames.MY_MATCHES
+            icon: icons.MY_MATCHES
         });
 
         this.props.fetchMyMatches();

@@ -108,9 +108,10 @@ checkForMatchWrapper = async (user1, user2, lastSwipedBookID) => {
     await addNotificationToUser( user2, user1 ); 
 };
 
-addSwipeToUser = (user, bookID, liked) => {
+addSwipeToUser = (user, bookID, ownerID, liked) => {
     return new Promise((resolve, reject) => {
         let newSwipe = {
+            userID: ownerID,
             bookID: bookID,
             like: liked,
             dateAdded: Date.now()
@@ -165,7 +166,7 @@ module.exports = (app, pusher) => {
         let me = await User.findById( myUserID );
         let owner = await User.findById( ownerID );
 
-        let swipeAdded = await addSwipeToUser( me, bookID, true );
+        let swipeAdded = await addSwipeToUser( me, bookID, ownerID, true );
         
         await addLikeToBook( bookID );
 

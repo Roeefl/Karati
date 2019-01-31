@@ -3,6 +3,7 @@ import { combineReducers } from 'redux';
 import { reducer as reduxForm } from 'redux-form';
 
 import { userDataReducer } from  './userData';
+import { ownerInfoReducer } from './ownerInfo';
 import { selectedBookFromBrowseReducer } from  './selectedBookFromBrowse';
 import { bookSearchReducer } from './bookSearch';
 import { myShelfReducer } from './myShelf';
@@ -28,6 +29,7 @@ export default combineReducers(
         genres: genresReducer,
         form: reduxForm,
         userData: userDataReducer,
+        ownerInfo: ownerInfoReducer,
         searchResults: bookSearchReducer,
         selectedBookFromBrowse: selectedBookFromBrowseReducer,
         myBooks: myShelfReducer,

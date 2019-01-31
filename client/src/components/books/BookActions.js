@@ -11,7 +11,7 @@ class BookActions extends React.Component {
 
     render() {
         return (
-            <div className="actions">
+            <div className="book-actions">
                 <div
                     className="ui negative labeled icon button"
                     onClick={this.rejectBook} >

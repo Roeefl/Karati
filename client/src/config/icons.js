@@ -12,3 +12,5 @@ export const SEARCH = 'search';
 export const ADD = 'plus';
 export const SEND = 'send';
 export const QUICK_ADD = 'check circle outline';
+export const JOINED_AT = 'calendar check outline';
+export const LOCATION = 'thumbtack';

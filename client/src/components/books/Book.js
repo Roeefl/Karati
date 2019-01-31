@@ -11,7 +11,8 @@ import ShelfBookActions from '../shelf/ShelfBookActions';
 import BookActions from './BookActions';
 
 import Message from '../shared/Message';
-import * as iconNames from '../../config/iconNames';
+import OfferedBy from './OfferedBy';
+import * as icons from '../../config/icons';
 
 class Book extends React.Component {
     componentDidMount() {
@@ -53,51 +54,54 @@ class Book extends React.Component {
         )
     }
 
-    renderActions() {
-        if (!this.props.selectedBookFromDB) {
-            return;
-        }
+    renderSwapComplete() {
+        return (
+            <div className="ui container">
+                <Message 
+                    color='green'
+                    lines={[
+                        'You got it boss!'
+                    ]} />
+                <Link to="/books/browse">
+                    <div className="ui large violet button">
+                        <i className={`${icons.BROWSE} icon`} />
+                        Back to Browsing
+                    </div>
+                </Link>  
+            </div>
+        );
+    }
 
-        if (!this.props.userData || !this.props.userData.ownedBooks) {
+    renderActions() {
+        if (!this.props.selectedBookFromDB)
             return;
-        }
+
+        if (!this.props.userData || !this.props.userData.ownedBooks)
+            return;
 
         const onShelf = this.props.userData.ownedBooks.find(book =>
             book.bookID === this.props.selectedBookFromDB._id
         );
 
-        if (onShelf) {
+        if (onShelf)
             return (
                 <ShelfBookActions book={this.props.selectedBookFromDB} user={this.props.userData} onShelf={onShelf} refreshBook={this.props.fetchUser}/>
             );
-        }
 
-        if (!this.props.selectedBookFromBrowse) {
+        if (!this.props.selectedBookFromBrowse)
             return;
-        }
 
         if (this.props.selectedBookFromBrowse.bookID === this.props.selectedBookFromDB._id) {
-            if (this.props.userData.swipes.find( swipe => swipe.bookID === this.props.selectedBookFromBrowse.bookID )) {
-                return (
-                    <div className="ui container">
-                        <Message 
-                            color='green'
-                            lines={[
-                                'You got it boss!'
-                            ]} />
-                        <Link to="/books/browse">
-                            <div className="ui large violet button">
-                                <i className={`${iconNames.BROWSE} icon`} />
-                                Back to Browsing
-                            </div>
-                        </Link>  
-                    </div>
-                );
-            }
+            if (this.props.userData.swipes.find( swipe => swipe.bookID === this.props.selectedBookFromBrowse.bookID ))
+                return this.renderSwapComplete();
 
             return (
-                <div className="ui center aligned raised segment container">
-                    <BookActions swipeBook={this.swipeBook} />
+                <div className="ui container">
+                    <div className="ui center aligned raised segment">
+                        <BookActions swipeBook={this.swipeBook} />
+                    </div>
+
+                    <OfferedBy />
                 </div>
             );
         }

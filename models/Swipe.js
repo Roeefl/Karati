@@ -3,6 +3,10 @@ const Schema = mongoose.Schema;
 
 const swipeSchema = new Schema(
     {
+        userID: {
+            type: String,
+            required: true
+        },
         bookID: {
             type: String,
             required: true

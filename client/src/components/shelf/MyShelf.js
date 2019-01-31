@@ -6,14 +6,14 @@ import BookCard from '../books/BookCard/BookCard';
 import { Link } from 'react-router-dom';
 import Message from '../shared/Message';
 import Spinner from '../shared/Spinner';
-import * as iconNames from '../../config/iconNames';
+import * as icons from '../../config/icons';
 
 class MyShelf extends React.Component   {
     componentDidMount() {
         this.props.setCurrentComponent({
             primary: 'Your Book Shelf',
             secondary: 'View and update the books that you offer for swap',
-            icon: iconNames.MY_SHELF
+            icon: icons.MY_SHELF
         });
 
         this.props.updateMyShelf();
@@ -89,14 +89,14 @@ class MyShelf extends React.Component   {
                         <div className="middle aligned row">
                             <div className="column">
                                 <div className="ui icon header">
-                                    <i className={`${iconNames.BOOK} icon`} />
+                                    <i className={`${icons.BOOK} icon`} />
                                     Have more books you wanna add?
                                 </div>
                                 <div className="field">
                                     <div className="ui search">
                                         <Link to="/myShelf/search" className="search item">
                                             <div className="ui labeled button green icon">
-                                                <i className={`${iconNames.SEARCH} icon`} /> Search
+                                                <i className={`${icons.SEARCH} icon`} /> Search
                                             </div>
                                         </Link>
                                         <div className="results"></div>
@@ -105,11 +105,11 @@ class MyShelf extends React.Component   {
                             </div>
                             <div className="column">
                                 <div className="ui icon header">
-                                    <i className={`${iconNames.ADD} icon`} />
+                                    <i className={`${icons.ADD} icon`} />
                                     Add a book to our database
                                 </div>
                                 <div className="ui labeled blue icon button disabled">
-                                <i className={`${iconNames.ADD} icon`} /> Create custom book
+                                <i className={`${icons.ADD} icon`} /> Create custom book
                                 </div>
                             </div>
                         </div>

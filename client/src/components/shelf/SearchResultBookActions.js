@@ -10,7 +10,7 @@ import Message from '../shared/Message';
 
 import { updateMyShelf, fetchUser } from '../../actions';
 
-import * as iconNames from '../../config/iconNames';
+import * as icons from '../../config/icons';
 
 class SearchResultBookActions extends React.Component {
     state = {
@@ -46,7 +46,7 @@ class SearchResultBookActions extends React.Component {
 
         return (
             <Link to="/myShelf" className="enforce-green">
-                <i className={`${iconNames.MY_SHELF} icon`} />
+                <i className={`${icons.MY_SHELF} icon`} />
                 My Shelf
             </Link>
         );
@@ -87,7 +87,7 @@ class SearchResultBookActions extends React.Component {
                 <div
                     className="add-to-my-shelf ui large button green"
                     onClick={this.addToMyShelf}>
-                    <i className={`${iconNames.ADD} icon`} />
+                    <i className={`${icons.ADD} icon`} />
                         {btnText}
                 </div>
             );
@@ -96,7 +96,7 @@ class SearchResultBookActions extends React.Component {
         if (this.props.quickAdd)
             return (
                 <div className="add-to-my-shelf ui large violet disabled button">
-                    <i className={`${iconNames.QUICK_ADD} icon`} />
+                    <i className={`${icons.QUICK_ADD} icon`} />
                 </div>
             )
 

@@ -8,14 +8,14 @@ import ProposalCard from './ProposalCard';
 import ProposalFilter from './ProposalFilter';
 import ProposalChat from './ProposalChat';
 import './MyProposals.css';
-import * as iconNames from '../../config/iconNames';
+import * as icons from '../../config/icons';
 
 class MyProposals extends React.Component {
     componentDidMount() {
         this.props.setCurrentComponent({
             primary: 'My Proposals',
             secondary: 'View proposals that you made to or received from other users',
-            icon: iconNames.MY_PROPOSALS
+            icon: icons.MY_PROPOSALS
         });
 
         this.props.fetchMyProposals();

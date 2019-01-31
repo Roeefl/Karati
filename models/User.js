@@ -6,6 +6,8 @@ const wishSchema = require('./Wish');
 const swipeSchema = require('./Swipe');
 const notificationSchema = require('./Notification');
 
+const portraits = require('../config/portraits');
+
 const userSchema = new Schema (
     {
         oauthID: {
@@ -29,6 +31,11 @@ const userSchema = new Schema (
         bio: {
             type: String,
             required: false
+        },
+        portrait: {
+            type: String,
+            required: false,
+            default: portraits.ELYSE
         },
         email: {
             type: String,
