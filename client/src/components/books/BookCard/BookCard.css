@@ -1,10 +1,15 @@
 .ui.card.book-card {
-    height: 340px;
+    height: 360px;
     padding: 8px;
 }
 
 .ui.card.book-card.with-desc {
     height: 460px;
+    padding: 8px;
+}
+
+.my-shelf .ui.card.book-card {
+    height: 480px;
     padding: 8px;
 }
 

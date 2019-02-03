@@ -3,6 +3,9 @@ import './Header.css';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
+import withLanguage from './withLanguage';
+import { getString } from '../locale';
+import { swapLanguage } from '../actions';
 
 import Auth from './Auth';
 
@@ -11,7 +14,11 @@ import HeaderMenu from './HeaderMenu';
 import icon64 from '../icons/64.png';
 import * as icons from '../config/icons';
 
-class Header extends React.Component {  
+class Header extends React.Component {
+    swapLanguage = () => {
+        this.props.swapLanguage();
+    }
+
     renderExplore() {
         if (!this.props.userData || this.props.userData.error) {
             return;
@@ -43,27 +50,27 @@ class Header extends React.Component {
         const links = [
             {
                 to: '/myShelf',
-                text: 'My Shelf',
+                text: getString(this.props.language, 'myShelf.button'),
                 icon: icons.MY_SHELF
             },
             {
                 to: '/myWishlist',
-                text: 'My Wishlist',
+                text: getString(this.props.language, 'wishlist.button'),
                 icon: icons.WISHLIST
             },
             {
                 to: '/myProposals',
-                text: 'My Proposals',
+                text: getString(this.props.language, 'myProposals.button'),
                 icon: icons.MY_PROPOSALS
             },
             {
                 to: '/myMatches',
-                text: 'My Matches',
+                text: getString(this.props.language, 'myMatches.button'),
                 icon: icons.MY_MATCHES
             },
             {
                 to: '/mySwipes',
-                text: 'My Swipes',
+                text: getString(this.props.language, 'mySwipes.button'),
                 icon: icons.MY_SWIPES
             }
         ];
@@ -87,7 +94,7 @@ class Header extends React.Component {
                         {this.renderMyStuff()}
     
                         <div className="right menu">
-                            <Auth method="google" userData={this.props.userData} />
+                            <Auth method="google" userData={this.props.userData} swapLanguage={this.swapLanguage} />
                         </div>
                     </div>
                 </div>
@@ -103,4 +110,7 @@ function mapStateToProps(state) {
     }
 };
 
-export default connect(mapStateToProps)(Header);
+export default connect(
+    mapStateToProps,
+    { swapLanguage }
+)(withLanguage(Header));

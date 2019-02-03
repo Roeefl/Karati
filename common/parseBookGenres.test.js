@@ -1,9 +1,9 @@
 const parseBookGenres = require('./parseBookGenres');
 
-let genre1 = 'adventure';
-let genre2 = 'fantasy';
+const genre1 = 'adventure';
+const genre2 = 'fantasy';
 
-let shelvesMock = {
+const shelvesMock = {
     shelf: [
         {
             name: genre1,
@@ -25,4 +25,3 @@ test('Parse book genre from book.shelves object', () => {
     parseBookGenres(shelvesMock)
   ).toContain(genre2);
 });
-

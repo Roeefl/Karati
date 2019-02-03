@@ -15,6 +15,10 @@ const methodConfig = {
 }
 
 class Auth extends React.Component {
+    swapLanguage = () => {
+        this.props.swapLanguage();
+    }
+    
     renderLink() {
         const { iconName } = methodConfig[this.props.method];
 
@@ -41,6 +45,11 @@ class Auth extends React.Component {
                 icon: 'user outline'
             },
             {
+                to: '/stats',
+                text: 'Infographics',
+                icon: 'th large'
+            },
+            {
                 to: '/mySettings',
                 text: 'Settings',
                 icon: 'settings'
@@ -65,6 +74,13 @@ class Auth extends React.Component {
                         <i className={`icon green small sign-out`} />
                         Log Out
                     </a>
+                </div>
+                <div className="item">
+                    <div 
+                        className="ui icon button"
+                        onClick={this.swapLanguage} >
+                        <i className={`red flag outline icon`} />
+                    </div>
                 </div>
             </div>
         );

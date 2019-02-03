@@ -2,13 +2,13 @@ import React from 'react';
 import { BrowserRouter, Route, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import * as actions from '../actions';
-
 import './App.css';
+import withLanguage from './withLanguage';
+import { getString } from '../locale';
 
 import Header from './Header';
 import Footer from './Footer';
 
-// import BookEdit from './books/BookEdit';
 import Book from './books/Book';
 
 import MyShelf from './shelf/MyShelf';
@@ -16,6 +16,7 @@ import SearchBooks from './shelf/SearchBooks';
 import SearchBookExpanded from './shelf/SearchBookExpanded';
 
 import MyProfile from './profile/MyProfile';
+import Infographics from './profile/Infographics';
 
 import MyWishlist from './wishlist/MyWishlist';
 
@@ -35,7 +36,6 @@ import CompHeader from './CompHeader';
 
 class App extends React.Component {
     componentDidMount() {
-        console.log('fetchUser');
         this.props.fetchUser();
         this.props.setupUserGeolocation();
         this.props.setupPusher();
@@ -44,7 +44,7 @@ class App extends React.Component {
 
     render() {
         return (
-            <div>
+            <div className={`app-container ${this.props.direction}`}>
                 <BrowserRouter>
                     <div>
                         <Header />
@@ -73,13 +73,12 @@ class App extends React.Component {
                                 <Route exact path="/myMatches/:userId" component={MatchesWithUser} />
 
                                 <Route path="/myProfile" component={MyProfile} />
+                                <Route path="/stats" component={Infographics} />
                                 <Route path="/mySettings" component={MySettings} />
 
                                 <Route path="/mySwipes" component={MySwipes} />
                                 <Route path="/myProposals" component={MyProposals} />
                                 <Route path="/myWishlist" component={MyWishlist} />
-
-                                {/* <Route path="/books/edit" component={BookEdit} /> */}
 
                                 <Route path="/books/browse" component={Browse} />
                                 <Route path="/books/swipe" component={Swipe} />
@@ -106,4 +105,4 @@ function mapStateToProps(state) {
 
 export default connect(
     mapStateToProps, actions
-)(App);
+)(withLanguage(App));

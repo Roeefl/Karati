@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import requireAuth from '../requireAuth';
 import { fetchMyProposals, acceptProposal, setCurrentProposal, setCurrentComponent } from '../../actions';
 import * as errors from '../shared/errors';
 import Message from '../shared/Message';
@@ -108,4 +109,4 @@ function mapStateToProps(state) {
 export default connect(
     mapStateToProps,
     { fetchMyProposals, acceptProposal, setCurrentProposal, setCurrentComponent }
-)(MyProposals);
+)(requireAuth(MyProposals));

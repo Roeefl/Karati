@@ -1,5 +1,8 @@
 import React from 'react';
 
+import withLanguage from './withLanguage';
+import { getString } from '../locale';
+
 import './FrontPage.css';
 
 import { connect } from 'react-redux'   ;
@@ -13,9 +16,6 @@ import Spinner from './shared/Spinner';
 import FeedCard from './books/FeedCard';
 
 import icon256 from '../icons/256.png';
-// import icon64 from '../icons/64.png';
-// import icon128 from '../icons/128.png';
-
 class FrontPage extends React.Component {
     componentDidMount() {
         this.props.updateFeeds();
@@ -39,8 +39,6 @@ class FrontPage extends React.Component {
                     ]} />
             );
         }
-
-        // console.log(feed);
 
         const feedColumns = feed.data.slice(0,4).map( book => {
             return (
@@ -100,20 +98,28 @@ class FrontPage extends React.Component {
                     <div className="ui middle aligned stackable grid container">
                         <div className="center aligned row rtl app-logo">
                             <div className="column">
-                                <h1 className="ui header">קראתי</h1>
-                                <h3 className="ui header">קראת? החלפת!</h3>
+                                <h1 className="ui header">
+                                    {getString(this.props.language, 'slogan')}
+                                    </h1>
+                                <h3 className="ui header">
+                                    {getString(this.props.language, 'subSlogan')}
+                                </h3>
                             </div>
                         </div>
                         <div className="centered row">
                             <div className="one wide column">
                             </div>
                             <div className="center aligned four wide column">
-                                <h1>Give away your old, dusty books</h1>
-                                <em>Add some of my old books up for exchange</em>
+                                <h1>
+                                    {getString(this.props.language, 'preview.myShelf.primary')}
+                                </h1>
+                                <em>
+                                    {getString(this.props.language, 'preview.myShelf.secondary')}
+                                </em>
                                 <Link to="/myShelf">
                                     <div className="ui huge violet labeled icon button">
                                         <i className="icon zip white large" />
-                                        My Shelf
+                                        {getString(this.props.language, 'myShelf.button')}
                                     </div>
                                 </Link>
                             </div>
@@ -121,12 +127,16 @@ class FrontPage extends React.Component {
                                     <img src={icon256} alt="karati-logo"/>
                             </div>
                             <div className="four wide center aligned column">
-                                <h1>Dive into new, untold adventures</h1>
-                                <em>See whats up for grabs around my location</em>
+                                <h1>
+                                    {getString(this.props.language, 'preview.nearby.primary')}
+                                </h1>
+                                <em>
+                                    {getString(this.props.language, 'preview.nearby.secondary')}
+                                </em>
                                 <Link to="/books/browse">
                                     <div className="ui huge orange labeled icon button">
                                         <i className="icon delicious white large" />
-                                        Books Nearby
+                                        {getString(this.props.language, 'nearby.button')}
                                     </div>
                                 </Link>
                             </div>
@@ -182,4 +192,4 @@ const mapStateToProps = (state) => {
 export default connect(
     mapStateToProps,
     { updateFeeds }
-)(FrontPage);
+)(withLanguage(FrontPage));

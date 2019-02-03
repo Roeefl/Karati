@@ -8,7 +8,7 @@ import BookContent from '../shared/BookContent';
 import BookReviews from '../shared/BookReviews';
 import BookReviewByCurrentUser from './BookReviewByCurrentUser';
 import ShelfBookActions from '../shelf/ShelfBookActions';
-import BookActions from './BookActions';
+import SwipeBookActions from './SwipeBookActions';
 
 import Message from '../shared/Message';
 import OfferedBy from './OfferedBy';
@@ -98,7 +98,7 @@ class Book extends React.Component {
             return (
                 <div className="ui container">
                     <div className="ui center aligned raised segment">
-                        <BookActions swipeBook={this.swipeBook} />
+                        <SwipeBookActions swipeBook={this.swipeBook} />
                     </div>
 
                     <OfferedBy />

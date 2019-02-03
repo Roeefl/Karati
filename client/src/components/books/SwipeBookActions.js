@@ -1,6 +1,6 @@
 import React from 'react';
 
-class BookActions extends React.Component {
+class SwipeBookActions extends React.Component {
     likeBook = () => {
         this.props.swipeBook(true);
     }
@@ -29,4 +29,4 @@ class BookActions extends React.Component {
     }
 }
 
-export default BookActions;
+export default SwipeBookActions;

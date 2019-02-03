@@ -3,8 +3,16 @@ import Axios from 'axios';
 
 import {
     FETCH_USER,
-    OWNER_INFO
+    OWNER_INFO,
+    SWAP_LANGUAGE
  } from './types';
+
+ export const swapLanguage = () => {
+    return {
+        type: SWAP_LANGUAGE,
+        payload: true
+    };
+};
 
  export const fetchUser = () => 
     async (dispatch) => { 

@@ -2,7 +2,7 @@ import React from 'react';
 
 import SwipePreviewBar from './SwipePreviewBar';
 import BookCard from './BookCard/BookCard';
-import BookActions from './BookActions';
+import SwipeBookActions from './SwipeBookActions';
 
 class SwipeContainer extends React.Component {
     swipeBook = (liked) => {
@@ -36,7 +36,7 @@ class SwipeContainer extends React.Component {
                         Offered for exchange by {book.ownedBy}
                     </div>
 
-                    <BookActions swipeBook={this.swipeBook} />
+                    <SwipeBookActions swipeBook={this.swipeBook} />
                 </div>
             </div>
         );

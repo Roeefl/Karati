@@ -18,4 +18,5 @@ export const UPDATE_CURRENT_PROPOSAL = 'UPDATE_CURRENT_PROPOSAL';
 export const SETUP_PUSHER = 'SETUP_PUSHER';
 export const SETUP_SENTRY = 'SETUP_SENTRY';
 export const LOAD_GENRES = 'LOAD_GENRES';
-export const OWNER_INFO= 'OWNER_INFO';
+export const OWNER_INFO = 'OWNER_INFO';
+export const SWAP_LANGUAGE = 'SWAP_LANGUAGE'; 

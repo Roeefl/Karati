@@ -2,6 +2,7 @@ import { combineReducers } from 'redux';
 
 import { reducer as reduxForm } from 'redux-form';
 
+import { languageReducer } from './languageReducer';
 import { userDataReducer } from  './userData';
 import { ownerInfoReducer } from './ownerInfo';
 import { selectedBookFromBrowseReducer } from  './selectedBookFromBrowse';
@@ -24,6 +25,7 @@ import { genresReducer } from './genresReducer';
 
 export default combineReducers(
     {
+        language: languageReducer,
         pusher: pusherReducer,
         sentry: sentryReducer,
         genres: genresReducer,

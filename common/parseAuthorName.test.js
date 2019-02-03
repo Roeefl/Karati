@@ -1,8 +1,8 @@
 const parseAuthorName = require('./parseAuthorName');
 
-let authorName = 'Tolkien';
+const authorName = 'Tolkien';
 
-let bookMock = {
+const bookMock = {
     authors: {
         author: [
             {
@@ -18,4 +18,3 @@ test('Parse author name from book object', () => {
       parseAuthorName(bookMock)
     ).toEqual(authorName);
 });
-
