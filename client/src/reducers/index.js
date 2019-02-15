@@ -5,20 +5,30 @@ import { reducer as reduxForm } from 'redux-form';
 import { languageReducer } from './languageReducer';
 import { userDataReducer } from  './userData';
 import { ownerInfoReducer } from './ownerInfo';
-import { selectedBookFromBrowseReducer } from  './selectedBookFromBrowse';
-import { bookSearchReducer } from './bookSearch';
 import { myShelfReducer } from './myShelf';
 import { feedsReducer } from './feeds';
-import { booksReducer } from './books';
-import { myMatchesReducer } from './myMatches';
-import { myProposalsReducer } from './myProposals';
-import { selectBookFromMongoReducer } from './selectBookFromMongo';
-import { retrieveBookFromGoodreadsReducer } from './retrieveBookFromGoodreads';
+
+import {
+    booksReducer,
+    retrieveBookFromGoodreadsReducer,
+    selectedBookFromBrowseReducer,
+    selectBookFromMongoReducer,
+    bookSearchReducer
+} from './books';
+
+import {
+    myMatchesReducer,
+    matchesWithUserReducer
+} from './matches';
+
+import {
+    myProposalsReducer,
+    currentProposalReducer
+} from './proposals';
+
 import { swipeHistoryReducer } from './swipeHistory';
-import { matchesWithUserReducer } from './matchesWithUser';
 import { currentComponentReducer } from './currentComponent';
 import { swapJustProposedReducer } from './swapJustProposed';
-import { currentProposalReducer } from './currentProposalReducer';
 import { pusherReducer } from './pusherReducer';
 import { sentryReducer } from './sentryReducer';
 import { genresReducer } from './genresReducer';

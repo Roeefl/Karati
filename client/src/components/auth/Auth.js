@@ -2,8 +2,8 @@ import './Auth.css';
 
 import React from 'react';
 
-import HeaderMenu from './HeaderMenu';
-import NotificationButton from './shared/NotificationButton';
+import HeaderMenu from '../header/HeaderMenu';
+import NotificationButton from '../shared/NotificationButton';
 
 const methodConfig = {
     google: {

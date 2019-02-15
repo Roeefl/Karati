@@ -11,7 +11,10 @@ class HeaderMenu extends React.Component {
         });
 
         return (
-            <Dropdown text={this.props.title} className="item header-menu">
+            <Dropdown
+                icon={false}
+                text={this.props.title}
+                className="item header-menu">
                 <Dropdown.Menu>
                     {items}
                 </Dropdown.Menu>

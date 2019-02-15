@@ -1,6 +1,7 @@
 const sgMail = require('@sendgrid/mail');
 
 class Mailer { 
+    
     constructor(subject, recipients, content) {
         sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 

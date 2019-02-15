@@ -24,6 +24,14 @@ const locale = {
         nearby: {
           button: 'להחלפה מסביבי'
         },
+        explore: {
+          browse: 'דפדוף',
+          swipe: 'החלקה'
+        },
+        header: {
+          explore: 'ספרים להחלפה מסביבי',
+          myStuff: 'שאר העניינים'
+        },
         preview: {
           myShelf: {
             primary: 'החליפו ספרים שכבר קראתם במקום שיעלו אבק',
@@ -56,6 +64,14 @@ const locale = {
         },
         nearby: {
           button: 'Books Nearby'
+        },
+        explore: {
+          browse: 'Browse',
+          swipe: 'Swipe'
+        },
+        header: {
+          explore: 'Explore Books Around You',
+          myStuff: 'My Stuff'
         },
         preview: {
           myShelf: {

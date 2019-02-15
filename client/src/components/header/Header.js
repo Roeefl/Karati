@@ -3,16 +3,16 @@ import './Header.css';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import withLanguage from './withLanguage';
-import { getString } from '../locale';
-import { swapLanguage } from '../actions';
+import withLanguage from '../withLanguage';
+import { getString } from '../../locale';
+import { swapLanguage } from '../../actions';
 
-import Auth from './Auth';
+import Auth from '../auth/Auth';
 
 import HeaderMenu from './HeaderMenu';
 
-import icon64 from '../icons/64.png';
-import * as icons from '../config/icons';
+import icon64 from '../../icons/64.png';
+import * as icons from '../../config/icons';
 
 class Header extends React.Component {
     swapLanguage = () => {
@@ -27,18 +27,18 @@ class Header extends React.Component {
         const links = [
             {
                 to: '/books/browse',
-                text: 'Browse Books',
+                text: getString(this.props.language, 'explore.browse'),
                 icon: icons.BROWSE
             },
             {
                 to: '/books/swipe',
-                text: 'Swipe',
+                text: getString(this.props.language, 'explore.swipe'),
                 icon: icons.SWIPE
             }
         ];
 
         return (
-            <HeaderMenu title='Explore Books Around You' links={links}/>
+            <HeaderMenu title={getString(this.props.language, 'header.explore')} links={links}/>
         );
     }
 
@@ -103,8 +103,7 @@ class Header extends React.Component {
     }
 }
 
-function mapStateToProps(state) {
-    // console.log(state.userData);    
+function mapStateToProps(state) { 
     return {
         userData: state.userData
     }

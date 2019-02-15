@@ -6,8 +6,8 @@ import './App.css';
 import withLanguage from './withLanguage';
 import { getString } from '../locale';
 
-import Header from './Header';
-import Footer from './Footer';
+import Header from './header/Header';
+import Footer from './footer/Footer';
 
 import Book from './books/Book';
 
@@ -30,9 +30,9 @@ import MatchesWithUser from './matches/MatchesWithUser';
 import Browse from './books/Browse';
 import Swipe from './books/Swipe';
 
-import FrontPage from './FrontPage';
-import Intro from './Intro';
-import CompHeader from './CompHeader';
+import FrontPage from './frontpage/FrontPage';
+import Intro from './frontpage/Intro';
+import CompHeader from './header/CompHeader';
 
 class App extends React.Component {
     componentDidMount() {

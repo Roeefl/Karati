@@ -1,13 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { updateMyShelf } from '../actions';
+import { updateMyShelf } from '../../actions';
 
 import { Link } from 'react-router-dom';
 
-import SearchBooks from './shelf/SearchBooks';
+import SearchBooks from '../shelf/SearchBooks';
 
-import Message from './shared/Message';
-import ProgressBar from './shared/ProgressBar';
+import Message from '../shared/Message';
+import ProgressBar from '../shared/ProgressBar';
 
 class Intro extends React.Component {
     componentDidMount() {

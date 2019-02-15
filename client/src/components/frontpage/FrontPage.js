@@ -1,21 +1,21 @@
-import React from 'react';
-
-import withLanguage from './withLanguage';
-import { getString } from '../locale';
-
 import './FrontPage.css';
 
+import React from 'react';
+
+import withLanguage from '../withLanguage';
+import { getString } from '../../locale';
+
 import { connect } from 'react-redux'   ;
-import { updateFeeds } from '../actions';
+import { updateFeeds } from '../../actions';
 
 import { Link } from 'react-router-dom';
 
-import Message from './shared/Message';
-import Spinner from './shared/Spinner';
+import Message from '../shared/Message';
+import Spinner from '../shared/Spinner';
 
-import FeedCard from './books/FeedCard';
+import FeedCard from '../books/FeedCard';
 
-import icon256 from '../icons/256.png';
+import icon256 from '../../icons/256.png';
 class FrontPage extends React.Component {
     componentDidMount() {
         this.props.updateFeeds();

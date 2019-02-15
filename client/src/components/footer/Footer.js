@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 
 import Social from './Social';
 
-import icon64 from '../icons/64.png';
+import icon64 from '../../icons/64.png';
 
 class Footer extends React.Component {  
     render() {
