@@ -1,33 +1,35 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import match64 from '../../icons/match/64.png';
+import React from "react";
+import { Link } from "react-router-dom";
+import match64 from "../../icons/match/64.png";
 
 class Notification extends React.Component {
-    notificationClicked = () => {
-        this.props.markNotificationAsSeen(this.props.userId, this.props.data._id);
-    }
+  notificationClicked = () => {
+    const { userId, data, markNotificationAsSeen } = this.props;
 
-    render() {
-        return (
-            <div className={`item ${this.props.data.seen ? 'seen' : 'new'}`}>
-                <div className="ui tiny image">
-                    <img src={match64} alt='match-icon-64' />
-                </div>
-                    <Link to={this.props.data.link} className="enforce-black">
-                        <div className="content">
-                            <div className="header">
-                                {this.props.data.notifType}
-                            </div>
+    markNotificationAsSeen(userId, data._id);
+  };
 
-                            <div className="description" onClick={this.notificationClicked}>
-                                {this.props.data.content}
-                            </div>
-                        </div>
-                    </Link>
-                <div className="ui section divider"></div>
+  render() {
+    const { data } = this.props;
+
+    return (
+      <div className={`item ${data.seen ? "seen" : "new"}`}>
+        <div className="ui tiny image">
+          <img src={match64} alt="match-icon-64" />
+        </div>
+        <Link to={data.link} className="enforce-black">
+          <div className="content">
+            <div className="header">{data.notifType}</div>
+
+            <div className="description" onClick={this.notificationClicked}>
+              {data.content}
             </div>
-        );
-    }
-};
+          </div>
+        </Link>
+        <div className="ui section divider" />
+      </div>
+    );
+  }
+}
 
 export default Notification;

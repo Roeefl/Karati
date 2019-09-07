@@ -1,0 +1,8 @@
+.top-header .ui.labeled.icon.button.dropdown {
+  padding-left: 3em !important;
+  margin-left: 1em !important;
+}
+
+.top-header .ui.labeled.icon.button.dropdown > i {
+  padding-left: 1em;
+}

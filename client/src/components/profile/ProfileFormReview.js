@@ -8,77 +8,67 @@ import { submitProfileForm } from '../../actions';
 import Spinner from '../shared/Spinner';
 
 class ProfileFormReview extends React.Component {
-    state = {
+  state = {
+    submitting: false
+  };
+
+  submitForm = () => {
+    this.setState({
+      submitting: true
+    });
+
+    this.props.submitProfileForm(this.props.formValues, this.props.history);
+  };
+
+  componentWillUpdate() {
+    if (this.state.submitting) {
+      this.setState({
         submitting: false
-    };
+      });
+    }
+  }
 
-    submitForm = () => {
-        this.setState({
-            submitting: true
-        });
-
-        this.props.submitProfileForm(this.props.formValues, this.props.history);
+  render() {
+    if (this.state.submitting) {
+      return <Spinner message="Updating your info..." />;
     }
 
-    componentWillUpdate() {
-        if (this.state.submitting) {
-            this.setState({
-                submitting: false
-            });
-        };
-    }
+    const reviewFields = formFields.map(field => {
+      return (
+        <div key={field.name}>
+          <div className="header">{field.label}</div>
+          <div className="content">{this.props.formValues[field.name]}</div>
+        </div>
+      );
+    });
 
-    render() {
-        if (this.state.submitting) {
-            return (
-                <Spinner message="Updating your info..."/>
-            );
-        }
+    return (
+      <div>
+        <h3>Please review your changes</h3>
 
-        const reviewFields = formFields.map( field => {
-            return (
-                <div key={field.name}>
-                    <div className="header">
-                        {field.label}
-                    </div>
-                    <div className="content">
-                        {this.props.formValues[field.name]}
-                    </div>
-                </div>
-            );
-        });
+        {reviewFields}
 
-        return (
-            <div>
-                <h3>Please review your changes</h3>
+        <button className="ui red button" onClick={this.props.cancelReview}>
+          Go Back
+        </button>
 
-                {reviewFields}
-
-                <button
-                    className="ui red button"
-                    onClick={this.props.cancelReview}>
-                    Go Back
-                </button>
-
-                <button
-                    className="ui primary button"
-                    onClick={this.submitForm} >
-                    Update my Info
-                </button>
-            </div>
-        );
-    }
+        <button className="ui primary button" onClick={this.submitForm}>
+          Update my Info
+        </button>
+      </div>
+    );
+  }
 }
 
 function mapStateToProps(state) {
-    console.log(state);
+  console.log(state);
 
-    return {
-        formValues: state.form.profileForm.values
-    }
-};
+  return {
+    formValues: state.form.profileForm.values
+  };
+}
 
 export default connect(
-    mapStateToProps, 
-    { submitProfileForm }
+  mapStateToProps,
+  { submitProfileForm }
 )(withRouter(ProfileFormReview));

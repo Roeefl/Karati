@@ -1,3 +1,8 @@
 .ui.menu .ui.dropdown .menu > .item .icon {
     color: #DB2828;
 }
+
+.top-header.ui.secondary.menu {
+  width: 80%;
+  margin: 0 auto;
+}

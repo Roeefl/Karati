@@ -13,7 +13,6 @@ export const myProposalsReducer = (myProposals = false, action) => {
 
 export const currentProposalReducer = (currentProposal = false, action) => {
     if (action.type === UPDATE_CURRENT_PROPOSAL) {
-        // console.log(action.payload);
         return action.payload;
     }
 

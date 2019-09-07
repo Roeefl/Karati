@@ -5,42 +5,40 @@ import BookCard from './BookCard/BookCard';
 import SwipeBookActions from './SwipeBookActions';
 
 class SwipeContainer extends React.Component {
-    swipeBook = (liked) => {
-        this.props.swipeBook(liked);
-    }
-    
-    render() {
-        let book = this.props.books[0];
-        // let trimmedDesc = book.desc.substring(0, 140);
+  swipeBook = liked => {
+    this.props.swipeBook(liked);
+  };
 
-        return (
-            <div className="ui container">
-                <div>
-                    Fetched {this.props.books.length} Available Matches
-                </div>
+  render() {
+    const { books } = this.props;
+    const book = books[0];
+    // let trimmedDesc = book.desc.substring(0, 140);
 
-                <SwipePreviewBar books={this.props.books} />
+    return (
+      <div className="ui container">
+        <div>Fetched {books.length} Available Matches</div>
 
-                <div className="ui center aligned raised segment container">
-                    <div className="book-card-container">
-                        <BookCard
-                            bookId={book.bookID}
-                            src={book.imageURL}
-                            title={book.title}
-                            author={book.author}
-                            numOfPages={book.numOfPages}
-                            linkTo={'/book/' + book.bookID} />
-                    </div>
+        <SwipePreviewBar books={books} />
 
-                    <div>
-                        Offered for exchange by {book.ownedBy}
-                    </div>
+        <div className="ui center aligned raised segment container">
+          <div className="book-card-container">
+            <BookCard
+              bookId={book.bookID}
+              src={book.imageURL}
+              title={book.title}
+              author={book.author}
+              numOfPages={book.numOfPages}
+              linkTo={'/book/' + book.bookID}
+            />
+          </div>
 
-                    <SwipeBookActions swipeBook={this.swipeBook} />
-                </div>
-            </div>
-        );
-    }
+          <div>Offered for exchange by {book.ownedBy}</div>
+
+          <SwipeBookActions swipeBook={this.swipeBook} />
+        </div>
+      </div>
+    );
+  }
 }
 
 export default SwipeContainer;

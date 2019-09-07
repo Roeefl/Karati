@@ -35,74 +35,89 @@ import Intro from './frontpage/Intro';
 import CompHeader from './header/CompHeader';
 
 class App extends React.Component {
-    componentDidMount() {
-        this.props.fetchUser();
-        this.props.setupUserGeolocation();
-        this.props.setupPusher();
-        this.props.setupSentry();
-    }
+  componentDidMount() {
+    this.props.fetchUser();
+    this.props.setupUserGeolocation();
+    this.props.setupPusher();
+    this.props.setupSentry();
+  }
 
-    render() {
-        return (
-            <div className={`app-container ${this.props.direction}`}>
-                <BrowserRouter>
-                    <div>
-                        <Header />
+  render() {
+    const {
+      userData
+    } = this.props;
 
-                        <main>
-                            <Route exact path="/" component={ () => (
-                                (this.props.userData && !this.props.userData.error && !this.props.userData.passedIntro) ? (
-                                        <Redirect to="/intro" />
-                                    ) : (
-                                        <FrontPage />
-                                    )
-                                )}
-                            />
+    return (
+      <div className={`app-container ${this.props.direction}`}>
+        <BrowserRouter>
+          <div>
+            <Header />
 
-                            <div className="route-container">
+            <main>
+              <Route
+                exact
+                path="/"
+                component={() =>
+                  // userData &&
+                  // !userData.error &&
+                  // !userData.passedIntro ? (
+                  //   <Redirect to="/intro" />
+                  // ) : (
+                    <FrontPage />
+                  // )
+                }
+              />
 
-                                <CompHeader header={this.props.currentComponent} />
+              <div className="route-container">
+                <CompHeader header={this.props.currentComponent} />
 
-                                <Route path="/intro" component={Intro} />
+                <Route path="/intro" component={Intro} />
 
-                                <Route exact path="/myShelf" component={MyShelf} />
-                                <Route exact path="/myShelf/search" component={SearchBooks} />
-                                <Route path="/myShelf/search/book/:bookId" component={SearchBookExpanded} />
+                <Route exact path="/myShelf" component={MyShelf} />
+                <Route exact path="/myShelf/search" component={SearchBooks} />
+                <Route
+                  path="/myShelf/search/book/:bookId"
+                  component={SearchBookExpanded}
+                />
 
-                                <Route exact path="/myMatches" component={MyMatches} />
-                                <Route exact path="/myMatches/:userId" component={MatchesWithUser} />
+                <Route exact path="/myMatches" component={MyMatches} />
+                <Route
+                  exact
+                  path="/myMatches/:userId"
+                  component={MatchesWithUser}
+                />
 
-                                <Route path="/myProfile" component={MyProfile} />
-                                <Route path="/stats" component={Infographics} />
-                                <Route path="/mySettings" component={MySettings} />
+                <Route path="/myProfile" component={MyProfile} />
+                <Route path="/stats" component={Infographics} />
+                <Route path="/mySettings" component={MySettings} />
 
-                                <Route path="/mySwipes" component={MySwipes} />
-                                <Route path="/myProposals" component={MyProposals} />
-                                <Route path="/myWishlist" component={MyWishlist} />
+                <Route path="/mySwipes" component={MySwipes} />
+                <Route path="/myProposals" component={MyProposals} />
+                <Route path="/myWishlist" component={MyWishlist} />
 
-                                <Route path="/books/browse" component={Browse} />
-                                <Route path="/books/swipe" component={Swipe} />
+                <Route path="/books/browse" component={Browse} />
+                <Route path="/books/swipe" component={Swipe} />
 
-                                <Route path="/book/:bookId" component={Book} />
-                            </div>
+                <Route path="/book/:bookId" component={Book} />
+              </div>
+            </main>
 
-                        </main>
-
-                        <Footer />
-                    </div>
-                </BrowserRouter>
-            </div>
-        );
-    }
+            <Footer />
+          </div>
+        </BrowserRouter>
+      </div>
+    );
+  }
 }
 
 function mapStateToProps(state) {
-    return {
-        userData: state.userData,
-        currentComponent: state.currentComponent
-    }
-};
+  return {
+    userData: state.userData,
+    currentComponent: state.currentComponent
+  };
+}
 
 export default connect(
-    mapStateToProps, actions
+  mapStateToProps,
+  actions
 )(withLanguage(App));

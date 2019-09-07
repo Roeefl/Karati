@@ -4,88 +4,84 @@ import { connect } from 'react-redux';
 import { selectBookFromBrowsing } from '../../actions';
 
 import BrowseFilter from './BrowseFilter';
-import BookCard from './BookCard/BookCard';
+import BookCard from '../books/BookCard';
 
 import './BrowseContainer.css';
 
 class BrowseContainer extends React.Component {
-    state = {  
-        filter: false
-    }
+  state = {
+    filter: false
+  };
 
-    selectBook = (bookId) => {
-        let currBook = this.props.books.find( book => 
-            book.bookID === bookId
-        );
+  selectBook = bookId => {
+    let currBook = this.props.books.find(book => book.bookID === bookId);
 
-        console.log(currBook);
-        if (!currBook)
-            return;
+    console.log(currBook);
+    if (!currBook) return;
 
-        this.props.selectBookFromBrowsing(currBook);
-    }
+    this.props.selectBookFromBrowsing(currBook);
+  };
 
-    onSelectGenre = (genre) => {
-        console.log(genre);
+  onSelectGenre = genre => {
+    console.log(genre);
 
-        this.setState({
-            filter: (genre.length > 1 ? genre : false)
-        })
-    }
+    this.setState({
+      filter: genre.length > 1 ? genre : false
+    });
+  };
 
-    render() {
-        const books = this.props.books.map( book => {
-            // console.log(book);
+  render() {
+    const books = this.props.books.map(book => {
+      // console.log(book);
 
-            // let trimmedDesc = book.desc.substring(0, 200);
+      // let trimmedDesc = book.desc.substring(0, 200);
 
-            let isHidden = (this.state.filter ? 'hidden' : 'shown');
-            if (this.state.filter) {
-                if (book.genres.includes(this.state.filter)) {
-                    isHidden = 'shown';
-                }
-            }
+      let isHidden = this.state.filter ? 'hidden' : 'shown';
+      if (this.state.filter) {
+        if (book.genres.includes(this.state.filter)) {
+          isHidden = 'shown';
+        }
+      }
 
-            // console.log(`key: ${book.ownerID}_${book.bookID}`);
-            return (
-                <div className={`book-card-container four wide column ${isHidden}`} key={`${book.ownerID}_${book.bookID}`}>
-                    <BookCard
-                        bookId={book.bookID}
-                        src={book.imageURL}
-                        title={book.title}
-                        author={book.author}
-                        numOfPages={book.numOfPages}
-                        linkTo={'/book/' + book.bookID}
-                        selectBook={this.selectBook} />
-                        
-                    <div>
-                        Offered for exchange by {book.ownedBy}
-                    </div>
-                </div>
-            );
-        });
+      // console.log(`key: ${book.ownerID}_${book.bookID}`);
+      return (
+        <div
+          className={`book-card-container four wide column ${isHidden}`}
+          key={`${book.ownerID}_${book.bookID}`}
+        >
+          <BookCard
+            bookId={book.bookID}
+            src={book.imageURL}
+            title={book.title}
+            author={book.author}
+            numOfPages={book.numOfPages}
+            linkTo={'/book/' + book.bookID}
+            selectBook={this.selectBook}
+          />
 
-        return (
-            <div className="browse-container">
-                <BrowseFilter onSelectGenre={this.onSelectGenre} />
+          <div>Offered for exchange by {book.ownedBy}</div>
+        </div>
+      );
+    });
 
-                <div className="ui container grid">
-                    {books}    
-                </div>
-            </div>
-        );
-    }
+    return (
+      <div className="browse-container">
+        <BrowseFilter onSelectGenre={this.onSelectGenre} />
+
+        <div className="ui container grid">{books}</div>
+      </div>
+    );
+  }
 }
 
-
 function mapStateToProps(state) {
-    return {
-        userData: state.userData,
-        books: state.books
-    }
-};
+  return {
+    userData: state.userData,
+    books: state.books
+  };
+}
 
 export default connect(
-    mapStateToProps,
-    { selectBookFromBrowsing }
+  mapStateToProps,
+  { selectBookFromBrowsing }
 )(BrowseContainer);

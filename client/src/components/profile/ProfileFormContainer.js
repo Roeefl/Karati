@@ -28,23 +28,18 @@ class ProfileFormContainer extends React.Component {
     }
 
     renderForm() {
-        if (this.state.step === 0) {
+        if (this.state.step === 0)
             return (
                 <div className="ui violet primary button" onClick={this.showForm}>
                     Customize my Profile
                 </div>
             );
-        }
 
-        if (this.state.step === 1) {
-            return (
-                <ProfileForm cancelForm={this.cancelForm} showReview={this.showReview} />
-            )
-        }
+        if (this.state.step === 1)
+            return <ProfileForm cancelForm={this.cancelForm} showReview={this.showReview} />;
 
-        return (
-            <ProfileFormReview cancelReview={this.showForm}/>
-        )
+        return <ProfileFormReview cancelReview={this.showForm}/>;
+
     }
 
     render() {

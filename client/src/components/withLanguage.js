@@ -10,10 +10,10 @@ export default (ChildComponent) => {
     }
 
     function mapStateToProps(state) {
+        const { language } = state;
         return {
-            language: state.language,
-            direction: (state.language === DEFAULT ? 'ltr' : 'rtl')
-
+            language,
+            direction: (language === DEFAULT ? 'ltr' : 'rtl')
         };
     };
 
