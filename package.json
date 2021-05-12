@@ -23,7 +23,7 @@
     "axios": "^0.18.0",
     "body-parser": "^1.18.3",
     "bulma": "^0.7.2",
-    "chart.js": "^2.7.3",
+    "chart.js": "^2.9.4",
     "concurrently": "^4.1.0",
     "connect-ensure-login": "^0.1.1",
     "connect-mongo": "^2.0.3",
