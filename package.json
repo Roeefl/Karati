@@ -33,7 +33,7 @@
     "dotenv": "^6.1.0",
     "ejs": "^2.6.1",
     "event-stream": "^3.3.4",
-    "express": "^4.16.4",
+    "express": "^4.17.3",
     "express-session": "^1.15.6",
     "geolib": "^2.0.24",
     "goodreads-api-node": "0.0.10",
